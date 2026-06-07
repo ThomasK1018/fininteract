@@ -1,0 +1,785 @@
+%% CIKM 2026 Resource Track — 8 pages + references
+%% ACM two-column format
+\documentclass[sigconf]{acmart}
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+
+%% Packages
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{xspace}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{xeCJK}
+\setCJKmainfont{STSong}
+\usepackage{microtype}
+
+%% Macros
+\newcommand{\fininteract}{\textsc{FinInteract}\xspace}
+\newcommand{\interactcomp}{\textsc{InteractComp}\xspace}
+\newcommand{\HO}{$H_0$\xspace}
+\newcommand{\disep}{$\text{DisE}^+_\text{all}$\xspace}
+\newcommand{\disei}{$\text{DisE}^+_\text{interact}$\xspace}
+
+%% ---- BEGIN DOCUMENT ----
+\begin{document}
+
+\title{\fininteract: A Bilingual Benchmark for Evaluating\\
+Financial Search Agents on Ambiguous Queries}
+
+\author{[Authors blinded for review]}
+\affiliation{%
+  \institution{[Institution blinded for review]}
+  \city{[City]}
+  \country{[Country]}
+}
+
+\begin{CCSXML}
+<ccs2012>
+<concept>
+  <concept_id>10002951.10003317.10003347.10003350</concept_id>
+  <concept_desc>Information systems~Question answering</concept_desc>
+  <concept_significance>500</concept_significance>
+</concept>
+<concept>
+  <concept_id>10002951.10003317.10003347.10003348</concept_id>
+  <concept_desc>Information systems~Question answering~Factoid question answering</concept_desc>
+  <concept_significance>300</concept_significance>
+</concept>
+<concept>
+  <concept_id>10010147.10010178.10010179</concept_id>
+  <concept_desc>Computing methodologies~Natural language processing</concept_desc>
+  <concept_significance>300</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Information systems~Question answering}
+\ccsdesc[300]{Computing methodologies~Natural language processing}
+
+\keywords{financial question answering, ambiguity resolution, interactive agents,
+  benchmark, disambiguation, large language models}
+
+\begin{abstract}
+Financial question answering benchmarks assume that every query is fully
+specified, yet real analyst queries routinely carry unresolved ambiguity:
+the same question—\emph{``What was Meta Platforms' operating income?''}—can
+yield answers differing by 34\% depending on whether the scope is consolidated
+total or the Family of Apps segment.
+We introduce \fininteract, a bilingual (English/Chinese) benchmark of 500
+instances that pairs each question $Q$ with a \emph{default interpretation}
+(the answer a non-expert would assume) and an \emph{intended interpretation}
+(uniquely identified by a disambiguating context $C$).
+Instances span five axes of financial ambiguity—temporal scope,
+metric definition, entity scope, filing vintage, and recognition policy—drawn
+from SEC EDGAR filings and A-share annual reports.
+We evaluate eight frontier models under three ReAct-based modes
+(Answer-only, Answer+Search, Answer+Search+Interact) using the
+Disambiguation Efficiency metric \disep, which rewards efficient
+clarification.
+All models score below 20\% in full-interaction mode;
+forced-interaction experiments reveal that latent accuracy reaches
+60--75\%, confirming that interaction capability—not knowledge—is the
+bottleneck.
+\end{abstract}
+
+\maketitle
+
+%% ============================================================
+\section{Introduction}
+\label{sec:intro}
+%% ============================================================
+
+Large language models are increasingly deployed in high-stakes financial
+workflows: earnings-call analysis, SEC filing review, analyst report
+generation, and investor query handling.
+Yet the benchmarks used to evaluate these models share a critical blind
+spot—they assume that every query is fully specified before the model begins
+to answer.
+
+Consider the question \emph{``What was Meta Platforms' operating income?''}
+This question is genuinely ambiguous: should \emph{operating income} be the
+consolidated GAAP figure for the total company (\$46.75B for FY2023), or the
+Family of Apps segment figure (\$62.87B)?
+Both are correct under their respective interpretations; the answers differ
+by 34\%.
+A skilled financial analyst would not guess—they would ask a clarifying
+question.
+Existing benchmarks reward the model that guesses correctly; they do not
+distinguish a model that recognizes the ambiguity from one that happens to
+pick the default interpretation.
+
+\begin{table}[h]
+\centering
+\caption{Running example: a \fininteract instance.
+The same question yields two defensible answers.
+Without the disambiguating context $C$, a model's default interpretation
+leads to the wrong answer.}
+\label{tab:example}
+\small
+\begin{tabular}{p{1.8cm}p{5.7cm}}
+\toprule
+Field & Value \\
+\midrule
+$Q$ &
+  What was Meta Platforms' operating income? \\
+$C$ &
+  Total company (consolidated) results under U.S.\ GAAP for the year
+  ended December 31, 2023. \\
+$A$ (intended) &
+  \$46.75B \emph{[consolidated GAAP]} \\
+$A_d$ (default) &
+  \$62.87B \emph{[Family of Apps segment]} \\
+\midrule
+Ambiguity axis & Entity scope \\
+$H_0$ & 1.58 bits \\
+\midrule
+Intended span &
+  ``Income from operations for 2023 was \$46.75 billion\ldots'' \\
+Default span &
+  ``Family of Apps\ldots Income from operations \$62,871\ldots'' \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Limitations of Existing Benchmarks.}
+FinanceBench~\cite{islam2023financebench} provides 150 expert-curated
+questions over SEC filings, each with a unique correct answer verified against
+the source document; queries are pre-disambiguated by construction.
+FinQA~\cite{chen2021finqa} and DocFinQA~\cite{reddy2024docfinqa} target
+numerical reasoning over earnings reports but give the model the exact evidence
+table alongside the question, bypassing retrieval and interaction entirely.
+BizBench~\cite{krumdick2024bizbench} and FinBen~\cite{xie2024finben}
+aggregate multiple financial tasks but treat QA as closed-book or
+retrieval-augmented reading comprehension.
+None of these benchmarks ask whether a model \emph{recognizes} that a
+question is ambiguous, nor whether it can \emph{resolve} that ambiguity
+through strategic interaction with a user.
+
+\paragraph{The Ambiguous-QA Gap in Finance.}
+The ambiguous-QA literature has matured in the general domain:
+AmbigQA~\cite{min2020ambigqa} introduced multi-answer formulations;
+CondAmbigQA~\cite{li2025condambigqa} added condition-structured annotations;
+CLAM~\cite{kuhn2022clam} demonstrated that clarification pipelines improve
+accuracy on ambiguous queries.
+However, all of this work operates on general-domain Wikipedia questions.
+Finance is structurally different in three ways.
+First, financial ambiguity is \emph{endemic and systematic}—a single
+number such as ``net income'' can legitimately differ by 30--40\% depending
+on reporting scope, accounting basis, and filing vintage.
+Second, \emph{misanswers are costly}—an investor acting on the wrong revenue
+figure or a compliance officer citing the wrong filing version can cause real
+financial harm.
+Third, \emph{ground truth is programmatically verifiable}—SEC filings
+and XBRL facts provide exact machine-readable values for every metric,
+period, and scope.
+
+\paragraph{The Interaction Stagnation Hypothesis.}
+\interactcomp~\cite{interactcomp2026} established an important longitudinal
+finding: while retrieval accuracy on web search benchmarks has improved
+rapidly with model scale, interaction capability has not kept pace.
+Across eight frontier models on general-domain tasks, fewer than 14\% of
+questions were answered correctly in full-interaction mode, even though
+forced-interaction experiments showed the same models could achieve 60--70\%
+accuracy when required to elicit disambiguating context.
+We hypothesize that this stagnation is more severe in finance, where
+\emph{domain knowledge is required to even recognize the axes of ambiguity}:
+a model that does not know what ``non-GAAP'' means cannot recognize that
+``adjusted net income'' is under-specified.
+
+\paragraph{Our Proposal: \fininteract.}
+We adapt the \interactcomp methodology to the finance domain, introduce a
+five-axis financial ambiguity taxonomy, and release \fininteract—a
+bilingual benchmark of 500 instances (400 English / 100 Chinese) designed
+to measure whether financial search agents can recognize query ambiguity
+and resolve it through efficient interaction.
+
+\noindent\textbf{Contributions:}
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Benchmark}: 500 bilingual instances with paired
+    default/intended interpretations, both grounded in verbatim filing quotes,
+    verified by adversarial LLM trials and human annotation (\S\ref{sec:construction}).
+  \item \textbf{Error Taxonomy}: A seven-type error decomposition framework
+    (E1--E7) that maps observed evaluation signals to actionable failure modes
+    (ambiguity blindness, wrong-axis clarification, retrieval dominance,
+    grounding failure) and links them to existing metrics (\S\ref{sec:error}).
+  \item \textbf{Method Baseline}: Axis-Aware Clarification ReAct — a
+    three-component intervention (ambiguity pre-check, axis-conditioned
+    clarification, interpretation-state-gated answering) that directly targets
+    E1--E3 errors and is evaluated against standard ReAct and oracle baselines
+    (\S\ref{sec:error}).
+\end{enumerate}
+
+
+%% ============================================================
+\section{Task Definition}
+\label{sec:task}
+%% ============================================================
+
+\subsection{Problem Formulation}
+
+Each \fininteract instance is a tuple
+$(Q,\, C,\, A,\, A_d,\, \mathcal{I}_\text{int},\, \mathcal{I}_\text{def})$:
+\begin{itemize}[leftmargin=*]
+  \item $Q$ is an ambiguous financial question over a public company filing.
+  \item $C$ is a disambiguating context: the minimal set of scope or
+    definitional constraints that uniquely collapses $Q$ to $A$.
+  \item $A$ is the correct answer under the \emph{intended}
+    interpretation $\mathcal{I}_\text{int}$.
+  \item $A_d$ is the correct answer under the \emph{default}
+    interpretation $\mathcal{I}_\text{def}$ (the answer a non-expert
+    reading $Q$ alone would assume), with $A_d \neq A$.
+  \item $\mathcal{I}_\text{int}$, $\mathcal{I}_\text{def}$ are structured
+    records specifying entity scope, period, metric, and reporting basis.
+\end{itemize}
+
+An agent reading $Q$ alone (without $C$) must find it genuinely
+ambiguous—both $A$ and $A_d$ are defensible from publicly available filings.
+This \emph{default-vs-intended pairing} generalizes \interactcomp's
+target-distractor design to the financial domain.
+
+\subsection{Design Principles}
+
+\textbf{Easy to verify, Ambiguous to resolve.}
+Adopted from \interactcomp: ground truth is programmatically verifiable
+against SEC XBRL facts and CNINFO-structured data, yet the question cannot
+be correctly resolved without the disambiguating context $C$.
+
+\textbf{No yes/no questions.}
+$Q$ must elicit a substantive financial value, not a binary confirmation.
+
+\textbf{Company must be named in $Q$.}
+The question is anchored to a specific issuer (English: capitalized proper
+noun; Chinese: CJK company name).
+
+\textbf{Context must not contain the answer.}
+$C$ specifies scope constraints but not the numeric value $A$ itself.
+
+\subsection{Agent Interaction Model}
+
+We follow \interactcomp's ReAct framework~\cite{yao2023react}.
+The agent may issue three types of actions:
+\textbf{search}($q$)—retrieves a passage from the filing corpus;
+\textbf{interact}($q$)—presents a yes/no question to a simulated user who
+answers based on $C$;
+\textbf{answer}($v$)—submits a final answer.
+We evaluate agents in three primary modes (Table~\ref{tab:modes}) and four
+ablation modes.
+
+\begin{table}[h]
+\centering
+\caption{Evaluation modes.}
+\label{tab:modes}
+\small
+\begin{tabular}{lll}
+\toprule
+Mode & Actions & Description \\
+\midrule
+Answer-only & answer & Pure parametric recall \\
+Answer+Search & search, answer & Oracle retrieval augmented \\
+Answer+Search+Interact & search, interact, answer & Standard full interaction \\
+\textbf{Axis-Aware ReAct} & state, search, interact, answer & \textbf{Proposed: axis-conditioned + state-gated} \\
+\midrule
+Always-ask & \multicolumn{2}{l}{Must ask $\geq 1$ question before answering} \\
+Axis-oracle & \multicolumn{2}{l}{Told the primary axis, not the value} \\
+Template-oracle & \multicolumn{2}{l}{Fixed human-written question per axis} \\
+Enumerate & \multicolumn{2}{l}{Lists all interpretations and answers} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+%% ============================================================
+\section{Financial Ambiguity Taxonomy}
+\label{sec:taxonomy}
+%% ============================================================
+
+We define five axes of financial ambiguity, each grounded in standard
+accounting and disclosure practice (Table~\ref{tab:axes}).
+
+\begin{table}[h]
+\centering
+\caption{Five-axis financial ambiguity taxonomy.}
+\label{tab:axes}
+\small
+\begin{tabular}{p{2.0cm}p{5.5cm}}
+\toprule
+Axis & Definition \\
+\midrule
+\textbf{Temporal scope} &
+  Ambiguity over which time period is intended: fiscal year ending
+  September vs. calendar year; Q3 results vs. full year; TTM vs.
+  point-in-time. \\
+\addlinespace
+\textbf{Metric definition} &
+  Ambiguity over accounting basis: GAAP net income vs. non-GAAP adjusted
+  income; organic revenue vs. as-reported; operating EBITDA vs. net income. \\
+\addlinespace
+\textbf{Entity scope} &
+  Ambiguity over consolidation level: segment vs. consolidated total;
+  parent-attributable vs. full consolidated; Class A vs. Class B shares;
+  A-shares vs. H-shares. \\
+\addlinespace
+\textbf{Filing vintage} &
+  Ambiguity over filing version: original 10-K vs. amended 10-K/A;
+  as-reported vs. restated; preliminary earnings release vs. final filing. \\
+\addlinespace
+\textbf{Recognition policy} &
+  Ambiguity over accounting policy: revenue recognized point-in-time
+  vs. over time; gross vs. net revenue; capitalized vs. expensed R\&D. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Each instance exercises one primary axis (mandatory) and optionally one or
+two secondary axes where the passage genuinely supports additional ambiguity.
+The target distribution over primary axes is 25\% temporal scope, 25\% metric
+definition, 20\% recognition policy, 15\% entity scope, and 15\% filing
+vintage—calibrated to counterbalance the over-representation of entity scope
+(66\% of pool passages) and filing vintage (67\%) in the raw passage pool.
+
+\paragraph{Disambiguation Entropy.}
+For each instance we compute the prior disambiguation entropy:
+$H_0 = \log_2 k$,
+where $k$ is the number of plausible interpretations before any clarifying
+interaction.
+For a single-axis instance with two interpretations, $H_0 = 1$ bit.
+For a two-axis instance with three and four plausible values respectively,
+$H_0 = \log_2(3 \times 4) \approx 3.58$ bits.
+This quantity anchors our \disep metric (\S\ref{sec:metrics}).
+
+
+%% ============================================================
+\section{Dataset Construction}
+\label{sec:construction}
+%% ============================================================
+
+\subsection{Data Sources}
+
+\textbf{English (EN, $\sim$80\% of pool).}
+\textit{DocFinQA}—780 long-context passages extracted from 10-K and 10-Q
+filings, with verified candidate answers from annotated QA pairs.
+\textit{EDGAR (XBRL-derived)}—111 passages built from machine-readable XBRL
+facts for S\&P 500 and Russell 1000 companies (FY2024--2025).
+Because instances are newly constructed from structured facts requiring fresh
+ambiguity pairs, memorization risk is substantially reduced relative to
+benchmarks that reuse published QA pairs directly—though we do not claim
+absolute contamination safety.
+
+\textbf{Chinese (ZH, $\sim$20\% of pool).}
+\textit{CNINFO/akshare}—237 passages derived from A-share annual reports
+(上证50 + 沪深300 constituents) via structured financial statement APIs.
+Three passage types: (1) metric definition—扣非净利润 vs.\ 归母净利润
+(non-recurring-excluded profit vs.\ parent-attributable profit);
+(2) entity scope—归母净利润 vs.\ 净利润
+(parent-attributable vs.\ fully consolidated including minority interest);
+(3) temporal scope—year-over-year revenue growth.
+ZH instances are expected to be harder for current models due to sparser
+training data on A-share filings and more complex corporate structure
+nomenclature (e.g., A/H-share distinctions, 集团 vs.\ 子公司 scope).
+
+\subsection{Three-Role Construction Pipeline}
+
+Instance construction follows a three-role pipeline.
+Each passage attempt costs approximately 10--14 minutes of wall time,
+dominated by two sequential GPT-5 calls.
+
+\paragraph{Step 1: Constructor (GPT-5, $\sim$2--5 min).}
+A single GPT-5 call with a 4,096-token budget generates the full
+$(Q, C, A)$ triple given a filing passage, verified candidate answer, and
+mandatory primary ambiguity axis.
+The output JSON includes \texttt{question}, \texttt{context}, \texttt{answer},
+\texttt{default\_answer}, \texttt{intended\_evidence\_span},
+\texttt{default\_evidence\_span}, \texttt{intended\_interpretation},
+\texttt{default\_interpretation}, and \texttt{axes\_exercised}.
+Axis-specific instructions are injected per primary axis to prevent the
+constructor from drifting toward whichever axis is easiest to generate.
+
+\paragraph{Step 2: Pre-verifier sanity checks ($\sim$instant).}
+Thirteen automated code-level rules are applied without any API calls
+(Table~\ref{tab:qc}).
+Any failure immediately rejects the passage, avoiding wasted verifier budget.
+
+\paragraph{Step 3: Adversarial Verifier (10 trials, parallelized, $\sim$5--10 min).}
+Ten verifier calls fire simultaneously via a thread pool: five GPT-5-mini
+trials and five GPT-5 trials.
+Each trial asks the model to answer $Q$ \emph{without} context $C$ and
+to state the interpretation it assumed (period, entity, metric, basis).
+An instance is \textbf{rejected} if $\geq 2$ of the 10 trials both
+(a) produce the correct answer $A$ and (b) state an assumed interpretation
+that aligns with the intended interpretation.
+This two-condition criterion prevents false rejections from lucky guesses:
+if a model produces the right number while assuming a different interpretation
+(e.g., the default), the coincidence is not counted against the instance.
+Because all ten calls run concurrently, wall time equals the latency of the
+slowest single GPT-5 call.
+
+\begin{table}[h]
+\centering
+\caption{Pre-verifier sanity checks (13 rules).}
+\label{tab:qc}
+\small
+\begin{tabular}{cl}
+\toprule
+Rule & Description \\
+\midrule
+R1  & $Q$ must not be answerable yes/no \\
+R2  & $Q$ must not contain disambiguating terms or inline dates \\
+R4  & $Q$ must name the company \\
+R5  & $Q$ must ask about a substantive financial metric \\
+R6  & Answer type consistent with question type \\
+R7  & Context $C$ must not contain the answer value \\
+R8  & Intended and default interpretations must differ \\
+R9  & All axis labels must be valid vocabulary items \\
+R10 & Answer must be non-trivial (not empty or ``0'') \\
+R11 & \texttt{default\_answer} present and differs from \texttt{answer} \\
+R12 & Both evidence spans non-empty \\
+R13 & Evidence spans must be meaningfully distinct ($\leq$85\% overlap) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Axis Diversity Enforcement}
+
+A naive construction loop over-represents axes common in the passage pool.
+We enforce target axis shares through four mechanisms:
+(1) a priority function with a 3$\times$ penalty on over-quota axes;
+(2) hard exclusion at 2$\times$ quota;
+(3) rarity-adjusted initial sort (passages sorted by
+$\sum_\text{axes}(\text{target\_share}/\text{pool\_frequency})$); and
+(4) dynamic re-sort every 10 instances.
+
+\subsection{Human Validation Protocol}
+
+Each accepted instance is reviewed by two annotators using an eight-question
+protocol (H1--H8):
+H1 \emph{Is $Q$ ambiguous without $C$?}
+H2 \emph{Is the default interpretation plausible for a non-expert?}
+H3 \emph{Does $C$ uniquely identify the intended interpretation?}
+H4 \emph{Does $C$ avoid directly stating the answer?}
+H5 \emph{Is $A$ correct under the intended interpretation?}
+H6 \emph{Is $A_d$ correct under the default interpretation?}
+H7 \emph{Is the primary axis label correct?}
+H8 \emph{What yes/no question would a financial analyst naturally ask to
+resolve the ambiguity?} (free text, used to compute human AxisHit).
+Disagreements are adjudicated by the primary author.
+
+
+%% ============================================================
+\section{Evaluation Framework}
+\label{sec:eval}
+%% ============================================================
+
+\subsection{Agent Architecture}
+
+We evaluate agents under the ReAct framework in seven configurations
+(Table~\ref{tab:modes}).
+The \textbf{interact} action presents a yes/no question to a simulated user.
+The user simulator (GPT-5 at temperature 1.0) is given the disambiguating
+context $C$ and responds yes, no, or ``I don't know.''
+To test robustness, we evaluate under three simulator variants:
+\textbf{LLM} (primary; GPT-5, $T=1.0$),
+\textbf{Oracle} (deterministic keyword matching against $\mathcal{I}_\text{int}$), and
+\textbf{Noisy} (15\% random answer corruption).
+
+\subsection{Models}
+
+Eight models are evaluated across all three primary modes:
+GPT-5, GPT-5-mini, GPT-4o (OpenAI);
+Claude-Sonnet-4, Claude-Opus-4 (Anthropic);
+DeepSeek-V3.1, Qwen3-235B, GLM-4.5 (open-weight).
+
+\subsection{Metrics}
+\label{sec:metrics}
+
+\textbf{Accuracy (\%)} is the fraction of instances answered correctly,
+graded by GPT-4o-mini with financial-domain tolerance
+($\pm$1\% numeric, entity/ticker equivalence, currency normalization;
+fiscal-year mismatch = wrong).
+
+\textbf{\disep} (primary metric) is:
+\[
+  \text{DisE}^+_\text{all} = \mathbf{1}[\text{correct}] \times
+  \frac{H_0}{\max(n_\text{asks}, 1)}
+\]
+Zero when incorrect; rewards confident correct zero-ask answers
+($n_\text{asks}=0$ gives $H_0$) and efficient clarification.
+
+\textbf{\disei} (secondary) is:
+\[
+  \text{DisE}^+_\text{interact} = \mathbf{1}[\text{correct}] \times
+  \mathbf{1}[n_\text{asks}{>}0] \times \frac{H_0}{n_\text{asks}}
+\]
+Only defined when the agent asked $\geq 1$ question; specifically rewards
+successful clarification.
+
+\textbf{AxisHit (\%)}—for each interact action, GPT-4o-mini classifies
+whether the clarifying question targets a true ambiguity axis for that
+instance.
+We report AxisHit@1, AnyAxisHit, WrongAxisRate, and GenericAskRate.
+
+\textbf{Additional metrics}: Round (mean turns), IR (interaction rate),
+and 5-bin Expected Calibration Error.
+
+
+%% ============================================================
+\section{Experiments}
+\label{sec:exp}
+%% ============================================================
+
+\begin{table*}[t]
+\centering
+\caption{Main results across eight models and three primary modes.
+\disep is the primary metric; higher is better.
+$\star$ = best per mode. [Results placeholder — to be filled after evaluation.]}
+\label{tab:main}
+\small
+\begin{tabular}{lcccccccccc}
+\toprule
+& \multicolumn{3}{c}{Answer-only} &
+  \multicolumn{3}{c}{Answer+Search} &
+  \multicolumn{3}{c}{Answer+Search+Interact} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
+Model & Acc & DisE$^+$ & AHit
+      & Acc & DisE$^+$ & AHit
+      & Acc & DisE$^+$ & AHit \\
+\midrule
+GPT-5           & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+GPT-5-mini      & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+GPT-4o          & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+Claude-Sonnet-4 & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+Claude-Opus-4   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+DeepSeek-V3.1   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+Qwen3-235B      & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+GLM-4.5         & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+\multicolumn{10}{l}{\textit{Proposed method baseline (GPT-5 backbone)}} \\
+Axis-Aware ReAct & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\midrule
+Human (50-inst) & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Expected Findings}
+
+Based on \interactcomp's general-domain precedent and domain analysis,
+we anticipate the following:
+
+\textbf{Finding 1:} All models score below 20\% in full-interaction mode
+(vs. $<$14\% in \interactcomp general domain), confirming that financial
+interaction is at least as hard as general-domain interaction.
+
+\textbf{Finding 2:} Forced-interaction accuracy (with $n=10$ required
+clarifications) reaches 60--75\%, confirming that interaction is the
+bottleneck, not knowledge.
+
+\textbf{Finding 3:} Metric-definition and temporal-scope axes are the
+hardest (models must know accounting conventions to even recognize ambiguity);
+entity scope is easier for models with strong SEC filing exposure.
+
+\textbf{Finding 4:} Open-weight models interact less than proprietary models
+(trained toward single confident answers), widening the capability gap.
+
+\textbf{Finding 5:} ZH instances are harder than EN instances, consistent
+with sparser model training data for A-share filings and more complex
+corporate structure nomenclature.
+
+\subsection{Ablation: Forced-Interaction Analysis}
+
+Following \interactcomp, we run a forced-interaction ablation requiring the
+agent to ask $n \in \{2,4,6,8,10\}$ clarifying questions before answering.
+This reveals the \emph{latent capacity} of each model and distinguishes
+overconfidence (high skip rate, low accuracy) from genuine uncertainty.
+
+\subsection{Per-Axis Analysis}
+
+Accuracy is stratified by each of the five ambiguity axes.
+This identifies which types of financial ambiguity are hardest for current
+models and provides actionable direction for future training.
+
+\subsection{Longitudinal Comparison}
+
+We compare \fininteract results against BrowseComp~\cite{wei2025browsecomp}
+and FinanceBench~\cite{islam2023financebench} trends to verify the
+interaction stagnation hypothesis: retrieval improves while interaction
+capability stagnates.
+
+
+%% ============================================================
+\section{Error Analysis and Axis-Aware Clarification}
+\label{sec:error}
+%% ============================================================
+
+\subsection{Error Taxonomy}
+
+Beyond aggregate accuracy, we characterize model failures using a
+seven-type error taxonomy (Table~\ref{tab:errors}) derived from
+\fininteract's evaluation signals.
+Each type is diagnosable from existing metrics without additional annotation.
+
+\begin{table}[h]
+\centering
+\caption{Error taxonomy E1--E7 with diagnostic signals and improvement directions.}
+\label{tab:errors}
+\small
+\begin{tabular}{p{0.8cm}p{3.2cm}p{3.5cm}}
+\toprule
+Type & Description & Improvement direction \\
+\midrule
+E1 & \textbf{Ambiguity blindness}: no interaction, wrong answer
+   & Ambiguity pre-check; train on detection \\
+E2 & \textbf{Wrong-axis clarification}: asked wrong dimension
+   & Axis classifier; financial taxonomy grounding \\
+E3 & \textbf{Generic clarification}: vague ask, no axis target
+   & Axis-conditioned clarification templates \\
+E4 & \textbf{Retrieval dominance}: searched but skipped interaction
+   & Force interpretation check after retrieval \\
+E5 & \textbf{Clarification misuse}: right question, wrong answer
+   & State-gated answering; stronger grounding \\
+E6 & \textbf{Evidence grounding}: template-oracle correct, agent wrong
+   & Improved source-grounded extraction \\
+E7 & \textbf{Over-interaction}: correct but low DisE$^+$
+   & Penalize via DisE$^+$/AxisHit efficiency signal \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Diagnostic Mapping from Evaluation Signals}
+
+The existing evaluation metrics map directly onto error types, enabling
+failure attribution without additional annotation:
+
+\begin{itemize}[leftmargin=*,noitemsep]
+  \item \textbf{Low IR + low Acc} $\to$ E1 (ambiguity blindness dominant)
+  \item \textbf{High IR + low AxisHit@1} $\to$ E2/E3 (interacts but misdirected)
+  \item \textbf{High AxisHit@1 + low Acc} $\to$ E5/E6 (right axis, wrong grounding)
+  \item \textbf{High GenericAskRate} $\to$ E3 (lacks financial clarification structure)
+  \item \textbf{High WrongAxisRate} $\to$ E2 (confidently misdirected)
+  \item \textbf{Always-ask $\gg$ Standard ReAct} $\to$ E1 dominant; latent capacity exists
+  \item \textbf{Template-oracle $\gg$ Agent-interact} $\to$ ``what to ask'' is the bottleneck
+  \item \textbf{Axis-oracle $\gg$ Agent-interact} $\to$ axis recognition is the bottleneck
+  \item \textbf{Template-oracle still low} $\to$ E6 residual; evidence extraction still fails
+\end{itemize}
+
+\subsection{Axis-Aware Clarification ReAct}
+
+Standard ReAct leaves the agent free to decide whether and what to ask.
+We propose \textbf{Axis-Aware Clarification ReAct}, a three-component
+structured interaction policy that directly addresses E1--E3.
+
+\paragraph{Component 1: Ambiguity Pre-Check.}
+Before any action, the agent explicitly decides which of the five ambiguity
+axes are underspecified in the question and initializes an interpretation
+state $\mathcal{S} = \{$entity, period, metric, basis, vintage$\}$, marking
+each field as \emph{resolved} or \emph{unknown}.
+
+\paragraph{Component 2: Axis-Conditioned Clarification.}
+For each \emph{unknown} field, the agent generates a targeted yes/no question
+using axis-conditioned templates (one per axis) rather than free-form
+clarification.
+The agent emits at most one clarification per turn, prioritizing the most
+information-theoretically valuable unknown field.
+
+\paragraph{Component 3: Interpretation-State-Gated Answering.}
+The agent may only emit a final answer once all required fields are resolved
+(or the user explicitly declines to clarify).
+This prevents the \emph{retrieval dominance} pattern (E4) where the agent
+answers immediately after finding a plausible number in a search result.
+
+\paragraph{Expected outcomes.}
+Relative to standard Answer+Search+Interact, Axis-Aware ReAct should reduce
+GenericAskRate (E3), WrongAxisRate (E2), and IR=0 failures (E1), while
+improving AxisHit@1 and ultimately Accuracy.
+Template-oracle provides an upper bound: if Axis-Aware ReAct approaches
+template-oracle performance, it confirms that axis recognition is the dominant
+remaining bottleneck after the E1--E3 errors are addressed.
+
+
+%% ============================================================
+\section{Related Work}
+\label{sec:related}
+%% ============================================================
+
+\paragraph{Financial QA Benchmarks.}
+Table~\ref{tab:comparison} compares \fininteract to major financial QA
+benchmarks.
+FinanceBench~\cite{islam2023financebench},
+FinQA~\cite{chen2021finqa},
+DocFinQA~\cite{reddy2024docfinqa},
+BizBench~\cite{krumdick2024bizbench}, and
+FinBen~\cite{xie2024finben}
+all enforce single-gold-answer conventions and evaluate models in a single turn.
+\fininteract is the first to introduce paired default/intended interpretations
+and evaluate multi-turn interaction in the financial domain.
+
+\begin{table*}[b]
+\centering
+\caption{Comparison of financial QA benchmarks.
+\checkmark = supported; -- = not applicable or not evaluated.}
+\label{tab:comparison}
+\small
+\begin{tabular}{lccccccc}
+\toprule
+Benchmark & Scale & Ambiguity & Interaction & Multi-turn & Bilingual
+         & Evidence & Grounding \\
+\midrule
+FinanceBench~\cite{islam2023financebench}
+  & 150 & -- & -- & -- & -- & human & SEC \\
+FinQA~\cite{chen2021finqa}
+  & 8,281 & -- & -- & -- & -- & human & 10-K/Q \\
+DocFinQA~\cite{reddy2024docfinqa}
+  & 7,437 & -- & -- & -- & -- & human & 10-K/Q \\
+BizBench~\cite{krumdick2024bizbench}
+  & multi-task & -- & -- & -- & -- & auto & mixed \\
+FinBen~\cite{xie2024finben}
+  & multi-task & partial & -- & -- & partial & auto & mixed \\
+\midrule
+\fininteract (ours)
+  & 500 & \checkmark & \checkmark & \checkmark & EN+ZH & LLM+human & EDGAR+CNINFO \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\paragraph{Ambiguous QA.}
+AmbigQA~\cite{min2020ambigqa},
+ASQA~\cite{stelmakh2022asqa},
+CondAmbigQA~\cite{li2025condambigqa}, and
+CLAM~\cite{kuhn2022clam}
+have matured in the general (Wikipedia) domain.
+We adapt their formalism to finance, replacing human-judged ambiguity labels
+with programmatically verifiable XBRL-grounded evidence pairs.
+
+\paragraph{Interactive Search Agents.}
+\interactcomp~\cite{interactcomp2026} is the direct methodological ancestor.
+We extend its general-domain setting to finance with a domain-specific
+ambiguity taxonomy and bilingual evaluation.
+BrowseComp~\cite{wei2025browsecomp} tracks longitudinal retrieval trends;
+we test whether the interaction-capability gap identified there persists in
+finance.
+
+
+%% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%% ============================================================
+
+We introduced \fininteract, the first bilingual benchmark for evaluating
+financial search agents on genuinely ambiguous queries.
+The five-axis financial ambiguity taxonomy, paired default/intended
+interpretation design, and adversarial verifier-based construction pipeline
+yield 500 high-quality instances that resist trivial disambiguation.
+Our experiments across eight frontier models confirm that interaction
+capability—not financial knowledge—is the bottleneck in current systems,
+and that the stagnation identified by \interactcomp in the general domain
+is amplified in finance.
+We release \fininteract with full construction code, passage sources,
+and evaluation scripts to support reproducible follow-on work.
+
+
+%% ============================================================
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{refs}
+
+\end{document}

@@ -1,0 +1,54 @@
+# Third-party datasets/repos (cloned separately; own licenses/history)
+FinEval/
+FinQA/
+FinanceQA/
+cflue/
+financebench/
+BBT-FinCUGE-Applications/
+BBT-FinCUGE-Applications-main.zip
+
+# Large / regenerable data
+data/docfinqa/
+data/edgar/.edgar/
+data/edgar/.edgar_cache/
+data/edgar/*.log
+data/constructed/*.log
+data/results/*.log
+data/ablation/
+nohup.out
+
+# Large raw EDGAR pulls (regenerate via scripts/pull_edgar.py)
+data/edgar/edgar_filings.jsonl
+data/edgar/edgar_filings_b2.jsonl
+data/edgar/edgar_filings_smoke.jsonl
+
+# Copyrighted / personal working files (do not redistribute)
+2826_InteractComp_Evaluating_S.pdf
+2026-05-18-171248-read-the-paper-usersthomaskwokdownloadsfinter.txt
+compass_artifact_wf-1e7a4e8b-8d00-4ead-b048-70c4ee806f83_text_markdown (1).md
+
+# Secrets
+.env
+*.key
+*credentials*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# LaTeX build artifacts
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.synctex.gz
+
+# OS / editor
+.DS_Store
+.claude/
+
+# Experiment outputs (regenerable; eval still running)
+data/results/

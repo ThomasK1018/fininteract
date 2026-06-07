@@ -1,0 +1,129 @@
+# EDGAR target list — diverse on fiscal-year-end + segment-reporting complexity.
+# Format: TICKER  # rationale
+# Editable: add/remove freely before running pull_edgar.py.
+# Already pulled (skip these to avoid re-downloading):
+#   AAPL ADBE AMZN BA COST F GE GOOGL HPE JNJ JPM KO META MSFT NKE NVDA ORCL PG TSLA WMT XOM
+
+# ============================================================
+# BATCH 2: new tickers only — ~100 additional S&P 500 names
+# Run: python scripts/pull_edgar.py \
+#        --targets data/edgar/target_companies.txt \
+#        --forms 10-K \
+#        --years 2023 2024 2025 \
+#        --out data/edgar/edgar_filings_b2.jsonl
+# Then run: python scripts/extract_edgar_passages.py \
+#        --filings data/edgar/edgar_filings_b2.jsonl \
+#        --out data/sources/edgar_passages_b2.jsonl
+# Then run: python scripts/prepare_passages.py to merge into passages.jsonl
+# ============================================================
+
+# --- Non-calendar FY (strong temporal_scope: FY ≠ CY) ---
+HD      # Home Depot: FY ends late January; Product vs Services split
+LOW     # Lowe's: FY ends late January; Comparable Sales growth
+TGT     # Target: FY ends late January; Digital vs in-store mix
+FDX     # FedEx: FY ends May 31; Express/Ground/Freight segments
+ACN     # Accenture: FY ends August 31; 5 industry segments
+MU      # Micron: FY ends late August; DRAM vs NAND vs other
+BBY     # Best Buy: FY ends late January; Online vs in-store
+DLTR    # Dollar Tree: FY ends late January; Dollar Tree vs Family Dollar segments
+ANF     # Abercrombie: FY ends late January; Abercrombie vs Hollister
+TJX     # TJ Maxx parent: FY ends late January; Marmaxx/HomeGoods/International
+
+# --- Calendar-FY with rich segment reporting (entity_scope + metric_definition) ---
+ABBV    # AbbVie: Aesthetics vs Immunology vs Neuroscience; royalties included/excluded
+LLY     # Eli Lilly: Revenue by product line; royalties gross vs net
+PFE     # Pfizer: Legacy Pfizer vs Paxlovid vs post-spinoff Viatris
+BMY     # Bristol-Myers Squibb: products + royalties; in-line vs new products
+MRK     # Merck: Pharma vs Animal Health; royalties timing
+AMGN    # Amgen: biosimilar vs originator revenue; royalties
+GILD    # Gilead: HIV vs Oncology vs other; royalties recognized vs received
+BIIB    # Biogen: MS vs Alzheimer's segment; collaboration royalties
+REGN    # Regeneron: net product sales vs collaboration revenue
+VRTX    # Vertex: CF franchise; collaboration revenue recognition
+CVX     # Chevron: Upstream vs Downstream; adjusted earnings vs GAAP
+COP     # ConocoPhillips: Segments by geography; adjusted EPS vs GAAP
+SLB     # SLB (Schlumberger): 4 divisions; adjusted EBITDA vs GAAP
+HAL     # Halliburton: Completion/Production vs Drilling; adjusted EPS
+EOG     # EOG Resources: proved reserves vs production; wellhead vs realized price
+DVN     # Devon Energy: Oil/Gas/NGL mix; free cash flow definition
+MPC     # Marathon Petroleum: Refining/Midstream; crack spread vs reported margin
+VLO     # Valero: Refinery throughput margin vs GAAP; segments by region
+PSX     # Phillips 66: Midstream/Chemicals/Refining/Marketing; adjusted EPS
+WMB     # Williams Companies: Transmission vs Gathering vs Processing
+GS      # Goldman Sachs: FICC/Equities/IB/Consumer segments; ROTCE adjusted
+MS      # Morgan Stanley: Wealth/Asset Mgmt/Institutional; net revenue vs GAAP
+BAC     # Bank of America: Consumer/GWIM/Global Banking/Markets; managed basis
+WFC     # Wells Fargo: Consumer Banking/CIB/Wealth segments; efficiency ratio
+C       # Citigroup: Services/Markets/Banking/Wealth segments; adjusted net income
+USB     # US Bancorp: Payments/Consumer/Wealth/CIB segments; ROTCE
+PNC     # PNC Financial: Retail/Corporate/BlackRock; net interest margin
+TFC     # Truist: Consumer/Wholesale/Insurance; adjusted PPNR
+COF     # Capital One: Consumer/Commercial segments; NIM
+AXP     # Amex: US Consumer/Commercial/International services; billed business
+V       # Visa: Consumer vs Commercial payments; net revenues ex-client incentives
+MA      # Mastercard: Net revenues vs gross; transaction volumes
+PYPL    # PayPal: Transaction revenue vs other; active accounts
+SQ      # Block (Square): Square/CashApp/Afterpay; gross profit vs revenue
+UBER    # Uber: Mobility/Delivery/Freight; Adjusted EBITDA vs GAAP
+LYFT    # Lyft: Revenue vs bookings; Contribution vs GAAP
+
+# --- Non-GAAP reporters (strong metric_definition axis) ---
+CRM     # Salesforce: non-GAAP EPS vs GAAP EPS; subscription vs professional services
+ORCL    # Oracle (already pulled — skip)
+NOW     # ServiceNow: subscription vs professional services; non-GAAP adjusted
+SNOW    # Snowflake: product revenue vs total; RPO; non-GAAP operating income
+DDOG    # Datadog: ARR vs revenue; non-GAAP margins
+CRWD    # CrowdStrike: ARR vs revenue; non-GAAP vs GAAP margins
+ZS      # Zscaler: billings vs revenue; non-GAAP margins
+TEAM    # Atlassian: FY ends June 30; cloud vs data center vs server revenue
+WDAY    # Workday: FY ends Jan 31; subscription vs professional services
+INTU    # Intuit: FY ends July; Consumer vs ProConnect vs Small Business segments
+ADSK    # Autodesk: FY ends Jan 31; AEC/MFG/M&E segments; Maintenance vs subscription
+PANW    # Palo Alto: FY ends July; Next-gen security ARR vs total; NGS vs legacy
+FTNT    # Fortinet: Product vs service revenue; adjusted EBITDA definition
+KLAC    # KLA: FY ends June; Semiconductor Process Control vs PCB segments
+LRCX    # Lam Research: FY ends June; Systems vs Customer Support-Related revenue
+AMAT    # Applied Materials: FY ends Oct; Semiconductor Systems vs AGS vs Display
+MKL     # Markel Group: Insurance/Ventures/Investments; combined ratio vs GAAP
+
+# --- Filing vintage / restatement history (filing_vintage axis) ---
+GE      # Already pulled — GE Aerospace post-spinoff restatements
+INTC    # Intel: manufacturing restructuring, goodwill impairments re-filed
+BABA    # Alibaba (NYSE): variable interest entity disclosures; restated segments
+PDD     # PinDuoDuo: annual report restatements
+NFLX    # Netflix: original/restated content amortization disclosures
+DIS     # Disney: post-merger segment restatements (Fox acquisition); streaming vs parks
+SBUX    # Starbucks: FY ends Sept; Americas/International/Channel segments
+MCD     # McDonald's: company-operated vs franchise revenue; Systemwide sales
+NKE     # Already pulled — FY ends May
+CMCSA   # Comcast: Cable/NBCUniversal/Sky — original vs restated Sky acquisition
+T       # AT&T: post-Warner Media spinoff restated; WarnerMedia excluded
+VZ      # Verizon: Consumer vs Business segments; ARPU definitions
+CHTR    # Charter Communications: video/internet/voice subscribers; adjusted EBITDA
+NFLX    # Netflix: paid/free memberships; regional vs global ARM
+PARA    # Paramount: pre/post-Showtime merger restated; Streaming vs Linear
+WBD     # Warner Bros Discovery: post-merger Discovery/Warner; adjusted EBITDA
+
+# --- Recognition policy (revenue recognition: point-in-time vs over-time) ---
+LMT     # Lockheed Martin: long-term contracts; cost-plus vs fixed-price
+RTX     # RTX (Raytheon): Pratt & Whitney/Collins/Raytheon segments; EAC adjustments
+NOC     # Northrop Grumman: Aeronautics/Defense/Mission/Space; % completion method
+GD      # General Dynamics: cost-type vs fixed-price; program accounting
+HII     # Huntington Ingalls: shipbuilding contracts; long-term % completion
+BA      # Already pulled — Boeing program accounting
+CAT     # Caterpillar: equipment vs financial products; ME&T vs Financial Products
+DE      # Deere & Co: FY ends Oct; Equipment vs Financial Services; gross vs retail
+MMM     # 3M: FY ends Dec; Safety/Transportation/Health segments; adjusted EPS
+EMR     # Emerson Electric: FY ends Sept; Automation Solutions vs commercial tools
+ITW     # Illinois Tool Works: 7 segments; organic revenue vs reported
+PH      # Parker Hannifin: FY ends June; Motion/Industrial segments; adjusted EPS
+DOV     # Dover: FY ends Dec; Engineered/Clean Energy/Imaging/Pumping; organic growth
+AME     # Ametek: Electronic/Electromechanical segments; organic vs inorganic growth
+ROK     # Rockwell Automation: Intelligent/Lifecycle segments; ARR vs revenue
+
+# --- Multi-class share companies (entity_scope: share class ambiguity) ---
+GOOGL   # Already pulled — Class A vs Class C
+BRKB    # Berkshire Hathaway: Class A vs B share metrics; insurance/non-insurance
+NWS     # News Corp: Class A vs Class B shares; segments by geography
+FOX     # Fox Corp: Class A vs Class B; Cable vs Television vs Other
+MOGA    # Moog: Class A vs B shares; Aerospace/Defense segments
