@@ -348,7 +348,10 @@ def chat(client: OpenAI, model: str, messages: list[dict],
                     (ml.startswith(("gpt-5", "o1", "o3", "o4")) or "gpt-5" in ml))
     kwargs: dict = {"model": model, "messages": messages}
     if is_reasoning:
-        kwargs["max_completion_tokens"] = max_tokens   # temperature omitted (defaults to 1)
+        # Reasoning models spend tokens on internal reasoning BEFORE producing output;
+        # a small cap (e.g. 1024) gets fully consumed by reasoning -> empty content.
+        # Add generous reasoning headroom on top of the requested output budget.
+        kwargs["max_completion_tokens"] = max_tokens + 4096   # temperature omitted (defaults to 1)
     else:
         kwargs["temperature"] = temperature
         kwargs["max_tokens"] = max_tokens
