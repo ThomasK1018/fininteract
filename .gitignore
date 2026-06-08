@@ -52,3 +52,6 @@ paper/*.synctex.gz
 
 # Experiment outputs (regenerable; eval still running)
 data/results/
+
+# transfer artifacts
+fininteract_flow_results.zip
