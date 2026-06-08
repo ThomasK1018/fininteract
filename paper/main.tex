@@ -530,9 +530,9 @@ and 5-bin Expected Calibration Error.
 
 \begin{table*}[t]
 \centering
-\caption{Main results across eight models and three primary modes.
-\disep is the primary metric; higher is better.
-$\star$ = best per mode. [Results placeholder — to be filled after evaluation.]}
+\caption{Main results across models and three primary modes (Acc \%, \disep,
+and AxisHit@1 in the interact mode). AHit is undefined when no question is asked.
+Remaining models in progress.}
 \label{tab:main}
 \small
 \begin{tabular}{lcccccccccc}
@@ -545,9 +545,9 @@ Model & Acc & DisE$^+$ & AHit
       & Acc & DisE$^+$ & AHit
       & Acc & DisE$^+$ & AHit \\
 \midrule
-GPT-5           & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+GPT-5           & 0.6 & .012 & -- & 6.4 & .110 & -- & \textbf{20.2} & \textbf{.125} & .38 \\
+GPT-4o          & 0.6 & .009 & -- & \textbf{12.1} & \textbf{.206} & -- & 4.6 & .039 & .37 \\
 GPT-5-mini      & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-GPT-4o          & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
 Claude-Sonnet-4 & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
 Claude-Opus-4   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
 DeepSeek-V3.1   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
@@ -562,29 +562,52 @@ Human (50-inst) & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
 \end{tabular}
 \end{table*}
 
-\subsection{Expected Findings}
+\subsection{Findings}
 
-Based on \interactcomp's general-domain precedent and domain analysis,
-we anticipate the following:
+We report results for GPT-5 and GPT-4o across all three modes
+(Table~\ref{tab:main}); the remaining models are in progress. Five findings
+emerge.
 
-\textbf{Finding 1:} All models score below 20\% in full-interaction mode
-(vs. $<$14\% in \interactcomp general domain), confirming that financial
-interaction is at least as hard as general-domain interaction.
+\textbf{Finding 1: Interaction is a capability, not a free lever --- it helps
+the strong model and \emph{harms} the weak one.} Adding interaction raises
+GPT-5 from 6.4\% to 20.2\% ($+13.8$), but \emph{lowers} GPT-4o from 12.1\% to
+4.6\% ($-7.5$). Forcing the weaker model to interact makes it worse than not
+interacting at all. This extends \interactcomp's ``interaction stagnation'' into
+a sharper claim: for models that cannot use it, interaction is actively harmful.
 
-\textbf{Finding 2:} Forced-interaction accuracy (with $n=10$ required
-clarifications) reaches 60--75\%, confirming that interaction is the
-bottleneck, not knowledge.
+\textbf{Finding 2: Model rankings flip with the interaction axis.} GPT-4o
+\emph{outperforms} GPT-5 under pure retrieval (12.1 vs.\ 6.4) yet is
+\emph{dominated} by it under interaction (4.6 vs.\ 20.2). A single-mode benchmark
+would mis-rank these models; the interaction axis is what separates them, which
+is precisely the dimension FinInteract is designed to measure.
 
-\textbf{Finding 3:} Metric-definition and temporal-scope axes are the
-hardest (models must know accounting conventions to even recognize ambiguity);
-entity scope is easier for models with strong SEC filing exposure.
+\textbf{Finding 3: Retrieval cannot substitute for interaction.} Oracle retrieval
+lifts GPT-5 to only 6.4\%: because each disambiguating passage contains
+\emph{both} the intended and default values, retrieval surfaces the ambiguity but
+does not resolve it. Only a targeted clarification collapses the question to a
+unique answer, which interaction (20.2\%) begins to do.
 
-\textbf{Finding 4:} Open-weight models interact less than proprietary models
-(trained toward single confident answers), widening the capability gap.
+\textbf{Finding 4: The weak model's failure is clarification non-integration, not
+inability to ask.} GPT-4o asks readily (IR 99\%, 4.7 questions on average) but
+fails to \emph{integrate} the user's responses: 87\% of its interactive errors
+are non-committal refusals (e.g.\ ``please specify the exact period'') issued
+\emph{after} the simulator has answered. It can recognize ambiguity and ask, but
+cannot close the loop and commit --- a multi-turn integration gap, not a protocol
+artifact (only 2\% produced no answer at all).
 
-\textbf{Finding 5:} ZH instances are harder than EN instances, consistent
-with sparser model training data for A-share filings and more complex
-corporate structure nomenclature.
+\textbf{Finding 5: Models are severely overconfident on ambiguous queries.}
+Expected Calibration Error ranges from 0.53 (GPT-5, interact) to 0.95 (GPT-4o,
+answer-only); models report 85--95\% confidence while answering 0--20\%
+correctly. Both models also ask imprecisely --- AxisHit@1 is only 0.38 (GPT-5)
+and 0.37 (GPT-4o), so even when a model asks, it targets the correct ambiguity
+axis barely a third of the time, motivating the axis-conditioned policy of
+\S\ref{sec:error}.
+
+\paragraph{Difficulty and headroom.} Per-instance accuracy falls monotonically
+with disambiguation entropy $H_0$ (from 10\% at $H_0{=}1$ to under 1\% at
+$H_0{\approx}3.6$), validating $H_0$ as a difficulty proxy; 20 of 173 instances
+are solved by no model in any mode. The best configuration reaches 20.2\%,
+leaving the benchmark far from saturated.
 
 \subsection{Ablation: Forced-Interaction Analysis}
 
