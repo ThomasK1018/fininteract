@@ -1,0 +1,206 @@
+{
+  "gpt-5/answer-only": {
+    "n": 173,
+    "accuracy": 0.0058,
+    "ir_rate": 0.0,
+    "avg_turns": 1,
+    "avg_asks": 0,
+    "axis_hit_rate": null,
+    "axis_hit_at1": null,
+    "any_axis_hit": null,
+    "wrong_axis_rate": null,
+    "generic_ask_rate": null,
+    "per_axis_accuracy": {
+      "entity_scope": 0.0,
+      "temporal_scope": 0.0,
+      "recognition_policy": 0.0,
+      "metric_definition": 0.0093
+    },
+    "per_lang_accuracy": {
+      "en": 0.0189,
+      "zh": 0.0
+    },
+    "mean_dise_plus_all": 0.0116,
+    "median_dise_plus_all": 0.0,
+    "mean_dise_plus_interact": 0.0,
+    "median_dise_plus_interact": 0.0,
+    "mean_dise": 0.0,
+    "median_dise": 0.0,
+    "n_valid": 173,
+    "n_skipped": 0,
+    "by_complexity": {
+      "1": 0.0156,
+      "2": 0.0
+    }
+  },
+  "gpt-5/answer+search": {
+    "n": 173,
+    "accuracy": 0.0636,
+    "ir_rate": 0.0,
+    "avg_turns": 1.77,
+    "avg_asks": 0,
+    "axis_hit_rate": null,
+    "axis_hit_at1": null,
+    "any_axis_hit": null,
+    "wrong_axis_rate": null,
+    "generic_ask_rate": null,
+    "per_axis_accuracy": {
+      "entity_scope": 0.0745,
+      "temporal_scope": 0.0,
+      "recognition_policy": 0.0,
+      "metric_definition": 0.037
+    },
+    "per_lang_accuracy": {
+      "en": 0.0943,
+      "zh": 0.05
+    },
+    "mean_dise_plus_all": 0.1104,
+    "median_dise_plus_all": 0.0,
+    "mean_dise_plus_interact": 0.0,
+    "median_dise_plus_interact": 0.0,
+    "mean_dise": 0.0,
+    "median_dise": 0.0,
+    "n_valid": 173,
+    "n_skipped": 0,
+    "by_complexity": {
+      "1": 0.1492,
+      "2": 0.0
+    }
+  },
+  "gpt-5/answer+search+interact": {
+    "n": 173,
+    "accuracy": 0.2023,
+    "ir_rate": 0.9884,
+    "avg_turns": 8.82,
+    "avg_asks": 4.92,
+    "axis_hit_rate": 0.3404,
+    "axis_hit_at1": 0.3801,
+    "any_axis_hit": 0.7544,
+    "wrong_axis_rate": 0.6526,
+    "generic_ask_rate": 0.0,
+    "per_axis_accuracy": {
+      "entity_scope": 0.234,
+      "temporal_scope": 0.5714,
+      "recognition_policy": 0.1111,
+      "metric_definition": 0.0833
+    },
+    "per_lang_accuracy": {
+      "en": 0.2453,
+      "zh": 0.1833
+    },
+    "mean_dise_plus_all": 0.1251,
+    "median_dise_plus_all": 0.0,
+    "mean_dise_plus_interact": 0.1251,
+    "median_dise_plus_interact": 0.0,
+    "mean_dise": 0.569,
+    "median_dise": 0.3333,
+    "n_valid": 173,
+    "n_skipped": 0,
+    "by_complexity": {
+      "1": 0.1645,
+      "2": 0.0133
+    }
+  },
+  "gpt-4o/answer-only": {
+    "n": 173,
+    "accuracy": 0.0058,
+    "ir_rate": 0.0,
+    "avg_turns": 1,
+    "avg_asks": 0,
+    "axis_hit_rate": null,
+    "axis_hit_at1": null,
+    "any_axis_hit": null,
+    "wrong_axis_rate": null,
+    "generic_ask_rate": null,
+    "per_axis_accuracy": {
+      "entity_scope": 0.0106,
+      "temporal_scope": 0.0,
+      "recognition_policy": 0.0,
+      "metric_definition": 0.0
+    },
+    "per_lang_accuracy": {
+      "en": 0.0189,
+      "zh": 0.0
+    },
+    "mean_dise_plus_all": 0.0092,
+    "median_dise_plus_all": 0.0,
+    "mean_dise_plus_interact": 0.0,
+    "median_dise_plus_interact": 0.0,
+    "mean_dise": 0.0,
+    "median_dise": 0.0,
+    "n_valid": 173,
+    "n_skipped": 0,
+    "by_complexity": {
+      "1": 0.0124,
+      "2": 0.0
+    }
+  },
+  "gpt-4o/answer+search": {
+    "n": 173,
+    "accuracy": 0.1214,
+    "ir_rate": 0.0,
+    "avg_turns": 2.32,
+    "avg_asks": 0,
+    "axis_hit_rate": null,
+    "axis_hit_at1": null,
+    "any_axis_hit": null,
+    "wrong_axis_rate": null,
+    "generic_ask_rate": null,
+    "per_axis_accuracy": {
+      "entity_scope": 0.1383,
+      "temporal_scope": 0.2857,
+      "recognition_policy": 0.1111,
+      "metric_definition": 0.0556
+    },
+    "per_lang_accuracy": {
+      "en": 0.1509,
+      "zh": 0.1083
+    },
+    "mean_dise_plus_all": 0.2058,
+    "median_dise_plus_all": 0.0,
+    "mean_dise_plus_interact": 0.0,
+    "median_dise_plus_interact": 0.0,
+    "mean_dise": 0.0,
+    "median_dise": 0.0,
+    "n_valid": 173,
+    "n_skipped": 0,
+    "by_complexity": {
+      "1": 0.2502,
+      "2": 0.0797
+    }
+  },
+  "gpt-4o/answer+search+interact": {
+    "n": 173,
+    "accuracy": 0.0462,
+    "ir_rate": 0.9942,
+    "avg_turns": 7.18,
+    "avg_asks": 4.71,
+    "axis_hit_rate": 0.2518,
+    "axis_hit_at1": 0.3721,
+    "any_axis_hit": 0.6279,
+    "wrong_axis_rate": 0.7138,
+    "generic_ask_rate": 0.0012,
+    "per_axis_accuracy": {
+      "entity_scope": 0.0532,
+      "temporal_scope": 0.1429,
+      "recognition_policy": 0.1111,
+      "metric_definition": 0.0093
+    },
+    "per_lang_accuracy": {
+      "en": 0.1321,
+      "zh": 0.0083
+    },
+    "mean_dise_plus_all": 0.0393,
+    "median_dise_plus_all": 0.0,
+    "mean_dise_plus_interact": 0.0393,
+    "median_dise_plus_interact": 0.0,
+    "mean_dise": 0.6392,
+    "median_dise": 0.5,
+    "n_valid": 173,
+    "n_skipped": 0,
+    "by_complexity": {
+      "1": 0.0531,
+      "2": 0.0
+    }
+  }
+}
