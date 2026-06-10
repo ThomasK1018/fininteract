@@ -633,51 +633,57 @@ capability stagnates.
 \label{sec:mechanistic}
 
 The behavioral results (\S\ref{sec:exp}) show that frontier models default to the naive
-interpretation rather than clarifying. A natural question is whether the bottleneck is
-\emph{recognition} (the model never internally registers the ambiguity) or \emph{action} (it
-registers the ambiguity but answers anyway). Because this requires access to hidden states, we
-run a small mechanistic probe on two open models as a proxy: \textbf{Qwen3-4B-Instruct}
-(dense, 37 layers) and \textbf{Qwen3.5-4B} (hybrid linear/full attention, 33 layers).
+interpretation rather than clarifying. A natural question is whether models internally
+\emph{represent} this ambiguity at all. Because this requires access to hidden states, we probe
+four open models as a proxy, spanning two size classes and two architectures:
+\textbf{Qwen3-4B-Instruct} (dense, 37 layers), \textbf{Qwen3.5-4B} (hybrid linear/full attention,
+33 layers), and the mixture-of-experts \textbf{Qwen3-30B-A3B} (49 layers) and
+\textbf{Qwen3.5-35B-A3B} (41 layers).
 
 \paragraph{Method.} For each instance we form a within-item contrast: the bare ambiguous
 question $Q$ versus $Q$ concatenated with its disambiguating context $C$. We define a per-layer
 \emph{ambiguity direction} as the difference in mean final-token activations between the two
-conditions, and score any hidden state by its (mean-centered) projection onto that direction.
-Tracing this score across layers gives a depth profile of how strongly each layer separates an
-under-specified question from a disambiguated one. An analogous entity$-$metric direction
-measures at which depth the model distinguishes the \emph{type} of ambiguity.
+conditions, and score any hidden state by its (mean-centered) projection onto that direction;
+tracing this across layers gives a depth profile of how strongly each layer separates an
+under-specified question from a disambiguated one. Independently, on the two larger models we
+train a per-layer linear probe to decode the ambiguity \emph{type} (entity\_scope vs.\
+metric\_definition), which---unlike a context-presence detector---cannot be solved trivially.
 
-\paragraph{Result.} Figure~\ref{fig:crossmodel} shows the profiles overlaid for both models
-(normalized for differing depth and scale). The signal is near-zero through the first
-$\sim$60\% of layers and rises sharply to a peak in the \emph{final few layers}
-(layer 35/37 and 32/33 respectively, $\approx$95--97\% relative depth). The entity-scope and
-metric-definition directions separate with \emph{opposite sign} at the same peak layer in both
-models. Despite different attention mechanisms, layer counts, and library versions, the two
-architectures agree: financial-query ambiguity, and its axis, is linearly encoded late in the
-stack.
+\paragraph{Result.} Figure~\ref{fig:crossmodel}(a) overlays the depth profiles (normalized for
+differing depth and scale). On all four models the signal is near-zero through most of the stack
+and rises sharply to a peak in the \emph{final few layers} ($\approx$95--98\% relative depth:
+layers 35/37, 32/33, 48/49, 40/41). Figure~\ref{fig:crossmodel}(b) shows that the ambiguity
+\emph{type} is linearly decodable at $0.80$ accuracy (majority baseline $0.60$) on both larger
+models, though it becomes available at different depths---early ($\approx$27\%) in Qwen3-30B and
+late ($\approx$85\%) in Qwen3.5-35B. Across four models, two scales, and three architecture
+families, the representation is consistent: financial-query ambiguity, and its axis, is linearly
+encoded, emerging toward the top of the network.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{fig_crossmodel_depthflow.png}
-  \caption{Cross-model depth profile of the ambiguity signal. (a) Ambiguous$-$disambiguated
-  separation rises to a peak in the final layers of both models. (b) Entity-scope (solid) and
-  metric-definition (dashed) separate with opposite sign at the top of the stack. Curves are
-  normalized for differing depth (x) and magnitude (y); dotted verticals mark per-model peaks.}
+  \caption{Four-model depth profile of the ambiguity signal (Qwen3 4B$\rightarrow$35B, dense and
+  MoE). (a) Ambiguous$-$disambiguated separation rises to a peak in the final layers of every
+  model (dotted verticals mark per-model peaks; normalized for depth and magnitude). (b) The
+  ambiguity \emph{type} (entity vs.\ metric) is linearly decodable at $0.80$ on both MoE models,
+  well above the $0.60$ majority baseline, peaking at different depths.}
   \label{fig:crossmodel}
 \end{figure}
 
-\paragraph{Finding 6: Open models linearly represent both ambiguity and its axis in their final
-layers, yet still default rather than clarify.} The internal representation exists and is
-type-specific, replicating across two distinct architectures; the behavioral gap is therefore
-better read as a failure to \emph{act} on a represented ambiguity than a failure to register it.
+\paragraph{Finding 6: Open models linearly represent both ambiguity and its axis, replicating
+from 4B to 35B and across dense and MoE architectures.} The representation is type-specific
+(entity vs.\ metric decodable at $0.80$) and robust to scale and architecture, yet behaviorally
+these same models still default rather than clarify. The behavioral gap is thus better read as a
+failure to \emph{act} on a represented ambiguity than a failure to register it---though
+establishing this causally (e.g.\ via activation steering) remains future work.
 
 \paragraph{Scope and caveats.} This is mechanistic evidence on open proxies, not the closed
-frontier models benchmarked in \S\ref{sec:exp}; diff-in-means probing establishes linear
-decodability, not causal use; and axis-type analysis is statistically supported only for the two
-well-populated axes (entity\_scope, metric\_definition). We deliberately do \emph{not} draw
-behavioral conclusions (e.g.\ clarification rates) from these open models' generations, as
-surface cues confound them; the asking-behavior claims come solely from the graded closed-model
-evaluation in \S\ref{sec:exp}.
+frontier models benchmarked in \S\ref{sec:exp}; diff-in-means probing and linear decoding
+establish \emph{availability}, not causal use; and axis-type decoding is supported only for the
+two well-populated axes (entity\_scope, metric\_definition). We deliberately do \emph{not} draw
+behavioral conclusions from these open models' free-form generations, where surface cues (chain-of-thought
+markers, retrieval that surfaces the evidence span) confound naive clarification counts; the
+asking-behavior claims come solely from the graded closed-model evaluation in \S\ref{sec:exp}.
 
 
 %% ============================================================
