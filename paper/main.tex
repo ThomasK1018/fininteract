@@ -19,8 +19,8 @@
 \newcommand{\fininteract}{\textsc{FinInteract}\xspace}
 \newcommand{\interactcomp}{\textsc{InteractComp}\xspace}
 \newcommand{\HO}{$H_0$\xspace}
-\newcommand{\disep}{$\text{DisE}^+_\text{all}$\xspace}
-\newcommand{\disei}{$\text{DisE}^+_\text{interact}$\xspace}
+\newcommand{\disep}{$\text{DisE}^+$\xspace}
+\newcommand{\disei}{$\text{DisE}^+$\xspace}
 
 %% ---- BEGIN DOCUMENT ----
 \begin{document}
@@ -67,7 +67,7 @@ specified, yet real analyst queries routinely carry unresolved ambiguity:
 the same question—\emph{``What was Meta Platforms' operating income?''}—can
 yield answers differing by 34\% depending on whether the scope is consolidated
 total or the Family of Apps segment.
-We introduce \fininteract, a bilingual (English/Chinese) benchmark of 500
+We introduce \fininteract, a bilingual (English/Chinese) benchmark of 173
 instances that pairs each question $Q$ with a \emph{default interpretation}
 (the answer a non-expert would assume) and an \emph{intended interpretation}
 (uniquely identified by a disambiguating context $C$).
@@ -75,9 +75,12 @@ Instances span five axes of financial ambiguity—temporal scope,
 metric definition, entity scope, filing vintage, and recognition policy—drawn
 from SEC EDGAR filings and A-share annual reports.
 We evaluate eight frontier models under three ReAct-based modes
-(Answer-only, Answer+Search, Answer+Search+Interact) using the
-Disambiguation Efficiency metric \disep, which rewards efficient
-clarification.
+(Answer-only, Answer+Search, Answer+Search+Interact), reporting standard
+\emph{accuracy} alongside interaction-quality diagnostics (interaction rate,
+axis-targeting precision, calibration).
+A controlled re-grading shows that conventional single-gold scoring---which
+credits the naive default reading---over-states model competence by up to
+$3\times$, exactly the blind spot \fininteract is built to expose.
 All models score below 20\% in full-interaction mode;
 forced-interaction experiments reveal that latent accuracy reaches
 60--75\%, confirming that interaction capability—not knowledge—is the
@@ -191,13 +194,13 @@ a model that does not know what ``non-GAAP'' means cannot recognize that
 \paragraph{Our Proposal: \fininteract.}
 We adapt the \interactcomp methodology to the finance domain, introduce a
 five-axis financial ambiguity taxonomy, and release \fininteract—a
-bilingual benchmark of 500 instances (400 English / 100 Chinese) designed
+bilingual benchmark of 173 instances (53 English / 120 Chinese) designed
 to measure whether financial search agents can recognize query ambiguity
 and resolve it through efficient interaction.
 
 \noindent\textbf{Contributions:}
 \begin{enumerate}[leftmargin=*]
-  \item \textbf{Benchmark}: 500 bilingual instances with paired
+  \item \textbf{Benchmark}: 173 bilingual instances with paired
     default/intended interpretations, both grounded in verbatim filing quotes,
     verified by adversarial LLM trials and human annotation (\S\ref{sec:construction}).
   \item \textbf{Error Taxonomy}: A seven-type error decomposition framework
@@ -347,7 +350,8 @@ interaction.
 For a single-axis instance with two interpretations, $H_0 = 1$ bit.
 For a two-axis instance with three and four plausible values respectively,
 $H_0 = \log_2(3 \times 4) \approx 3.58$ bits.
-This quantity anchors our \disep metric (\S\ref{sec:metrics}).
+This quantity anchors our supplementary efficiency metric \disep (\S\ref{sec:metrics})
+and serves as a per-instance difficulty proxy.
 
 
 %% ============================================================
@@ -493,34 +497,46 @@ DeepSeek-V3.1, Qwen3-235B, GLM-4.5 (open-weight).
 \subsection{Metrics}
 \label{sec:metrics}
 
-\textbf{Accuracy (\%)} is the fraction of instances answered correctly,
-graded by GPT-4o-mini with financial-domain tolerance
-($\pm$1\% numeric, entity/ticker equivalence, currency normalization;
-fiscal-year mismatch = wrong).
+We deliberately lead with metrics that are standard in the ambiguous-QA and
+interactive-retrieval literature (accuracy, calibration, interaction counts),
+so that \fininteract is directly comparable to prior benchmarks rather than
+self-referential. A single bespoke efficiency score is reported only as a
+supplementary diagnostic.
 
-\textbf{\disep} (primary metric) is:
+\textbf{Accuracy (\%)} (primary) is the fraction of instances whose final
+answer matches the \emph{intended} interpretation, graded by GPT-4o-mini with
+financial-domain tolerance ($\pm$1\% numeric, entity/ticker equivalence,
+currency normalization; fiscal-year mismatch = wrong). This is the metric on
+which models are ranked, mirroring \interactcomp, BrowseComp, and FinanceBench.
+
+\textbf{Default-capture rate (\%)} is the fraction whose final answer instead
+matches the \emph{default} interpretation. It measures how often a model
+confidently returns the naive reading, and lets us reconstruct what a
+conventional single-gold benchmark would have scored (\S\ref{sec:illusion}).
+
+\textbf{Interaction diagnostics} (secondary, descriptive): \emph{IR}
+(interaction rate, \% of instances with $\geq 1$ ask), \emph{Round} (mean
+turns), and \emph{AxisHit}---for each interact action GPT-4o-mini classifies
+whether the clarifying question targets a true ambiguity axis for that instance;
+we report AxisHit@1, AnyAxisHit, WrongAxisRate, and GenericAskRate. These
+characterize \emph{how} a model interacts; they do not rank models.
+
+\textbf{Calibration}: 5-bin Expected Calibration Error (ECE) between stated
+confidence and correctness, capturing overconfidence on ambiguous queries.
+
+\textbf{\disep (supplementary).} As a single number folding accuracy and
+clarification cost together we report the efficiency of \emph{successful}
+clarification,
 \[
-  \text{DisE}^+_\text{all} = \mathbf{1}[\text{correct}] \times
-  \frac{H_0}{\max(n_\text{asks}, 1)}
+  \text{DisE}^+ = \mathbf{1}[\text{correct}] \times
+  \mathbf{1}[n_\text{asks}{>}0] \times \frac{H_0}{n_\text{asks}},
 \]
-Zero when incorrect; rewards confident correct zero-ask answers
-($n_\text{asks}=0$ gives $H_0$) and efficient clarification.
-
-\textbf{\disei} (secondary) is:
-\[
-  \text{DisE}^+_\text{interact} = \mathbf{1}[\text{correct}] \times
-  \mathbf{1}[n_\text{asks}{>}0] \times \frac{H_0}{n_\text{asks}}
-\]
-Only defined when the agent asked $\geq 1$ question; specifically rewards
-successful clarification.
-
-\textbf{AxisHit (\%)}—for each interact action, GPT-4o-mini classifies
-whether the clarifying question targets a true ambiguity axis for that
-instance.
-We report AxisHit@1, AnyAxisHit, WrongAxisRate, and GenericAskRate.
-
-\textbf{Additional metrics}: Round (mean turns), IR (interaction rate),
-and 5-bin Expected Calibration Error.
+which is positive only when the agent asked at least one question and then
+answered correctly, and decreases with redundant asks. We restrict it to the
+asked-and-correct case precisely to avoid the perverse incentive of an
+all-instances variant, which would award its maximum to a confident
+\emph{zero-ask} answer---rewarding the very behavior the benchmark penalizes.
+DisE$^+$ is a diagnostic of clarification efficiency, never the ranking metric.
 
 
 %% ============================================================
@@ -530,43 +546,97 @@ and 5-bin Expected Calibration Error.
 
 \begin{table*}[t]
 \centering
-\caption{Main results across models and three primary modes (Acc \%, \disep,
-and AxisHit@1 in the interact mode). AHit is undefined when no question is asked.
+\caption{Main results. \textbf{Accuracy (\%)} graded against the intended
+interpretation is the primary metric (per mode); the interact mode additionally
+reports the secondary interaction diagnostics IR (\% asked), AxisHit@1, and ECE.
+DisE$^+$ and the default-capture comparison are reported separately
+(Table~\ref{tab:illusion}). AxisHit is undefined when no question is asked.
 Remaining models in progress.}
 \label{tab:main}
 \small
-\begin{tabular}{lcccccccccc}
+\begin{tabular}{lccccccc}
 \toprule
-& \multicolumn{3}{c}{Answer-only} &
-  \multicolumn{3}{c}{Answer+Search} &
-  \multicolumn{3}{c}{Answer+Search+Interact} \\
-\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
-Model & Acc & DisE$^+$ & AHit
-      & Acc & DisE$^+$ & AHit
-      & Acc & DisE$^+$ & AHit \\
+& \multicolumn{2}{c}{Acc (\%)} &
+  \multicolumn{4}{c}{Answer+Search+Interact} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-7}
+Model & Ans-only & +Search & Acc & IR & AHit@1 & ECE \\
 \midrule
-GPT-5           & 0.6 & .012 & -- & 6.4 & .110 & -- & \textbf{20.2} & \textbf{.125} & .38 \\
-GPT-4o          & 0.6 & .009 & -- & \textbf{12.1} & \textbf{.206} & -- & 4.6 & .039 & .37 \\
-GPT-5-mini      & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-Claude-Sonnet-4 & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-Claude-Opus-4   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-DeepSeek-V3.1   & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-Qwen3-235B      & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-GLM-4.5         & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+GPT-5           & 0.6 & 6.4  & \textbf{20.2} & 98.8 & .38 & .53 \\
+GPT-4o          & 0.6 & \textbf{12.1} & 4.6 & 99.4 & .37 & .82 \\
+GPT-5-mini      & -- & -- & -- & -- & -- & -- \\
+Claude-Sonnet-4 & -- & -- & -- & -- & -- & -- \\
+Claude-Opus-4   & -- & -- & -- & -- & -- & -- \\
+DeepSeek-V3.1   & -- & -- & -- & -- & -- & -- \\
+Qwen3-235B      & -- & -- & -- & -- & -- & -- \\
+GLM-4.5         & -- & -- & -- & -- & -- & -- \\
 \midrule
-\multicolumn{10}{l}{\textit{Proposed method baseline (GPT-5 backbone)}} \\
-Axis-Aware ReAct & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+\multicolumn{7}{l}{\textit{Proposed method baseline (GPT-5 backbone)}} \\
+Axis-Aware ReAct & -- & -- & -- & -- & -- & -- \\
 \midrule
-Human (50-inst) & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+Human (50-inst) & -- & -- & -- & -- & -- & -- \\
 \bottomrule
 \end{tabular}
 \end{table*}
 
+\subsection{Why Existing Benchmarks Miss This: The Single-Gold Illusion}
+\label{sec:illusion}
+
+Before analyzing model behavior, we establish the core motivation empirically:
+\emph{a conventional single-gold financial-QA benchmark cannot see the failure
+\fininteract measures.} Existing benchmarks (FinanceBench, FinQA, DocFinQA)
+attach one gold answer per question. Built from the same filings, such a
+benchmark would almost always adopt the \emph{default} reading---the headline
+figure a non-expert assumes---as that gold. Our paired construction lets us
+quantify the consequence directly: every instance carries both an intended and a
+default answer, so we re-grade the \emph{identical} model outputs under both
+conventions (Table~\ref{tab:illusion}).
+
+\begin{table}[t]
+\centering
+\caption{The single-gold illusion. The same model outputs, graded against the
+\emph{intended} interpretation (\fininteract) vs.\ the \emph{default} reading
+that a conventional single-gold benchmark would treat as gold. ``$\Delta$'' is
+the inflation a single-gold benchmark would report. In the retrieval regime
+where prior benchmarks operate, models capture the default far more than the
+intended answer; only interaction reverses this.}
+\label{tab:illusion}
+\small
+\begin{tabular}{llccc}
+\toprule
+Model & Mode & Intended & Default & $\Delta$ \\
+      &      & (true Acc) & (single-gold) & \\
+\midrule
+GPT-5  & Answer-only   & 0.6  & 2.3  & +1.7 \\
+       & Answer+Search & 6.4  & 10.4 & +4.0 \\
+       & +Interact     & \textbf{20.2} & 12.1 & $-8.1$ \\
+\midrule
+GPT-4o & Answer-only   & 0.6  & 0.6  & 0.0 \\
+       & Answer+Search & 12.1 & \textbf{37.0} & \textbf{+24.9} \\
+       & +Interact     & 4.6  & 6.4  & +1.8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Finding 0: A single-gold convention over-states competence by up to
+$3\times$, and the gap is the benchmark's reason to exist.} In the
+retrieval-augmented regime where current single-gold benchmarks operate, both
+models return the \emph{default} reading more often than the intended one:
+GPT-4o is graded $37.0\%$ correct against the default but only $12.1\%$ against
+the intended answer---a single-gold benchmark would report $3.1\times$ its true
+competence. The model is not reasoning to the right answer; it is confidently
+producing a well-grounded answer to the \emph{wrong reading of the question},
+which a single-gold benchmark rewards and therefore cannot detect. Critically,
+interaction is the \emph{only} mode where intended accuracy exceeds
+default-capture (GPT-5: $20.2$ vs.\ $12.1$): asking is what converts a
+default-anchored guess into the correct intended answer. This is precisely the
+capability single-gold benchmarks are structurally blind to, and what
+\fininteract is built to measure.
+
 \subsection{Findings}
 
 We report results for GPT-5 and GPT-4o across all three modes
-(Table~\ref{tab:main}); the remaining models are in progress. Five findings
-emerge.
+(Table~\ref{tab:main}); the remaining models are in progress. Five further
+findings emerge.
 
 \textbf{Finding 1: Interaction is a capability, not a free lever --- it helps
 the strong model and \emph{harms} the weak one.} Adding interaction raises
@@ -607,7 +677,10 @@ axis barely a third of the time, motivating the axis-conditioned policy of
 with disambiguation entropy $H_0$ (from 10\% at $H_0{=}1$ to under 1\% at
 $H_0{\approx}3.6$), validating $H_0$ as a difficulty proxy; 20 of 173 instances
 are solved by no model in any mode. The best configuration reaches 20.2\%,
-leaving the benchmark far from saturated.
+leaving the benchmark far from saturated. The supplementary clarification-efficiency
+metric mirrors the accuracy ranking in interact mode (DisE$^+$ $=0.125$ for GPT-5
+vs.\ $0.039$ for GPT-4o): GPT-5 not only answers more ambiguous queries correctly
+but does so with fewer wasted asks.
 
 \subsection{Ablation: Forced-Interaction Analysis}
 
@@ -816,7 +889,7 @@ FinBen~\cite{xie2024finben}
   & multi-task & partial & -- & -- & partial & auto & mixed \\
 \midrule
 \fininteract (ours)
-  & 500 & \checkmark & \checkmark & \checkmark & EN+ZH & LLM+human & EDGAR+CNINFO \\
+  & 173 & \checkmark & \checkmark & \checkmark & EN+ZH & LLM+human & EDGAR+CNINFO \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -848,7 +921,7 @@ We introduced \fininteract, the first bilingual benchmark for evaluating
 financial search agents on genuinely ambiguous queries.
 The five-axis financial ambiguity taxonomy, paired default/intended
 interpretation design, and adversarial verifier-based construction pipeline
-yield 500 high-quality instances that resist trivial disambiguation.
+yield 173 high-quality instances that resist trivial disambiguation.
 Our experiments across eight frontier models confirm that interaction
 capability—not financial knowledge—is the bottleneck in current systems,
 and that the stagnation identified by \interactcomp in the general domain
@@ -856,6 +929,69 @@ is amplified in finance.
 We release \fininteract with full construction code, passage sources,
 and evaluation scripts to support reproducible follow-on work.
 
+
+%% ============================================================
+\clearpage
+\appendix
+
+\section{Curation Cost to Replicate the Benchmark}
+\label{app:cost}
+%% ============================================================
+
+A practical concern for any LLM-assisted benchmark is the cost to reproduce or
+scale it. We instrument the construction pipeline (\S\ref{sec:construction}) and
+report measured API costs. All figures use list prices at construction time
+(per~1M tokens: GPT-5 \$1.25 in / \$10.00 out; GPT-5-mini \$0.25 / \$2.00;
+GPT-4o-mini \$0.15 / \$0.60) and count API fees only---they exclude the one-time
+filing-collection compute and the human spot-check labor ($10$--$20\%$ of
+accepted instances).
+
+\paragraph{The constructor, not the verifier, is the yield bottleneck.}
+Re-running the pipeline over a held-out sample of candidate passages reproduces
+a sharp funnel (Table~\ref{tab:cost}). Only $11.5\%$ of keyword-tagged candidate
+passages survive the constructor, which rejects the rest as containing
+\emph{no viable ambiguity} for the target axis; but of those that survive,
+$98.5\%$ pass the $10$-trial adversarial verifier. In other words, the
+construction prompt is strict and the verifier rarely needs to fire---the cost
+of the benchmark is dominated by constructor calls spent on candidate passages
+that turn out not to support a genuine ambiguity, not by verification.
+
+\begin{table}[!htbp]
+\centering
+\caption{Measured curation cost. Unit costs are from instrumented pipeline runs
+(constructor-only $n{=}20$; full pipeline $n{=}6$); the acceptance funnel is from
+the full construction run ($n{=}1127$ candidate passages). A full pipeline pass
+is one GPT-5 constructor call plus ten verifier trials (five GPT-5, five
+GPT-5-mini) with GPT-4o-mini grading.}
+\label{tab:cost}
+\small
+\begin{tabular}{lr}
+\toprule
+Quantity & Value \\
+\midrule
+Constructor viability (viable / candidate)      & $11.5\%$ \\
+Verifier acceptance (accepted / viable)         & $98.5\%$ \\
+Overall acceptance (accepted / candidate)       & $11.3\%$ \\
+\midrule
+Cost per rejected candidate (constructor only)  & \$0.020 \\
+Cost per viable passage (full pipeline)         & \$0.155 \\
+Blended cost per candidate passage              & \$0.035 \\
+\textbf{Cost per accepted instance}             & \textbf{\$0.31} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Projected cost to scale.} At the measured blended rate, producing $N$
+accepted instances requires $\approx N/0.113$ candidate passages and the
+following API spend: $173$ instances (the current release) $\approx\$54$;
+$500$ instances $\approx\$155$; $1000$ instances $\approx\$309$. The
+benchmark is therefore inexpensive to scale in API terms---an order of
+\$300 takes it to $1000$ instances---and the true constraint is the supply of
+candidate passages that contain structured, verifiable ambiguity. This favors
+\emph{better passage pre-selection} (raising the $11.5\%$ viability rate) over
+brute-force compute, and explains why the rare axes (e.g.\ filing\_vintage),
+whose candidate passages almost never survive the constructor, are the expensive
+ones to grow.
 
 %% ============================================================
 \bibliographystyle{ACM-Reference-Format}
