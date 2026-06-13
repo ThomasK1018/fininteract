@@ -56,3 +56,6 @@ data/results/
 # transfer artifacts
 fininteract_flow_results.zip
 fininteract-*-main.zip
+
+# AI reviewer chat dumps (local reference only, large HTML)
+ai_reviewer/

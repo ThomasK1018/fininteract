@@ -74,17 +74,19 @@ instances that pairs each question $Q$ with a \emph{default interpretation}
 Instances span five axes of financial ambiguity—temporal scope,
 metric definition, entity scope, filing vintage, and recognition policy—drawn
 from SEC EDGAR filings and A-share annual reports.
-We evaluate eight frontier models under three ReAct-based modes
+We evaluate frontier models under three ReAct-based modes
 (Answer-only, Answer+Search, Answer+Search+Interact), reporting standard
 \emph{accuracy} alongside interaction-quality diagnostics (interaction rate,
 axis-targeting precision, calibration).
 A controlled re-grading shows that conventional single-gold scoring---which
 credits the naive default reading---over-states model competence by up to
 $3\times$, exactly the blind spot \fininteract is built to expose.
-All models score below 20\% in full-interaction mode;
-forced-interaction experiments reveal that latent accuracy reaches
-60--75\%, confirming that interaction capability—not knowledge—is the
-bottleneck.
+Even the strongest model reaches only $\approx$20\% in full-interaction mode,
+yet when handed the resolved interpretation the same models answer $93$--$95\%$
+correctly---so the $\approx$75-point gap is the cost of failing to \emph{elicit}
+the disambiguation, not missing knowledge. Forcing models to ask more does not
+close it (and often hurts), and the capability does not improve monotonically
+with model scale.
 \end{abstract}
 
 \maketitle
@@ -551,7 +553,7 @@ interpretation is the primary metric (per mode); the interact mode additionally
 reports the secondary interaction diagnostics IR (\% asked), AxisHit@1, and ECE.
 DisE$^+$ and the default-capture comparison are reported separately
 (Table~\ref{tab:illusion}). AxisHit is undefined when no question is asked.
-Remaining models in progress.}
+The OpenAI tier ladder is fully evaluated; other-vendor models in progress.}
 \label{tab:main}
 \small
 \begin{tabular}{lccccccc}
@@ -563,7 +565,7 @@ Model & Ans-only & +Search & Acc & IR & AHit@1 & ECE \\
 \midrule
 GPT-5           & 0.6 & 6.4  & \textbf{20.2} & 98.8 & .38 & .53 \\
 GPT-4o          & 0.6 & \textbf{12.1} & 4.6 & 99.4 & .37 & .82 \\
-GPT-5-mini      & -- & -- & -- & -- & -- & -- \\
+GPT-5-mini      & 0.6 & 0.0 & 0.0 & 96.0 & .34 & .00 \\
 Claude-Sonnet-4 & -- & -- & -- & -- & -- & -- \\
 Claude-Opus-4   & -- & -- & -- & -- & -- & -- \\
 DeepSeek-V3.1   & -- & -- & -- & -- & -- & -- \\
@@ -613,19 +615,26 @@ GPT-5  & Answer-only   & 0.6  & 2.3  & +1.7 \\
 GPT-4o & Answer-only   & 0.6  & 0.6  & 0.0 \\
        & Answer+Search & 12.1 & \textbf{37.0} & \textbf{+24.9} \\
        & +Interact     & 4.6  & 6.4  & +1.8 \\
+\midrule
+GPT-5-mini & Answer-only   & 0.6 & 0.0 & $-0.6$ \\
+           & Answer+Search & 0.0 & 0.0 & 0.0 \\
+           & +Interact     & 0.0 & 0.0 & 0.0 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \textbf{Finding 0: A single-gold convention over-states competence by up to
 $3\times$, and the gap is the benchmark's reason to exist.} In the
-retrieval-augmented regime where current single-gold benchmarks operate, both
-models return the \emph{default} reading more often than the intended one:
+retrieval-augmented regime where current single-gold benchmarks operate, the
+larger models return the \emph{default} reading more often than the intended one:
 GPT-4o is graded $37.0\%$ correct against the default but only $12.1\%$ against
 the intended answer---a single-gold benchmark would report $3.1\times$ its true
 competence. The model is not reasoning to the right answer; it is confidently
 producing a well-grounded answer to the \emph{wrong reading of the question},
-which a single-gold benchmark rewards and therefore cannot detect. Critically,
+which a single-gold benchmark rewards and therefore cannot detect. (GPT-5-mini is
+the instructive exception: it captures \emph{neither} reading because it asks
+rather than commits (Finding~6), so single-gold grading does not flatter it---but
+nor does it answer.) Critically,
 interaction is the \emph{only} mode where intended accuracy exceeds
 default-capture (GPT-5: $20.2$ vs.\ $12.1$): asking is what converts a
 default-anchored guess into the correct intended answer. This is precisely the
@@ -634,16 +643,20 @@ capability single-gold benchmarks are structurally blind to, and what
 
 \subsection{Findings}
 
-We report results for GPT-5 and GPT-4o across all three modes
-(Table~\ref{tab:main}); the remaining models are in progress. Five further
-findings emerge.
+We report results for the full OpenAI tier ladder---GPT-5, GPT-4o, and
+GPT-5-mini---across all three modes (Table~\ref{tab:main}); other-vendor models
+are in progress. All headline accuracy comparisons below are reported with
+bootstrap $95\%$ CIs over instances, and we test each within-model mode
+transition with a two-sided paired bootstrap ($n{=}173$). Six findings emerge
+here, with a seventh (the latent-capacity ceiling) in \S\ref{sec:ceiling}.
 
 \textbf{Finding 1: Interaction is a capability, not a free lever --- it helps
 the strong model and \emph{harms} the weak one.} Adding interaction raises
-GPT-5 from 6.4\% to 20.2\% ($+13.8$), but \emph{lowers} GPT-4o from 12.1\% to
-4.6\% ($-7.5$). Forcing the weaker model to interact makes it worse than not
-interacting at all. This extends \interactcomp's ``interaction stagnation'' into
-a sharper claim: for models that cannot use it, interaction is actively harmful.
+GPT-5 from 6.4\% to 20.2\% (95\% CI $[14.5,26.6]$; paired bootstrap $p{<}0.001$),
+but \emph{lowers} GPT-4o from 12.1\% to 4.6\% ($p{=}0.002$). Forcing the weaker
+model to interact makes it significantly worse than not interacting at all. This
+extends \interactcomp's ``interaction stagnation'' into a sharper claim: for
+models that cannot use it, interaction is actively harmful.
 
 \textbf{Finding 2: Model rankings flip with the interaction axis.} GPT-4o
 \emph{outperforms} GPT-5 under pure retrieval (12.1 vs.\ 6.4) yet is
@@ -673,6 +686,31 @@ and 0.37 (GPT-4o), so even when a model asks, it targets the correct ambiguity
 axis barely a third of the time, motivating the axis-conditioned policy of
 \S\ref{sec:error}.
 
+\textbf{Finding 6: A smaller model collapses into ill-formed clarification ---
+it asks the most but commits the least.} GPT-5-mini scores $0.6/0.0/0.0\%$ across
+the three modes. The cause is not ambiguity-blindness but the opposite: it is the
+\emph{most} eager to clarify (interact IR $96\%$, $4.6$ asks/instance), yet it
+issues \emph{open-ended} questions (``which fiscal year? please paste the 2023 and
+2022 figures'') rather than the protocol's yes/no questions. Manually inspecting
+all $173$ interact trajectories, $63\%$ terminate on an unanswered open-ended
+question and $35\%$ exhaust the $10$-round budget still asking; only $1$ instance
+ever commits a value (also wrong), and just $1.3\%$ were format-unparseable. Even
+in Answer+Search---where no interact channel exists---it asks instead of
+answering, capturing \emph{neither} the intended nor the default reading
+($0.0/0.0\%$). This is an extreme form of Finding~4's integration gap and a
+distinct failure mode: clarification without commitment.
+
+\paragraph{Language and axis breakdown.} Splitting by language confirms the
+benchmark's bilingual-difficulty hypothesis: Chinese instances are consistently
+harder than English in the interact mode (GPT-5 $18.3\%$ ZH vs.\ $24.5\%$ EN;
+GPT-4o $0.8\%$ vs.\ $13.2\%$), reflecting more complex corporate-structure naming
+and metric conventions in A-share filings. Stratifying by primary axis (interact
+mode), \texttt{metric\_definition} is the hardest well-populated axis (GPT-5
+$12.7\%$, $n{=}63$) and \texttt{entity\_scope} the next ($23.4\%$, $n{=}94$),
+while \texttt{temporal\_scope} is comparatively easy ($57.1\%$, $n{=}7$). This
+inverts the general-domain pattern where entity disambiguation dominates, and
+identifies metric-definition ambiguity as the distinctive financial challenge.
+
 \paragraph{Difficulty and headroom.} Per-instance accuracy falls monotonically
 with disambiguation entropy $H_0$ (from 10\% at $H_0{=}1$ to under 1\% at
 $H_0{\approx}3.6$), validating $H_0$ as a difficulty proxy; 20 of 173 instances
@@ -682,12 +720,48 @@ metric mirrors the accuracy ranking in interact mode (DisE$^+$ $=0.125$ for GPT-
 vs.\ $0.039$ for GPT-4o): GPT-5 not only answers more ambiguous queries correctly
 but does so with fewer wasted asks.
 
-\subsection{Ablation: Forced-Interaction Analysis}
+\subsection{Latent Capacity: Forced Interaction vs.\ the Oracle Ceiling}
+\label{sec:ceiling}
 
-Following \interactcomp, we run a forced-interaction ablation requiring the
-agent to ask $n \in \{2,4,6,8,10\}$ clarifying questions before answering.
-This reveals the \emph{latent capacity} of each model and distinguishes
-overconfidence (high skip rate, low accuracy) from genuine uncertainty.
+To locate the bottleneck we bracket interactive accuracy with two ablations
+(Table~\ref{tab:ceiling}). \textbf{Forced interaction} requires the agent to ask
+$n{=}4$ clarifying questions before answering. \textbf{Context-oracle} hands the
+model the disambiguating context $C$ (which fixes the intended interpretation)
+together with a passage containing \emph{both} the intended and the default
+evidence spans, then asks it to answer---the ambiguity is pre-resolved but the
+model must still ground the correct value.
+
+\begin{table}[t]
+\centering
+\caption{The disambiguation bottleneck. Forcing more clarification does not help
+(and often hurts), but \emph{resolving} the ambiguity lifts every model to
+$93$--$95\%$. The $\approx$75-point gap between the oracle ceiling and free
+interaction is attributable to the model's inability to elicit $C$ itself---not
+to missing knowledge or grounding. ($^\dagger$GPT-5 forced capped at $n{=}65$.)}
+\label{tab:ceiling}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Model & Answer-only & Interact & Forced(4) & \textbf{Oracle ceiling} \\
+\midrule
+GPT-5      & 0.6 & 20.2 & 1.5$^\dagger$ & \textbf{95.4} \\
+GPT-4o     & 0.6 & 4.6  & 0.0 & \textbf{93.1} \\
+GPT-5-mini & 0.6 & 0.0  & 0.6 & \textbf{95.4} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Finding 7: Models can answer once the ambiguity is resolved---they
+cannot resolve it themselves.} The context-oracle ceiling is $93$--$95\%$ for all
+three models, including GPT-5-mini, which scores $0\%$ under free interaction.
+Latent answering capacity is therefore near-ceiling and roughly scale-invariant;
+what varies---and what \fininteract measures---is whether a model can
+\emph{elicit} the disambiguating context. Crucially, \emph{forcing} clarification
+does not recover this capacity: requiring four asks leaves GPT-4o and GPT-5-mini
+near $0\%$ ($0.0\%$ and $0.6\%$) and \emph{lowers} GPT-5 from $20.2\%$ to $1.5\%$, because forced asks
+consume the round budget on low-value questions without converging on a committed
+answer. The bottleneck is targeted, self-initiated disambiguation, which neither
+scale nor brute-force asking supplies.
 
 \subsection{Per-Axis Analysis}
 

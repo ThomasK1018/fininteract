@@ -624,6 +624,7 @@ def run_agent(instance: dict, mode: str, agent_client: OpenAI,
     true_axes    = instance.get("axes", [])
     intended_int = instance.get("intended_interpretation", {})
     default_int  = instance.get("default_interpretation", {})
+    axis_hits    = []   # init before any early-returning branch (e.g. template-oracle)
 
     # Template-oracle baseline: inject one fixed human-written question per primary axis,
     # then let the model answer. Bypasses the ReAct loop entirely.
@@ -669,11 +670,13 @@ def run_agent(instance: dict, mode: str, agent_client: OpenAI,
         system = AGENT_SYSTEM_ALWAYS_ASK
     elif mode == "axis-oracle":
         primary_axis = true_axes[0] if true_axes else "metric_definition"
-        system = AGENT_SYSTEM_AXIS_ORACLE.format(axis=primary_axis)
+        # .replace (not .format): these templates contain literal JSON braces
+        # ({"action": ...}) that .format would misread as replacement fields.
+        system = AGENT_SYSTEM_AXIS_ORACLE.replace("{axis}", primary_axis)
     elif mode == "axis-aware":
         system = AGENT_SYSTEM_AXIS_AWARE
     elif forced_n > 0:
-        system = AGENT_SYSTEM_FORCED.format(n_forced=forced_n)
+        system = AGENT_SYSTEM_FORCED.replace("{n_forced}", str(forced_n))
     else:
         system = AGENT_SYSTEM_INTERACT
 
