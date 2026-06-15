@@ -53,6 +53,8 @@ def main(a):
             gold = key[i]["intended_answer"]; dflt = key[i]["default_answer"]
             if a.self_graded:
                 ok = (ans[i].get(field + "_correct", "").strip().lower() in ("1", "yes", "y", "true"))
+                # optional hand-marked default-capture column
+                dcap += int(ans[i].get(field + "_default", "").strip().lower() in ("1", "yes", "y", "true"))
             else:
                 ok = grade(key[i]["question"], gold, pred)
                 if grade(key[i]["question"], dflt, pred): dcap += 1
@@ -60,7 +62,7 @@ def main(a):
         return (100*c/n if n else 0.0), (100*dcap/n if n else 0.0), n
 
     res = {"n": len(ids)}
-    for cond, field in [("no_interaction", "noask_answer"),
+    for cond, field in [("search_noask", "search_answer"),
                         ("interaction", "interact_answer")]:
         a_acc, a_def, n = acc(field)
         res[cond] = {"accuracy": a_acc, "default_capture": a_def, "n_answered": n}
