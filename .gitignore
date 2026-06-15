@@ -62,3 +62,6 @@ ai_reviewer/
 
 # Reference PDFs of related papers (local only)
 related_paper/
+
+# Annotation sheets contain gold answers / filled labels — keep local
+annotation/sheets/
