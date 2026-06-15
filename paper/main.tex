@@ -458,9 +458,10 @@ $\sum_\text{axes}(\text{target\_share}/\text{pool\_frequency})$); and
 (4) dynamic re-sort every 10 instances.
 
 \subsection{Human Validation Protocol}
+\label{sec:humanval}
 
-Each accepted instance is reviewed by two annotators using an eight-question
-protocol (H1--H8):
+Two finance-literate annotators (one bilingual, for the Chinese split)
+independently review instances on an eight-question protocol (H1--H8):
 H1 \emph{Is $Q$ ambiguous without $C$?}
 H2 \emph{Is the default interpretation plausible for a non-expert?}
 H3 \emph{Does $C$ uniquely identify the intended interpretation?}
@@ -470,7 +471,19 @@ H6 \emph{Is $A_d$ correct under the default interpretation?}
 H7 \emph{Is the primary axis label correct?}
 H8 \emph{What yes/no question would a financial analyst naturally ask to
 resolve the ambiguity?} (free text, used to compute human AxisHit).
-Disagreements are adjudicated by the primary author.
+Acceptance requires H1--H6 to hold after adjudication by the primary author.
+
+\paragraph{Agreement.} On a stratified 60-instance sample (by language and axis),
+per-item raw agreement is $0.82$--$0.97$. Because the labels are heavily skewed
+toward ``yes'' ($>85\%$ per item), Cohen's $\kappa$ is degenerate under the
+Feinstein--Cicchetti prevalence paradox; we therefore report the prevalence-robust
+Gwet's AC1, which is \textbf{$0.85$ on average} (range $0.78$--$0.97$) and
+$1.00$ for the axis label (H7)---substantial-to-near-perfect agreement. Only one
+instance was rejected by \emph{both} annotators on the same item (consensus
+rejection $1.7\%$); adjudication confirmed it as an axis over-reach (a
+revenue-recognition-timing pairing whose plausible default is the firm's total
+revenue, not a disaggregation component) and we exclude it. As it was solved by no
+model in any configuration, all reported results are unaffected.
 
 \subsection{Dataset Statistics}
 \label{sec:stats}
