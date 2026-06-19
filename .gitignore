@@ -65,3 +65,6 @@ related_paper/
 
 # Annotation sheets contain gold answers / filled labels — keep local
 annotation/sheets/
+paper/main.fdb_latexmk
+paper/main.fls
+paper/main.xdv

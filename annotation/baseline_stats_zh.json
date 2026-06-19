@@ -1,0 +1,10 @@
+{
+  "n": 18,
+  "interact": {
+    "accuracy": 22.22222222222222,
+    "default_capture": 72.22222222222223,
+    "n_answered": 18
+  },
+  "interaction_rate": 100.0,
+  "human_axishit": 72.22222222222223
+}

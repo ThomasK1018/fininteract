@@ -1,10 +1,9 @@
 """Grade the filled human-baseline sheets (Task 2) -> the Human row of the table.
 
 Reuses the SAME grader as evaluate.py (GPT-4o-mini, finance tolerance) so the
-human numbers are directly comparable to the model numbers. Reports, for the
-no-interaction and interaction conditions: accuracy, default-capture rate,
-interaction rate (did they ask), and human AxisHit (did their yes/no question
-target a true ambiguity axis), plus mean time.
+human numbers are directly comparable to the model numbers. SINGLE condition
+(human +Interact): reports accuracy, default-capture rate, interaction rate, and
+human AxisHit (did their yes/no question target a true ambiguity axis).
 
 Needs OPENAI_API_KEY for grading/AxisHit (or pass --self-graded if you hand-marked
 a 'correct' column). Merges the per-language annotator sheets with the answer key.
@@ -22,11 +21,24 @@ from pathlib import Path
 def load_key(path):
     return {r["instance_id"]: r for r in csv.DictReader(open(path, encoding="utf-8"))}
 
+def _rows(path):
+    """Yield dict rows from a .csv or .xlsx annotator sheet (xlsx for CJK safety)."""
+    if str(path).lower().endswith((".xlsx", ".xlsm")):
+        from openpyxl import load_workbook
+        ws = load_workbook(path, read_only=True, data_only=True).active
+        it = ws.iter_rows(values_only=True)
+        header = [str(c) if c is not None else "" for c in next(it)]
+        for row in it:
+            yield {header[i]: ("" if v is None else str(v)) for i, v in enumerate(row)}
+    else:
+        yield from csv.DictReader(open(path, encoding="utf-8-sig"))
+
 def load_sheets(paths):
     out = {}
     for p in paths:
-        for r in csv.DictReader(open(p, encoding="utf-8")):
-            out[r["instance_id"]] = r
+        for r in _rows(p):
+            if (r.get("instance_id") or "").strip():
+                out[r["instance_id"]] = r
     return out
 
 def main(a):
@@ -61,22 +73,21 @@ def main(a):
             c += int(ok)
         return (100*c/n if n else 0.0), (100*dcap/n if n else 0.0), n
 
+    # SINGLE condition: human +Interact (read passage, ask one yes/no, answer).
     res = {"n": len(ids)}
-    for cond, field in [("search_noask", "search_answer"),
-                        ("interaction", "interact_answer")]:
-        a_acc, a_def, n = acc(field)
-        res[cond] = {"accuracy": a_acc, "default_capture": a_def, "n_answered": n}
-        print(f"{cond:16s} acc={a_acc:5.1f}%  default-capture={a_def:5.1f}%  (n={n})")
+    a_acc, a_def, n = acc("final_answer")
+    res["interact"] = {"accuracy": a_acc, "default_capture": a_def, "n_answered": n}
+    print(f"{'interact':16s} acc={a_acc:5.1f}%  default-capture={a_def:5.1f}%  (n={n})")
 
-    # interaction rate + human AxisHit (from interact_question_asked)
-    asked = [i for i in ids if (ans[i].get("interact_question_asked") or "").strip()]
+    # interaction rate + human AxisHit (from the yes/no question they asked)
+    asked = [i for i in ids if (ans[i].get("your_yesno_question") or "").strip()]
     res["interaction_rate"] = 100*len(asked)/len(ids) if ids else 0.0
     print(f"\ninteraction rate (asked at all): {res['interaction_rate']:.1f}%")
     if axis_hit and asked:
         hits = 0
         for i in asked:
             true_axes = [key[i]["primary_axis"]]
-            info = axis_hit(ans[i]["interact_question_asked"], true_axes)
+            info = axis_hit(ans[i]["your_yesno_question"], true_axes)
             hits += int(info.get("is_hit", False))
         res["human_axishit"] = 100*hits/len(asked)
         print(f"human AxisHit@1: {res['human_axishit']:.1f}%  (n={len(asked)} asks)")

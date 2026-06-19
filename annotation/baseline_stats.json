@@ -1,0 +1,10 @@
+{
+  "n": 50,
+  "interact": {
+    "accuracy": 30.0,
+    "default_capture": 50.0,
+    "n_answered": 50
+  },
+  "interaction_rate": 100.0,
+  "human_axishit": 68.0
+}
