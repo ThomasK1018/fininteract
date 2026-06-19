@@ -612,7 +612,8 @@ interpretation is the primary metric (per mode); the interact mode additionally
 reports the secondary interaction diagnostics IR (\% asked), AxisHit@1, and ECE.
 DisE$^+$ and the default-capture comparison are reported separately
 (Table~\ref{tab:illusion}). AxisHit is undefined when no question is asked.
-The OpenAI tier ladder is fully evaluated; other-vendor models in progress.
+The OpenAI tier ladder and two open MoE models (Qwen3-30B-A3B, Qwen3.5-35B-A3B)
+are evaluated; remaining other-vendor rows in progress.
 The human baseline is the single interaction condition (passage + one yes/no
 clarification + answer) on a stratified 50-instance subset; see \S\ref{sec:humanbaseline}.}
 \label{tab:main}
@@ -632,6 +633,8 @@ Claude-Opus-4   & -- & -- & -- & -- & -- & -- \\
 DeepSeek-V3.1   & -- & -- & -- & -- & -- & -- \\
 Qwen3-235B      & -- & -- & -- & -- & -- & -- \\
 GLM-4.5         & -- & -- & -- & -- & -- & -- \\
+Qwen3-30B-A3B   & 1.2 & 0.0 & 0.0 & 72 & .23 & -- \\
+Qwen3.5-35B-A3B & 0.0 & 2.3 & 0.0 & 77 & .40 & -- \\
 \midrule
 \multicolumn{7}{l}{\textit{Proposed method baseline (GPT-5 backbone)}} \\
 Axis-Aware ReAct & -- & -- & -- & -- & -- & -- \\
@@ -808,6 +811,8 @@ Model & Answer-only & Interact & Forced(4) & \textbf{Oracle ceiling} \\
 GPT-5      & 0.6 & 20.2 & 1.5$^\dagger$ & \textbf{95.4} \\
 GPT-4o     & 0.6 & 4.6  & 0.0 & \textbf{93.1} \\
 GPT-5-mini & 0.6 & 0.0  & 0.6 & \textbf{95.4} \\
+Qwen3-30B-A3B   & 1.2 & 0.0 & -- & \textbf{90.2} \\
+Qwen3.5-35B-A3B & 0.0 & 0.0 & -- & \textbf{91.9} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -897,6 +902,19 @@ models, though it becomes available at different depths---early ($\approx$27\%) 
 late ($\approx$85\%) in Qwen3.5-35B. Across four models, two scales, and three architecture
 families, the representation is consistent: financial-query ambiguity, and its axis, is linearly
 encoded, emerging toward the top of the network.
+
+\paragraph{Representation without action.} Crucially, the two MoE models we probe are also
+\emph{evaluated} (Tables~\ref{tab:main},~\ref{tab:ceiling}): despite linearly encoding the axis,
+both score $0\%$ in \texttt{+interact} under a $90$--$92\%$ context-oracle ceiling. They fail
+\emph{differently} in the policy---Qwen3-30B under-elicits in English yet loops without committing
+in Chinese ($76\%$ of its interactive transcripts never produce a final answer), whereas
+Qwen3.5-35B elicits consistently and targets the correct axis nearly twice as often
+(AxisHit $0.40$ vs.\ $0.23$) and commits in $95\%$ of cases---but neither converts a resolved
+ambiguity into the correct figure. The bottleneck is therefore not whether the ambiguity is
+\emph{represented} but whether the policy turns that recognition into a committed, correct
+answer; better elicitation alone does not close the gap. A linear-probe replication on the
+\emph{base} (non-instruct) checkpoints reproduces the decodability and the early-vs-late depth
+split (peaks $0.71$/$0.74$ vs.\ baseline $0.60$).
 
 \begin{figure}[t]
   \centering
