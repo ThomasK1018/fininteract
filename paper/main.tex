@@ -482,13 +482,19 @@ $1.00$ for the axis label (H7)---substantial-to-near-perfect agreement. Only one
 instance was rejected by \emph{both} annotators on the same item (consensus
 rejection $1.7\%$); adjudication confirmed it as an axis over-reach (a
 revenue-recognition-timing pairing whose plausible default is the firm's total
-revenue, not a disaggregation component) and we exclude it. As it was solved by no
-model in any configuration, all reported results are unaffected.
+revenue, not a disaggregation component). We quarantine it from the public
+release (\texttt{v1.1}, $N{=}172$); all experiments below are computed on the
+frozen \texttt{v1.0} evaluation snapshot ($N{=}173$), which retains it. The
+instance is unsolved by every model in every \emph{interactive} mode---it is
+answerable only when the resolving context is supplied outright (context-oracle),
+where removing it shifts the ceiling by $<\!0.05$pp ($93$--$95\%$ unchanged)---so
+no reported finding depends on it.
 
 \subsection{Dataset Statistics}
 \label{sec:stats}
 
-The frozen release contains 173 instances (Table~\ref{tab:stats}), drawn from
+The frozen evaluation snapshot (\texttt{v1.0}) contains 173 instances
+(Table~\ref{tab:stats}; the public \texttt{v1.1} release is $N{=}172$, \S\ref{sec:humanval}), drawn from
 61 unique companies and SEC/CSRC filings dated 2022--2025. Every instance passes
 all 14 pre-verifier rules and the 10-trial adversarial verifier (mean blind-solve
 rate $0.7\%$), and is R14-discriminating (intended $\neq$ default answer beyond
