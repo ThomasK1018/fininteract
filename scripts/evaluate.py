@@ -77,6 +77,7 @@ from dise import compute_dise, aggregate_dise, DEFAULT_AXIS_OPTIONS
 # ---------------------------------------------------------------------------
 USER_SIM_MODEL  = "gpt-5"    # temperature=1.0 — mirrors real user uncertainty
 GRADER_MODEL    = "gpt-4o-mini"
+AGENT_EXTRA_BODY: dict | None = None  # set from --agent-thinking; applied to AGENT calls only
 MAX_TURNS       = 12          # hard cap on ReAct loop turns
 MAX_INTERACT    = 6           # max interact actions per instance
 TEMPERATURE_SIM = 1.0
@@ -340,7 +341,8 @@ def make_client(model_name: str, extra_kwargs: dict) -> OpenAI:
 
 
 def chat(client: OpenAI, model: str, messages: list[dict],
-         temperature: float = 0.0, max_tokens: int = 512) -> str:
+         temperature: float = 0.0, max_tokens: int = 512,
+         extra_body: dict | None = None) -> str:
     # gpt-5 / o-series reasoning models reject temperature != 1 and use max_completion_tokens;
     # other / non-OpenAI models use temperature + max_tokens.
     ml = model.lower()
@@ -355,6 +357,8 @@ def chat(client: OpenAI, model: str, messages: list[dict],
     else:
         kwargs["temperature"] = temperature
         kwargs["max_tokens"] = max_tokens
+    if extra_body:                      # e.g. {"chat_template_kwargs": {"enable_thinking": False}}
+        kwargs["extra_body"] = extra_body
     try:
         resp = client.chat.completions.create(**kwargs)
         return (resp.choices[0].message.content or "").strip()
@@ -675,14 +679,24 @@ def run_agent(instance: dict, mode: str, agent_client: OpenAI,
         system = AGENT_SYSTEM_AXIS_ORACLE.replace("{axis}", primary_axis)
     elif mode == "axis-aware":
         system = AGENT_SYSTEM_AXIS_AWARE
+    elif mode == "interp-oracle":
+        # Decompose the +interact gap: hand the agent the RESOLVED interpretation C
+        # (which reading is intended) but NOT the answer-bearing evidence spans and
+        # no search. Drop from full context-oracle (C + spans) to here = the RECALL
+        # cost; drop from here to +interact = the ELICITATION cost.
+        system = AGENT_SYSTEM_ANSWER_ONLY
     elif forced_n > 0:
         system = AGENT_SYSTEM_FORCED.replace("{n_forced}", str(forced_n))
     else:
         system = AGENT_SYSTEM_INTERACT
 
+    user_content = question
+    if mode == "interp-oracle":
+        user_content = (f"Intended interpretation: {context}\n\n"
+                        f"Question: {question}")
     messages = [
         {"role": "system", "content": system},
-        {"role": "user",   "content": question},
+        {"role": "user",   "content": user_content},
     ]
 
     trajectory   = []
@@ -694,7 +708,7 @@ def run_agent(instance: dict, mode: str, agent_client: OpenAI,
 
     for turn in range(MAX_TURNS):
         response = chat(agent_client, model_name, messages, temperature=0.0,
-                        max_tokens=1024)
+                        max_tokens=1024, extra_body=AGENT_EXTRA_BODY)
         if not response:
             break
 
@@ -923,7 +937,7 @@ def main():
                    default=["answer-only", "answer+search", "answer+search+interact"],
                    choices=["answer-only", "answer+search", "answer+search+interact",
                             "always-ask", "axis-oracle", "template-oracle", "enumerate",
-                            "axis-aware"])
+                            "axis-aware", "interp-oracle"])
     p.add_argument("--limit",      type=int, default=None,
                    help="Max instances to evaluate (for pilot runs)")
     p.add_argument("--out",        default="data/results/eval_results.jsonl",
@@ -950,7 +964,13 @@ def main():
                         "The user-simulator and grader stay on the OpenAI API.")
     p.add_argument("--agent-api-key", default=os.environ.get("AGENT_API_KEY", "EMPTY"),
                    help="API key for --agent-base-url (vLLM ignores it; default EMPTY).")
+    p.add_argument("--agent-thinking", choices=["on", "off"], default=None,
+                   help="Toggle hybrid-reasoning models' thinking mode on the local agent "
+                        "via chat_template_kwargs.enable_thinking (applies to agent calls only).")
     args = p.parse_args()
+    global AGENT_EXTRA_BODY
+    if args.agent_thinking:
+        AGENT_EXTRA_BODY = {"chat_template_kwargs": {"enable_thinking": args.agent_thinking == "on"}}
 
     # Load instances
     instances_path = Path(args.instances)
