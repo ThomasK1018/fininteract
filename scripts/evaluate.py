@@ -944,6 +944,12 @@ def main():
     p.add_argument("--deepseek-base-url", default="https://api.deepseek.com/v1")
     p.add_argument("--qwen-base-url",     default="https://dashscope.aliyuncs.com/compatible-mode/v1")
     p.add_argument("--zhipu-base-url",    default="https://open.bigmodel.cn/api/paas/v4/")
+    p.add_argument("--agent-base-url", default=os.environ.get("AGENT_BASE_URL"),
+                   help="OpenAI-compatible endpoint for the AGENT under test "
+                        "(e.g. a local vLLM server http://localhost:8000/v1). "
+                        "The user-simulator and grader stay on the OpenAI API.")
+    p.add_argument("--agent-api-key", default=os.environ.get("AGENT_API_KEY", "EMPTY"),
+                   help="API key for --agent-base-url (vLLM ignores it; default EMPTY).")
     args = p.parse_args()
 
     # Load instances
@@ -980,6 +986,10 @@ def main():
     # Build clients
     oai = OpenAI()   # default (OpenAI)
     def get_client(model_name: str) -> OpenAI:
+        # Local/self-hosted agent (vLLM, SGLang, TGI) — any OpenAI-compatible URL.
+        # Routes the AGENT only; simulator/grader use OpenAI() directly above.
+        if args.agent_base_url:
+            return OpenAI(api_key=args.agent_api_key, base_url=args.agent_base_url)
         if "deepseek" in model_name.lower():
             return OpenAI(
                 api_key=os.environ.get("DEEPSEEK_API_KEY", ""),

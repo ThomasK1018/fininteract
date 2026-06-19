@@ -12,7 +12,7 @@ If accuracy here is high while interactive accuracy is low, the bottleneck is th
 Unlike the built-in template-oracle (which withholds data and forbids search, so
 models just emit a search action and score ~0), this provides the data directly.
 """
-import argparse, json, random
+import argparse, json, random, os
 from pathlib import Path
 from openai import OpenAI
 import sys
@@ -37,8 +37,8 @@ def build_user(inst, rng):
 def main(a):
     inst = [json.loads(l) for l in open(a.instances)]
     if a.limit: inst = inst[:a.limit]
-    client = make_client(a.model, {})
-    grader = OpenAI()
+    client = make_client(a.model, {"base_url": a.base_url, "api_key": a.api_key} if a.base_url else {})
+    grader = OpenAI()  # grader stays on the OpenAI API
     out = open(a.out, "w")
     n=correct=0
     for i, x in enumerate(inst):
@@ -65,4 +65,7 @@ if __name__ == "__main__":
     p.add_argument("--model", required=True)
     p.add_argument("--out", required=True)
     p.add_argument("--limit", type=int, default=None)
+    p.add_argument("--base-url", default=os.environ.get("AGENT_BASE_URL"),
+                   help="OpenAI-compatible endpoint for a local agent (vLLM). Grader stays on OpenAI.")
+    p.add_argument("--api-key", default=os.environ.get("AGENT_API_KEY", "EMPTY"))
     main(p.parse_args())
