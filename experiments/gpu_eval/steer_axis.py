@@ -54,10 +54,10 @@ def steer(model, layer_idxs, dirs, alpha):
     layers = model.model.layers
     handles = []
     def mk(L):
-        vec = dirs[L].to(model.dtype).to(model.device)
+        vec = dirs[L].to(model.dtype)
         def hook(_m, _in, out):
             h = out[0] if isinstance(out, tuple) else out
-            h = h + alpha * vec
+            h = h + alpha * vec.to(h.device)   # device_map="auto" shards layers across GPUs
             return (h, *out[1:]) if isinstance(out, tuple) else h
         return hook
     try:
@@ -72,12 +72,24 @@ def steer(model, layer_idxs, dirs, alpha):
 def first_action(model, tok, system, question):
     import torch
     msgs = [{"role": "system", "content": system}, {"role": "user", "content": question}]
-    ids = tok.apply_chat_template(msgs, add_generation_prompt=True,
-                                  return_tensors="pt").to(model.device)
+    # thinking-OFF so the structured first action is emitted within the token budget
+    # (matches the round-1 thinking-off baseline; otherwise <think> eats all 200 tokens).
+    try:
+        enc = tok.apply_chat_template(msgs, add_generation_prompt=True,
+                                      return_tensors="pt", enable_thinking=False)
+    except TypeError:
+        enc = tok.apply_chat_template(msgs, add_generation_prompt=True, return_tensors="pt")
+    # transformers 5.x returns a BatchEncoding (dict); older returns a bare tensor.
+    if hasattr(enc, "keys"):
+        enc = {k: v.to(model.device) for k, v in enc.items()}
+        input_ids = enc["input_ids"]
+    else:
+        input_ids = enc.to(model.device)
+        enc = {"input_ids": input_ids}
     with torch.no_grad():
-        gen = model.generate(ids, max_new_tokens=200, do_sample=False,
+        gen = model.generate(**enc, max_new_tokens=200, do_sample=False,
                              pad_token_id=tok.eos_token_id)
-    txt = tok.decode(gen[0, ids.shape[1]:], skip_special_tokens=True)
+    txt = tok.decode(gen[0, input_ids.shape[1]:], skip_special_tokens=True)
     from evaluate import parse_action
     return parse_action(txt), txt
 
@@ -104,23 +116,29 @@ def main(a):
            "n_dir": a.n_dir, "n_test": len(test), "by_alpha": {}}
 
     for alpha in a.alphas:
-        asks = hits = answered = 0
+        asks = hits = answered = searched = noparse = 0
         for inst in test:
             true_axes = inst.get("axes", []) or ["metric_definition"]
             with steer(model, layer_idxs, dirs, float(alpha)) if alpha else _null():
                 act, _ = first_action(model, tok, AGENT_SYSTEM_INTERACT, inst["question"])
-            if act and act.get("action") == "interact":
+            a_ = act.get("action") if act else None
+            if a_ == "interact":
                 asks += 1
                 info = classify_axis_hit(act.get("question", ""), true_axes, oai)
                 hits += int(info.get("is_hit", False))
-            elif act and act.get("action") == "answer":
+            elif a_ == "answer":
                 answered += 1
+            elif a_ == "search":
+                searched += 1
+            else:
+                noparse += 1
         n = len(test)
         row = {"IR": 100*asks/n, "AxisHit@1": (hits/asks if asks else 0.0),
-               "answer_rate": 100*answered/n, "n_ask": asks}
+               "answer_rate": 100*answered/n, "search_rate": 100*searched/n,
+               "noparse_rate": 100*noparse/n, "n_ask": asks}
         res["by_alpha"][str(alpha)] = row
         print(f"  alpha={alpha:+.1f}  IR={row['IR']:5.1f}%  AxisHit@1={row['AxisHit@1']:.2f}  "
-              f"answer_rate={row['answer_rate']:5.1f}%")
+              f"ans={row['answer_rate']:5.1f}%  search={row['search_rate']:5.1f}%")
 
     from pathlib import Path
     Path(a.out).write_text(json.dumps(res, indent=2))
