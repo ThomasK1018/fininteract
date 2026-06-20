@@ -340,10 +340,16 @@ Axis & Definition \\
 
 Each instance exercises one primary axis (mandatory) and optionally one or
 two secondary axes where the passage genuinely supports additional ambiguity.
-The target distribution over primary axes is 25\% temporal scope, 25\% metric
-definition, 20\% recognition policy, 15\% entity scope, and 15\% filing
-vintage—calibrated to counterbalance the over-representation of entity scope
-(66\% of pool passages) and filing vintage (67\%) in the raw passage pool.
+Viable structured ambiguity is far more available for some axes than others:
+cleanly paired, independently verifiable ambiguity is abundant for entity scope
+and metric definition but rare for the other three in public filings
+(Appendix~\ref{app:cost}). The released corpus reflects this---entity scope
+(54\%) and metric definition (37\%) dominate, with recognition policy (5\%),
+temporal scope (4\%), and filing vintage ($0\%$) sparse. We therefore position
+\fininteract as an \textbf{entity/metric-dominant} financial-ambiguity benchmark
+with exploratory coverage of three sparser axes, confine quantitative per-axis
+claims to the two well-powered axes, and report the sparser axes with their
+sample sizes as preliminary signal.
 
 \paragraph{Disambiguation Entropy.}
 For each instance we compute the prior disambiguation entropy:
@@ -424,7 +430,7 @@ slowest single GPT-5 call.
 
 \begin{table}[h]
 \centering
-\caption{Pre-verifier sanity checks (13 rules).}
+\caption{Pre-verifier sanity checks (14 rules).}
 \label{tab:qc}
 \small
 \begin{tabular}{cl}
@@ -433,6 +439,7 @@ Rule & Description \\
 \midrule
 R1  & $Q$ must not be answerable yes/no \\
 R2  & $Q$ must not contain disambiguating terms or inline dates \\
+R3  & $A$ taken verbatim from the source candidate value (not invented) \\
 R4  & $Q$ must name the company \\
 R5  & $Q$ must ask about a substantive financial metric \\
 R6  & Answer type consistent with question type \\
@@ -443,6 +450,7 @@ R10 & Answer must be non-trivial (not empty or ``0'') \\
 R11 & \texttt{default\_answer} present and differs from \texttt{answer} \\
 R12 & Both evidence spans non-empty \\
 R13 & Evidence spans must be meaningfully distinct ($\leq$85\% overlap) \\
+R14 & Intended and default \emph{answers} differ beyond grader tolerance \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -860,18 +868,54 @@ therefore harder to \emph{resolve}, not harder to \emph{recognize}---the
 distinction is sticky even once correctly surfaced---corroborating the
 language-asymmetry caveat in \S\ref{sec:limitations} with a mechanism.
 
-\subsection{Per-Axis Analysis}
+\subsection{Per-Axis Skills: Which Clarification Abilities Do Models Lack?}
+\label{sec:skills}
 
-Accuracy is stratified by each of the five ambiguity axes.
-This identifies which types of financial ambiguity are hardest for current
-models and provides actionable direction for future training.
+The five axes are not just data strata; each names a distinct \emph{skill}---the
+ability to recognize that a question is under-specified \emph{along that axis} and
+ask the question that resolves it. We make this measurable by decomposing each
+model's per-axis \texttt{+interact} competence into three components:
+\textbf{Recognition} (interaction rate---does it ask when it should?),
+\textbf{Targeting} (AxisHit@1---does it ask about the \emph{right} axis?), and
+\textbf{Resolution} (accuracy---does asking yield the intended answer?). A model
+``has'' an axis skill only when all three are high; a low value localizes the
+failure to not-asking, asking-wrong, or asking-right-but-still-wrong.
+Table~\ref{tab:skills} reports Targeting, the decisive component.
 
-\subsection{Longitudinal Comparison}
+\begin{table}[t]
+\centering
+\caption{Per-axis \textbf{Targeting} skill (AxisHit@1) in \texttt{+interact}.
+Recognition policy is a near-universal blind spot; temporal scope is largely
+solved; entity/metric are partial. ``--'': model never asked on that axis (IR$=0$).
+The two sparse axes ($n{\le}9$) are preliminary.}
+\label{tab:skills}
+\small
+\begin{tabular}{lrccccc}
+\toprule
+Axis & $n$ & GPT-5 & GPT-4o & {\footnotesize GPT-5-m} & {\footnotesize Q3-30B} & {\footnotesize Q3.5-35B} \\
+\midrule
+entity\_scope       & 94 & .41 & .29 & .37 & .28 & .39 \\
+metric\_definition  & 63 & .32 & .13 & .27 & .18 & .36 \\
+recognition\_policy &  9 & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} & .17 \\
+temporal\_scope     &  7 & .95 & 1.0 & .95 & -- & 1.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-We compare \fininteract results against BrowseComp~\cite{wei2025browsecomp}
-and FinanceBench~\cite{islam2023financebench} trends to verify the
-interaction stagnation hypothesis: retrieval improves while interaction
-capability stagnates.
+\textbf{Finding 9: Ambiguity clarification is a per-axis skill, and models lack
+specific ones.} Targeting is sharply differentiated: every OpenAI model scores
+AxisHit $=0$ on \texttt{recognition\_policy} (they essentially never ask whether a
+figure is recognized point-in-time vs.\ over time), yet all reach $\geq0.95$ on
+\texttt{temporal\_scope}; entity and metric sit in between ($0.13$--$0.41$).
+Resolution follows the same shape (e.g.\ GPT-5 resolves $57\%$ of temporal but
+$\leq23\%$ of entity/metric). The gap is therefore not uniform incompetence but
+\emph{missing specific skills}---which is precisely the target an intervention
+should aim at (\S\ref{sec:grpo}). We also tested whether failures cluster by axis
+in per-instance behavior space (PCA over per-model correct/ask/AxisHit/default);
+they do not (k-means ARI $\approx0.01$, $p\approx0.15$), a floor effect of the
+near-zero accuracies---the axis structure lives in the aggregate targeting
+profile, not in coarse per-instance behavior. Clustering the \emph{text of the
+asked clarifying questions} is the sharper test and is left to future work.
 
 \subsection{Mechanistic Case Study: Where Ambiguity Lives in the Network}
 \label{sec:mechanistic}
@@ -927,7 +971,7 @@ split (peaks $0.71$/$0.74$ vs.\ baseline $0.60$).
   \label{fig:crossmodel}
 \end{figure}
 
-\paragraph{Finding 6: Open models linearly represent both ambiguity and its axis, replicating
+\paragraph{Finding 10: Open models linearly represent both ambiguity and its axis, replicating
 from 4B to 35B and across dense and MoE architectures.} The representation is type-specific
 (entity vs.\ metric decodable at $0.80$) and robust to scale and architecture, yet behaviorally
 these same models still default rather than clarify. The behavioral gap is thus better read as a
@@ -1053,6 +1097,10 @@ remaining bottleneck after the E1--E3 errors are addressed.
 \subsection{Training-Time Intervention: Axis-Guided SFT and GRPO}
 \label{sec:grpo}
 
+The per-axis skill analysis (\S\ref{sec:skills}) gives this intervention a precise
+target: models do not lack clarification ability uniformly---they lack \emph{specific}
+axis skills (AxisHit $=0$ on recognition policy, partial on metric). The question is
+whether those missing skills can be installed by training rather than prompting.
 The second intervention applies the \emph{same} idea---condition on the
 axis---but in the weights rather than the prompt, showing the benchmark is not
 only diagnosable but \emph{trainable}. Starting from Qwen3-4B-Instruct (4-bit
