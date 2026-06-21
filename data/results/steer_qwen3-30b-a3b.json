@@ -1,0 +1,53 @@
+{
+  "model": "Qwen/Qwen3-30B-A3B",
+  "n_layers": 48,
+  "steer_layers": [
+    19,
+    29,
+    38
+  ],
+  "n_dir": 40,
+  "n_test": 133,
+  "by_alpha": {
+    "-8.0": {
+      "IR": 0.0,
+      "AxisHit@1": 0.0,
+      "answer_rate": 0.0,
+      "search_rate": 0.0,
+      "noparse_rate": 100.0,
+      "n_ask": 0
+    },
+    "-4.0": {
+      "IR": 0.0,
+      "AxisHit@1": 0.0,
+      "answer_rate": 0.0,
+      "search_rate": 2.255639097744361,
+      "noparse_rate": 97.74436090225564,
+      "n_ask": 0
+    },
+    "0.0": {
+      "IR": 61.65413533834587,
+      "AxisHit@1": 0.2073170731707317,
+      "answer_rate": 0.0,
+      "search_rate": 1.5037593984962405,
+      "noparse_rate": 36.8421052631579,
+      "n_ask": 82
+    },
+    "4.0": {
+      "IR": 75.93984962406014,
+      "AxisHit@1": 0.594059405940594,
+      "answer_rate": 0.0,
+      "search_rate": 22.55639097744361,
+      "noparse_rate": 1.5037593984962405,
+      "n_ask": 101
+    },
+    "8.0": {
+      "IR": 0.0,
+      "AxisHit@1": 0.0,
+      "answer_rate": 0.0,
+      "search_rate": 0.0,
+      "noparse_rate": 100.0,
+      "n_ask": 0
+    }
+  }
+}

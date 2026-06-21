@@ -1,0 +1,104 @@
+{
+  "qwen3-4b/answer-only": {
+    "n": 173,
+    "accuracy": 0.0,
+    "ir_rate": 0.0,
+    "avg_turns": 1,
+    "avg_asks": 0,
+    "axis_hit_rate": null,
+    "axis_hit_at1": null,
+    "any_axis_hit": null,
+    "wrong_axis_rate": null,
+    "generic_ask_rate": null,
+    "per_axis_accuracy": {
+      "entity_scope": 0.0,
+      "temporal_scope": 0.0,
+      "recognition_policy": 0.0,
+      "metric_definition": 0.0
+    },
+    "per_lang_accuracy": {
+      "en": 0.0,
+      "zh": 0.0
+    },
+    "mean_dise_plus_all": 0.0,
+    "median_dise_plus_all": 0.0,
+    "mean_dise_plus_interact": 0.0,
+    "median_dise_plus_interact": 0.0,
+    "mean_dise": 0.0,
+    "median_dise": 0.0,
+    "n_valid": 173,
+    "n_skipped": 0,
+    "by_complexity": {
+      "1": 0.0,
+      "2": 0.0
+    }
+  },
+  "qwen3-4b/answer+search": {
+    "n": 173,
+    "accuracy": 0.0,
+    "ir_rate": 0.0,
+    "avg_turns": 2.03,
+    "avg_asks": 0,
+    "axis_hit_rate": null,
+    "axis_hit_at1": null,
+    "any_axis_hit": null,
+    "wrong_axis_rate": null,
+    "generic_ask_rate": null,
+    "per_axis_accuracy": {
+      "entity_scope": 0.0,
+      "temporal_scope": 0.0,
+      "recognition_policy": 0.0,
+      "metric_definition": 0.0
+    },
+    "per_lang_accuracy": {
+      "en": 0.0,
+      "zh": 0.0
+    },
+    "mean_dise_plus_all": 0.0,
+    "median_dise_plus_all": 0.0,
+    "mean_dise_plus_interact": 0.0,
+    "median_dise_plus_interact": 0.0,
+    "mean_dise": 0.0,
+    "median_dise": 0.0,
+    "n_valid": 173,
+    "n_skipped": 0,
+    "by_complexity": {
+      "1": 0.0,
+      "2": 0.0
+    }
+  },
+  "qwen3-4b/answer+search+interact": {
+    "n": 173,
+    "accuracy": 0.0058,
+    "ir_rate": 0.6012,
+    "avg_turns": 4.05,
+    "avg_asks": 1.76,
+    "axis_hit_rate": 0.2303,
+    "axis_hit_at1": 0.25,
+    "any_axis_hit": 0.4712,
+    "wrong_axis_rate": 0.7566,
+    "generic_ask_rate": 0.0,
+    "per_axis_accuracy": {
+      "entity_scope": 0.0106,
+      "temporal_scope": 0.0,
+      "recognition_policy": 0.0,
+      "metric_definition": 0.0
+    },
+    "per_lang_accuracy": {
+      "en": 0.0189,
+      "zh": 0.0
+    },
+    "mean_dise_plus_all": 0.0092,
+    "median_dise_plus_all": 0.0,
+    "mean_dise_plus_interact": 0.0092,
+    "median_dise_plus_interact": 0.0,
+    "mean_dise": 0.6948,
+    "median_dise": 0.3962,
+    "n_valid": 173,
+    "n_skipped": 0,
+    "by_complexity": {
+      "1": 0.0124,
+      "2": 0.0
+    }
+  }
+}
