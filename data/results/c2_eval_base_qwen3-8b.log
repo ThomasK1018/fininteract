@@ -1,0 +1,70 @@
+Loading checkpoint shards:   0%|          | 0/5 [00:00<?, ?it/s]Loading checkpoint shards:  20%|██        | 1/5 [00:03<00:15,  3.88s/it]Loading checkpoint shards:  40%|████      | 2/5 [00:08<00:12,  4.31s/it]Loading checkpoint shards:  60%|██████    | 3/5 [00:12<00:08,  4.28s/it]Loading checkpoint shards:  80%|████████  | 4/5 [00:16<00:03,  3.88s/it]Loading checkpoint shards: 100%|██████████| 5/5 [00:16<00:00,  2.69s/it]Loading checkpoint shards: 100%|██████████| 5/5 [00:16<00:00,  3.32s/it]
+/home/xinyu/fininteract_train_venv/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:631: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.6` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+/home/xinyu/fininteract_train_venv/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:636: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.95` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+  warnings.warn(
+/home/xinyu/fininteract_train_venv/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:653: UserWarning: `do_sample` is set to `False`. However, `top_k` is set to `20` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_k`.
+  warnings.warn(
+/home/xinyu/fininteract_train_venv/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:631: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.6` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+/home/xinyu/fininteract_train_venv/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:636: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.95` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+  warnings.warn(
+/home/xinyu/fininteract_train_venv/lib/python3.11/site-packages/transformers/generation/configuration_utils.py:653: UserWarning: `do_sample` is set to `False`. However, `top_k` is set to `20` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_k`.
+  warnings.warn(
+[1/51] fininteract_0100 correct=False asks=1 hit=False
+[2/51] fininteract_0153 correct=False asks=1 hit=False
+[3/51] fininteract_0143 correct=False asks=3 hit=False
+[4/51] fininteract_0039 correct=True asks=3 hit=False
+[5/51] fininteract_0084 correct=False asks=2 hit=False
+[6/51] fininteract_0049 correct=False asks=4 hit=False
+[7/51] fininteract_0068 correct=True asks=2 hit=True
+[8/51] fininteract_0043 correct=False asks=1 hit=False
+[9/51] fininteract_0003 correct=False asks=3 hit=False
+[10/51] fininteract_0126 correct=False asks=4 hit=True
+[11/51] fininteract_0088 correct=True asks=2 hit=True
+[12/51] fininteract_0026 correct=False asks=2 hit=False
+[13/51] fininteract_0162 correct=False asks=4 hit=False
+[14/51] fininteract_0052 correct=True asks=1 hit=False
+[15/51] fininteract_0015 correct=True asks=3 hit=False
+[16/51] fininteract_0105 correct=True asks=3 hit=False
+[17/51] fininteract_0120 correct=True asks=3 hit=False
+[18/51] fininteract_0073 correct=True asks=2 hit=False
+[19/51] fininteract_0062 correct=False asks=3 hit=True
+[20/51] fininteract_0123 correct=True asks=3 hit=False
+[21/51] fininteract_0097 correct=False asks=4 hit=False
+[22/51] fininteract_0035 correct=False asks=1 hit=False
+[23/51] fininteract_0122 correct=False asks=4 hit=True
+[24/51] fininteract_0152 correct=False asks=4 hit=False
+[25/51] fininteract_0017 correct=False asks=2 hit=True
+[26/51] fininteract_0161 correct=False asks=2 hit=False
+[27/51] fininteract_0163 correct=False asks=4 hit=False
+[28/51] fininteract_0053 correct=True asks=4 hit=True
+[29/51] fininteract_0139 correct=False asks=3 hit=False
+[30/51] fininteract_0146 correct=False asks=0 hit=None
+[31/51] fininteract_0136 correct=True asks=2 hit=False
+[32/51] fininteract_0044 correct=True asks=3 hit=False
+[33/51] fininteract_0116 correct=False asks=1 hit=False
+[34/51] fininteract_0137 correct=True asks=1 hit=True
+[35/51] fininteract_0118 correct=False asks=4 hit=False
+[36/51] fininteract_0063 correct=True asks=2 hit=True
+[37/51] fininteract_0106 correct=True asks=2 hit=False
+[38/51] fininteract_0157 correct=False asks=1 hit=False
+[39/51] fininteract_0019 correct=False asks=2 hit=True
+[40/51] fininteract_0148 correct=False asks=4 hit=True
+[41/51] fininteract_0079 correct=False asks=4 hit=False
+[42/51] fininteract_0093 correct=True asks=2 hit=False
+[43/51] fininteract_0005 correct=True asks=2 hit=False
+[44/51] fininteract_0099 correct=False asks=4 hit=True
+[45/51] fininteract_0069 correct=False asks=4 hit=False
+[46/51] fininteract_0090 correct=False asks=0 hit=None
+[47/51] fininteract_0037 correct=False asks=2 hit=True
+[48/51] fininteract_0013 correct=False asks=4 hit=False
+[49/51] fininteract_0057 correct=True asks=3 hit=True
+[50/51] fininteract_0091 correct=False asks=1 hit=False
+[51/51] fininteract_0023 correct=False asks=2 hit=True
+
+=== Qwen/Qwen3-8B on test.jsonl (n=51) ===
+Accuracy     : 35.3%
+Interaction  : 96.1%
+AxisHit@1    : 30.6%  (over 49 interacting episodes)
+Mean reward  : 0.509

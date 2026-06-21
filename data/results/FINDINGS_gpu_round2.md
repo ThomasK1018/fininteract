@@ -130,6 +130,40 @@ This is the §6.3 result: **scale lifts the oracle ceiling, not self-elicitation
 scaling-axis complement to D — scale buys *reading* (ceiling) but not the *recall on an
 elicited query* that the +interact gap demands, so the gap is scale-invariant.
 
-## Not yet run
-- **C2 GRPO ladder (8B/14B/32B):** heavy training; held pending an explicit go (qualitatively
-  different resource profile from the A/B/C1/D inference work).
+## C2. GRPO ladder scale-up — axis-guided SFT at 8B / 14B / 32B  (`c2_grpo_ladder.png`)
+
+Re-ran the axis-guided post-training ladder (the 4B kit) with the base swapped to
+Qwen3-8B/14B/32B. The teacher-generated SFT data (372 demos) is **model-agnostic**, so it
+is reused; only the student is retrained (QLoRA 4-bit) and evaluated (held-out test n=51,
+gpt-4o-mini sim/grader/axis judges). Leak-proof metrics per §7.4 are **AxisHit@1** and
+**interaction rate** (accuracy is partly leaked by the env's disambiguated `search`).
+
+| size | stage | Accuracy | Interaction | **AxisHit@1** | mean reward |
+|------|-------|---------:|------------:|--------------:|------------:|
+| 4B (kit ref) | base | 84.3 | 54.9 | 25.0 | 0.956 |
+| 4B | **SFT** | 88.2 | 100 | **68.6** | 1.278 |
+| 8B  | base | 35.3 | 96.1 | 30.6 | 0.509 |
+| 8B  | **SFT** | 82.4 | 100 | **64.7** | 1.190 |
+| 14B | base | 7.8  | 96.1 | 16.3 | 0.150 |
+| 14B | **SFT** | 82.4 | 100 | **72.5** | 1.241 |
+| 32B | base | 15.7 | 70.6 | 25.0 | 0.183 |
+| 32B | **SFT** | 70.6 | 100 | **72.5** | 1.171 |
+
+**Read:** the axis-guided teacher trick is **scale-invariant**. At every size SFT pulls a
+low/erratic base AxisHit (16–31%) up to a tight **64.7–72.5%** band and interaction to
+**100%** — the same lift the 4B kit showed (25→68.6). Crucially the *base* models do **not**
+get better at on-axis elicitation with scale (14B base 16.3% < 8B base 30.6% < 32B base
+25.0% — no trend), so the gain comes from the recipe, not the parameters. This is the
+training-axis complement to A/B/C1/D: scale, reasoning, and steering all leave elicitation
+where it is, but a small axis-guided SFT (372 demos) fixes it at any size. (Accuracy also
+jumps base→SFT, but it is partly leaked; AxisHit/interaction are the honest signals.)
+
+KTO/GRPO follow-on (8B, representative): the 4B kit found KTO/GRPO refine *within noise* of
+SFT; the 8B KTO→GRPO rung is running to confirm at scale — see `c2_eval_{kto,grpo}_qwen3-8b`.
+
+### C2 setup notes
+- Pinned training venv (torch 2.7.1+cu126, transformers 4.51.3, trl 0.19.1) — round-1's
+  fininteract_venv upgrade would have broken trl training.
+- 32B QLoRA OOM'd on one 40GB card; fixed with gradient checkpointing (`sft_train_gc.py`,
+  ~25 GB). 8B/14B fit a single card directly.
+- Deliverables: `c2_grpo_ladder.json/.png`, `c2_eval_{base,sft}_qwen3-{8b,14b,32b}.log`.
