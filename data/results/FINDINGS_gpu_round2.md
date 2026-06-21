@@ -108,8 +108,28 @@ lift accuracy).
 - `data/results/eval_interp_oracle_qwen3-30b-a3b.jsonl`, `..._qwen3p5-35b-a3b.jsonl` (+summaries)
 - `FINDINGS_gpu_round2.md` (this file)
 
+## C1. Scaling sweep — dense Qwen3 0.6B → 32B  (`scaling_curve.png`)
+
+Same family, all modes + context-oracle ceiling, served on the HF stack. The only
+variable is scale.
+
+| size | answer-only | +search | +interact | IR | AxisHit@1 | **ceiling** |
+|------|-------------|---------|-----------|-----|-----------|-------------|
+| 0.6B | 0.0 | 0.0 | 0.0 | 14 | 0.67 | **60.1** |
+| 1.7B | 0.6 | 0.0 | 0.0 | 19 | 0.45 | **81.5** |
+| 4B   | 0.0 | 0.0 | 0.6 | 60 | 0.32 | **87.3** |
+| 8B   | 0.6 | 0.0 | 0.6 | 32 | 0.20 | **92.5** |
+| 14B  | 0.0 | 0.0 | 0.0 | 80 | 0.41 | **90.8** |
+| 32B  | 0.6 | 0.0 | 0.0 | 82 | 0.52 | **93.1** |
+
+**Read:** the **context-oracle ceiling rises monotonically with scale (60.1 → 93.1%)** —
+bigger models read/recall-from-evidence far better — while **+interact accuracy stays
+pinned at ~0% at every size** (and answer-only/+search likewise ≈0). AxisHit is flat-noisy
+(~0.2–0.67, no scaling trend) and IR is erratic (14→82%) but never converts to accuracy.
+This is the §6.3 result: **scale lifts the oracle ceiling, not self-elicitation.** It is the
+scaling-axis complement to D — scale buys *reading* (ceiling) but not the *recall on an
+elicited query* that the +interact gap demands, so the gap is scale-invariant.
+
 ## Not yet run
-- **C1 scaling sweep (0.6B→32B):** queued next on the freed GPUs (the "scale lifts the
-  oracle ceiling, not self-elicitation" figure).
 - **C2 GRPO ladder (8B/14B/32B):** heavy training; held pending an explicit go (qualitatively
   different resource profile from the A/B/C1/D inference work).
