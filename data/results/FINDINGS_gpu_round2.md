@@ -158,8 +158,21 @@ training-axis complement to A/B/C1/D: scale, reasoning, and steering all leave e
 where it is, but a small axis-guided SFT (372 demos) fixes it at any size. (Accuracy also
 jumps base→SFT, but it is partly leaked; AxisHit/interaction are the honest signals.)
 
-KTO/GRPO follow-on (8B, representative): the 4B kit found KTO/GRPO refine *within noise* of
-SFT; the 8B KTO→GRPO rung is running to confirm at scale — see `c2_eval_{kto,grpo}_qwen3-8b`.
+**Full ladder at 8B (SFT→KTO→GRPO), confirming the 4B "SFT does the heavy lifting" result:**
+
+| stage | Accuracy | Interaction | AxisHit@1 | reward |
+|-------|---------:|------------:|----------:|-------:|
+| base | 35.3 | 96.1 | 30.6 | 0.509 |
+| SFT  | 82.4 | 100 | **64.7** | 1.190 |
+| KTO  | 82.4 | 100 | **64.7** | 1.211 |
+| GRPO | 78.4 | 100 | **64.7** | 1.155 |
+
+AxisHit is **identical (64.7%) across SFT/KTO/GRPO** and accuracy/reward move only within
+n=51 judge noise — the policy-improvement steps *refine, don't transform*, exactly as the 4B
+kit found. (GRPO did train: 30 steps, reward ~1.1–1.5, within-group reward_std ~0.34, so there
+was gradient signal — just no headroom above the strong axis-guided SFT seed.) Net C2 message:
+**the recipe's elicitation gain is an SFT effect, scale-invariant from 4B to 32B, and the RL
+rungs add nothing measurable on the leak-proof metric.**
 
 ### C2 setup notes
 - Pinned training venv (torch 2.7.1+cu126, transformers 4.51.3, trl 0.19.1) — round-1's
