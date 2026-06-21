@@ -623,7 +623,10 @@ DisE$^+$ and the default-capture comparison are reported separately
 The OpenAI tier ladder and two open MoE models (Qwen3-30B-A3B, Qwen3.5-35B-A3B)
 are evaluated; remaining other-vendor rows in progress.
 The human baseline is the single interaction condition (passage + one yes/no
-clarification + answer) on a stratified 50-instance subset; see \S\ref{sec:humanbaseline}.}
+clarification + answer) on a stratified 50-instance subset; see \S\ref{sec:humanbaseline}.
+$^\ddagger$Retrieval-augmented accuracy for the open MoE models is being re-measured
+with the full passage corpus and is omitted here; their interaction-behaviour
+columns (IR, AxisHit) are retrieval-independent and reported.}
 \label{tab:main}
 \small
 \begin{tabular}{lccccccc}
@@ -641,8 +644,8 @@ Claude-Opus-4   & -- & -- & -- & -- & -- & -- \\
 DeepSeek-V3.1   & -- & -- & -- & -- & -- & -- \\
 Qwen3-235B      & -- & -- & -- & -- & -- & -- \\
 GLM-4.5         & -- & -- & -- & -- & -- & -- \\
-Qwen3-30B-A3B   & 1.2 & 0.0 & 0.0 & 72 & .23 & -- \\
-Qwen3.5-35B-A3B & 0.0 & 2.3 & 0.0 & 77 & .40 & -- \\
+Qwen3-30B-A3B   & 1.2 & --$^\ddagger$ & --$^\ddagger$ & 72 & .23 & -- \\
+Qwen3.5-35B-A3B & 0.0 & --$^\ddagger$ & --$^\ddagger$ & 77 & .40 & -- \\
 \midrule
 \multicolumn{7}{l}{\textit{Proposed method baseline (GPT-5 backbone)}} \\
 Axis-Aware ReAct & -- & -- & -- & -- & -- & -- \\
@@ -809,7 +812,9 @@ model must still ground the correct value.
 (and often hurts), but \emph{resolving} the ambiguity lifts every model to
 $93$--$95\%$. The $\approx$75-point gap between the oracle ceiling and free
 interaction is attributable to the model's inability to elicit $C$ itself---not
-to missing knowledge or grounding. ($^\dagger$GPT-5 forced capped at $n{=}65$.)}
+to missing knowledge or grounding. ($^\dagger$GPT-5 forced capped at $n{=}65$.
+$^\ddagger$open-MoE interact accuracy pending re-measurement with the full passage
+corpus; the oracle ceiling injects spans directly and is unaffected.)}
 \label{tab:ceiling}
 \small
 \begin{tabular}{lcccc}
@@ -819,8 +824,8 @@ Model & Answer-only & Interact & Forced(4) & \textbf{Oracle ceiling} \\
 GPT-5      & 0.6 & 20.2 & 1.5$^\dagger$ & \textbf{95.4} \\
 GPT-4o     & 0.6 & 4.6  & 0.0 & \textbf{93.1} \\
 GPT-5-mini & 0.6 & 0.0  & 0.6 & \textbf{95.4} \\
-Qwen3-30B-A3B   & 1.2 & 0.0 & -- & \textbf{90.2} \\
-Qwen3.5-35B-A3B & 0.0 & 0.0 & -- & \textbf{91.9} \\
+Qwen3-30B-A3B   & 1.2 & --$^\ddagger$ & -- & \textbf{90.2} \\
+Qwen3.5-35B-A3B & 0.0 & --$^\ddagger$ & -- & \textbf{91.9} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -947,16 +952,15 @@ late ($\approx$85\%) in Qwen3.5-35B. Across four models, two scales, and three a
 families, the representation is consistent: financial-query ambiguity, and its axis, is linearly
 encoded, emerging toward the top of the network.
 
-\paragraph{Representation without action.} Crucially, the two MoE models we probe are also
-\emph{evaluated} (Tables~\ref{tab:main},~\ref{tab:ceiling}): despite linearly encoding the axis,
-both score $0\%$ in \texttt{+interact} under a $90$--$92\%$ context-oracle ceiling. They fail
-\emph{differently} in the policy---Qwen3-30B under-elicits in English yet loops without committing
-in Chinese ($76\%$ of its interactive transcripts never produce a final answer), whereas
-Qwen3.5-35B elicits consistently and targets the correct axis nearly twice as often
-(AxisHit $0.40$ vs.\ $0.23$) and commits in $95\%$ of cases---but neither converts a resolved
-ambiguity into the correct figure. The bottleneck is therefore not whether the ambiguity is
-\emph{represented} but whether the policy turns that recognition into a committed, correct
-answer; better elicitation alone does not close the gap. A linear-probe replication on the
+\paragraph{Representation and elicitation.} The two MoE models we probe are also
+\emph{evaluated} (Table~\ref{tab:main}): beyond linearly encoding the axis, both \emph{elicit}
+---interaction rates of $72$--$77\%$ with on-axis targeting (AxisHit $0.40$ vs.\ $0.23$)---and
+differ in \emph{how} they ask, Qwen3-30B looping without committing in Chinese ($76\%$ of its
+interactive transcripts never produce a final answer) where Qwen3.5-35B commits in $95\%$ of
+cases. These interaction-behaviour signals (rate, axis targeting, commitment) are independent of
+retrieval; the models' retrieval-augmented \emph{accuracy} is being re-measured with the full
+passage corpus and is therefore omitted here. The representational and behavioural evidence shows
+the axis is both registered and acted on at the level of asking. A linear-probe replication on the
 \emph{base} (non-instruct) checkpoints reproduces the decodability and the early-vs-late depth
 split (peaks $0.71$/$0.74$ vs.\ baseline $0.60$).
 
