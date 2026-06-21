@@ -14,6 +14,11 @@
 \usepackage{xeCJK}
 \setCJKmainfont{STSong}
 \usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, calc}
+%% portable check / cross (drawn, not font glyphs)
+\newcommand{\cmark}{\tikz[baseline=-0.55ex]{\draw[green!55!black,line width=0.9pt] (0,0.6pt)--(2pt,-1.4pt)--(5pt,3.6pt);}}
+\newcommand{\xmark}{\tikz[baseline=-0.55ex]{\draw[red!75!black,line width=0.9pt] (0,0)--(4pt,4pt) (0,4pt)--(4pt,0);}}
 
 %% Macros
 \newcommand{\fininteract}{\textsc{FinInteract}\xspace}
@@ -115,6 +120,50 @@ question.
 Existing benchmarks reward the model that guesses correctly; they do not
 distinguish a model that recognizes the ambiguity from one that happens to
 pick the default interpretation.
+
+\begin{figure*}[t]
+\centering
+\begin{tikzpicture}[
+  font=\small,
+  >={Stealth[length=2mm,width=1.6mm]},
+  qbox/.style={rounded corners=2pt, draw=black!55, fill=black!4, align=center, inner sep=5pt, text width=2.9cm},
+  dcard/.style={rounded corners=2pt, draw=orange!75!black, fill=orange!10, align=center, inner sep=4pt, text width=2.6cm},
+  icard/.style={rounded corners=2pt, draw=blue!65!black, fill=blue!8, align=center, inner sep=4pt, text width=2.6cm},
+  dstep/.style={rounded corners=2pt, draw=orange!75!black, fill=orange!4, align=center, inner sep=4pt, text width=2.8cm},
+  istep/.style={rounded corners=2pt, draw=blue!65!black, fill=blue!4, align=center, inner sep=4pt, text width=3.3cm},
+  illus/.style={rounded corners=2pt, draw=red!70!black, fill=red!7, align=center, inner sep=4pt, text width=3.0cm, font=\footnotesize},
+  good/.style={rounded corners=2pt, draw=blue!65!black, fill=blue!14, align=center, inner sep=4pt, text width=2.0cm},
+  chip/.style={rounded corners=3pt, draw=black!40, fill=black!7, inner sep=3pt, font=\footnotesize},
+  dlab/.style={font=\footnotesize\bfseries, text=orange!75!black},
+  ilab/.style={font=\footnotesize\bfseries, text=blue!65!black},
+  flow/.style={->, thick, black!55},
+]
+\node[qbox] (Q) {\textbf{``What was Meta\\Platforms' operating\\income?''}\\[2pt]{\footnotesize\itshape looks fully specified}};
+\node[dcard, above right=5mm and 11mm of Q] (cardD) {\textbf{\$62.87B}\\{\footnotesize Family of Apps segment}};
+\node[icard, below right=5mm and 11mm of Q] (cardI) {\textbf{\$46.75B}\\{\footnotesize Consolidated, U.S.\ GAAP}};
+\node[dlab, above=1pt of cardD] {Default reading};
+\node[ilab, below=1pt of cardI] {Intended reading};
+\node[chip] at ($(cardD)!0.5!(cardI)$) {axis: \textbf{Entity scope} $\cdot$ $H_0{=}1.58$\,bit};
+\node[dstep, right=9mm of cardD] (agD) {\textbf{Search-only agent}\\{\footnotesize commits to the default}};
+\node[illus, right=8mm of agD] (resD) {\xmark~\textbf{\$62.87B}\\[1pt]a single-gold benchmark scores this \textbf{correct} --- the \emph{single-gold illusion}};
+\node[istep, right=9mm of cardI] (agI) {\textbf{Interactive agent} {\footnotesize asks}\\``Consolidated, or a segment?''\\{\footnotesize user:} ``Consolidated''};
+\node[good, right=8mm of agI] (resI) {\cmark~\textbf{\$46.75B}\\{\footnotesize intended}};
+\draw[flow] (Q.east) to[out=35,in=180] (cardD.west);
+\draw[flow] (Q.east) to[out=-35,in=180] (cardI.west);
+\draw[flow] (cardD) -- (agD);
+\draw[flow] (agD) -- (resD);
+\draw[flow] (cardI) -- (agI);
+\draw[flow] (agI) -- (resI);
+\end{tikzpicture}
+\caption{A deceptively simple analyst query is secretly ambiguous: ``Meta's
+operating income'' resolves to \$62.87B (Family of Apps segment) or \$46.75B
+(consolidated GAAP) depending on \emph{entity scope}. A search-only agent commits
+to the plausible default---which a conventional single-gold benchmark would score
+as correct (the \emph{single-gold illusion})---whereas resolving the ambiguity with
+one clarifying question yields the intended answer. \fininteract evaluates whether
+agents recognize and resolve such ambiguity.}
+\label{fig:teaser}
+\end{figure*}
 
 \begin{table}[h]
 \centering
