@@ -997,11 +997,18 @@ def main():
                     passage_texts[p_obj["passage_id"]] = p_obj.get("passage_text", "")
 
     # Inject passage_text into instances
+    n_fallback = 0
     for inst in instances:
         if "passage_text" not in inst and inst.get("passage_id") in passage_texts:
             inst["passage_text"] = passage_texts[inst["passage_id"]]
         elif "passage_text" not in inst:
             inst["passage_text"] = inst.get("context", "")[:500]
+            n_fallback += 1
+    if n_fallback and any(m in ("answer+search", "answer+search+interact") for m in args.modes):
+        print(f"\n  *** WARNING: {n_fallback}/{len(instances)} instances have NO retrieval "
+              f"passage; search will return the disambiguator C (NO answer values). "
+              f"+search/+interact accuracy will be invalid. Pass --passage-file "
+              f"data/sources/passages.jsonl. ***\n", file=sys.stderr)
 
     # Build clients
     oai = OpenAI()   # default (OpenAI)

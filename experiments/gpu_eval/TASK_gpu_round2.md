@@ -45,6 +45,7 @@ ask-loops, 76% never-commit). The flag injects
 for T in on off; do
   python scripts/evaluate.py --instances data/final/fininteract_v1.jsonl \
     --models qwen3-30b-a3b --modes answer+search+interact \
+    --passage-file data/sources/passages.jsonl \
     --agent-base-url http://localhost:8000/v1 --agent-thinking $T \
     --out data/results/eval_think_${T}_qwen3-30b-a3b.jsonl \
     --summary data/results/eval_think_${T}_qwen3-30b-a3b.summary.json
