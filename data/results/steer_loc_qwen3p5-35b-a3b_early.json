@@ -1,0 +1,28 @@
+{
+  "model": "Qwen/Qwen3.5-35B-A3B",
+  "n_layers": 40,
+  "steer_layers": [
+    8,
+    12
+  ],
+  "n_dir": 40,
+  "n_test": 90,
+  "by_alpha": {
+    "0.0": {
+      "IR": 2.2222222222222223,
+      "AxisHit@1": 0.5,
+      "answer_rate": 0.0,
+      "search_rate": 97.77777777777777,
+      "noparse_rate": 0.0,
+      "n_ask": 2
+    },
+    "1.5": {
+      "IR": 0.0,
+      "AxisHit@1": 0.0,
+      "answer_rate": 0.0,
+      "search_rate": 0.0,
+      "noparse_rate": 100.0,
+      "n_ask": 0
+    }
+  }
+}

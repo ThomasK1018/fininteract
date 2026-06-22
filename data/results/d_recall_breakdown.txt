@@ -1,0 +1,16 @@
+=== qwen3-30b-a3b: recall-cost decomposition (ceiling - interp-oracle) ===
+  EN (n=53): ceiling=69.8%  interp-oracle=0.0%  recall-cost=69.8
+  ZH (n=120): ceiling=99.2%  interp-oracle=0.0%  recall-cost=99.2
+  axis entity_scope       (n= 94): ceiling= 94%  interp-oracle=  0%  recall-cost= 94
+  axis metric_definition  (n= 63): ceiling= 89%  interp-oracle=  0%  recall-cost= 89
+  axis recognition_policy (n=  9): ceiling= 89%  interp-oracle=  0%  recall-cost= 89
+  axis temporal_scope     (n=  7): ceiling= 57%  interp-oracle=  0%  recall-cost= 57
+
+=== qwen3p5-35b-a3b: recall-cost decomposition (ceiling - interp-oracle) ===
+  EN (n=53): ceiling=73.6%  interp-oracle=1.9%  recall-cost=71.7
+  ZH (n=120): ceiling=100.0%  interp-oracle=1.7%  recall-cost=98.3
+  axis entity_scope       (n= 94): ceiling= 97%  interp-oracle=  2%  recall-cost= 95
+  axis metric_definition  (n= 63): ceiling= 92%  interp-oracle=  2%  recall-cost= 90
+  axis recognition_policy (n=  9): ceiling= 67%  interp-oracle=  0%  recall-cost= 67
+  axis temporal_scope     (n=  7): ceiling= 57%  interp-oracle=  0%  recall-cost= 57
+
