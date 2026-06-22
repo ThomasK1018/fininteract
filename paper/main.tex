@@ -392,6 +392,34 @@ and serves as a per-instance difficulty proxy.
 \label{sec:construction}
 %% ============================================================
 
+\fininteract is built and evaluated in four stages (Figure~\ref{fig:framework}):
+we \textbf{(1)~construct} ambiguous instances from public filings,
+\textbf{(2)~verify} their quality with sanity checks, an adversarial verifier, and
+expert review, \textbf{(3)~evaluate} agents under a ReAct interaction protocol with
+a user simulator that answers only from the disambiguating context $C$, and
+\textbf{(4)~score and diagnose} with accuracy plus interaction-quality,
+calibration, and efficiency metrics. This section covers stages~1--2;
+\S\ref{sec:eval} and \S\ref{sec:exp} cover stages~3--4.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_framework.pdf}
+\caption{\textbf{The \fininteract framework.} \textbf{(1)~Construct:} from SEC/EDGAR
+and A-share annual reports we build instances, each pairing an ambiguous question
+$Q$, disambiguating context $C$, intended answer $A$, and default answer $D$, across
+five financial ambiguity axes (173 bilingual instances). \textbf{(2)~Verify:} a
+constructor generates $(Q,C,A,D)$; sanity checks, an adversarial verifier (must
+\emph{fail} to answer $Q$ without $C$), and expert validation retain only hard,
+valid, non-trivial instances. \textbf{(3)~Evaluate:} agents run a ReAct loop
+(search/interact/answer) where a user simulator answers only from $C$, under
+answer-only, +search, +interact, and Axis-Aware ReAct modes. \textbf{(4)~Score and
+diagnose:} accuracy on the intended interpretation is primary; the intended-vs-default
+comparison exposes the single-gold illusion, and interaction-quality (IR, AxisHit@1,
+wrong-axis / generic-ask rates), calibration (ECE), and efficiency ($\text{DisE}^+$)
+localize the core bottleneck---issuing the correct follow-up clarification.}
+\label{fig:framework}
+\end{figure*}
+
 \subsection{Data Sources}
 
 \textbf{English (EN, $\sim$80\% of pool).}
