@@ -110,6 +110,7 @@ spot—they assume that every query is fully specified before the model begins
 to answer.
 
 Consider the question \emph{``What was Meta Platforms' operating income?''}
+(Figure~\ref{fig:teaser}).
 This question is genuinely ambiguous: should \emph{operating income} be the
 consolidated GAAP figure for the total company (\$46.75B for FY2023), or the
 Family of Apps segment figure (\$62.87B)?
@@ -123,45 +124,19 @@ pick the default interpretation.
 
 \begin{figure*}[t]
 \centering
-\begin{tikzpicture}[
-  font=\small,
-  >={Stealth[length=2mm,width=1.6mm]},
-  qbox/.style={rounded corners=2pt, draw=black!55, fill=black!4, align=center, inner sep=5pt, text width=2.9cm},
-  dcard/.style={rounded corners=2pt, draw=orange!75!black, fill=orange!10, align=center, inner sep=4pt, text width=2.6cm},
-  icard/.style={rounded corners=2pt, draw=blue!65!black, fill=blue!8, align=center, inner sep=4pt, text width=2.6cm},
-  dstep/.style={rounded corners=2pt, draw=orange!75!black, fill=orange!4, align=center, inner sep=4pt, text width=2.8cm},
-  istep/.style={rounded corners=2pt, draw=blue!65!black, fill=blue!4, align=center, inner sep=4pt, text width=3.3cm},
-  illus/.style={rounded corners=2pt, draw=red!70!black, fill=red!7, align=center, inner sep=4pt, text width=3.0cm, font=\footnotesize},
-  good/.style={rounded corners=2pt, draw=blue!65!black, fill=blue!14, align=center, inner sep=4pt, text width=2.0cm},
-  chip/.style={rounded corners=3pt, draw=black!40, fill=black!7, inner sep=3pt, font=\footnotesize},
-  dlab/.style={font=\footnotesize\bfseries, text=orange!75!black},
-  ilab/.style={font=\footnotesize\bfseries, text=blue!65!black},
-  flow/.style={->, thick, black!55},
-]
-\node[qbox] (Q) {\textbf{``What was Meta\\Platforms' operating\\income?''}\\[2pt]{\footnotesize\itshape looks fully specified}};
-\node[dcard, above right=5mm and 11mm of Q] (cardD) {\textbf{\$62.87B}\\{\footnotesize Family of Apps segment}};
-\node[icard, below right=5mm and 11mm of Q] (cardI) {\textbf{\$46.75B}\\{\footnotesize Consolidated, U.S.\ GAAP}};
-\node[dlab, above=1pt of cardD] {Default reading};
-\node[ilab, below=1pt of cardI] {Intended reading};
-\node[chip] at ($(cardD)!0.5!(cardI)$) {axis: \textbf{Entity scope} $\cdot$ $H_0{=}1.58$\,bit};
-\node[dstep, right=9mm of cardD] (agD) {\textbf{Search-only agent}\\{\footnotesize commits to the default}};
-\node[illus, right=8mm of agD] (resD) {\xmark~\textbf{\$62.87B}\\[1pt]a single-gold benchmark scores this \textbf{correct} --- the \emph{single-gold illusion}};
-\node[istep, right=9mm of cardI] (agI) {\textbf{Interactive agent} {\footnotesize asks}\\``Consolidated, or a segment?''\\{\footnotesize user:} ``Consolidated''};
-\node[good, right=8mm of agI] (resI) {\cmark~\textbf{\$46.75B}\\{\footnotesize intended}};
-\draw[flow] (Q.east) to[out=35,in=180] (cardD.west);
-\draw[flow] (Q.east) to[out=-35,in=180] (cardI.west);
-\draw[flow] (cardD) -- (agD);
-\draw[flow] (agD) -- (resD);
-\draw[flow] (cardI) -- (agI);
-\draw[flow] (agI) -- (resI);
-\end{tikzpicture}
-\caption{A deceptively simple analyst query is secretly ambiguous: ``Meta's
-operating income'' resolves to \$62.87B (Family of Apps segment) or \$46.75B
-(consolidated GAAP) depending on \emph{entity scope}. A search-only agent commits
-to the plausible default---which a conventional single-gold benchmark would score
-as correct (the \emph{single-gold illusion})---whereas resolving the ambiguity with
-one clarifying question yields the intended answer. \fininteract evaluates whether
-agents recognize and resolve such ambiguity.}
+\includegraphics[width=\textwidth]{fig_motivation.pdf}
+\caption{\textbf{Why ambiguous financial queries need interactive evaluation.}
+(1)~A real analyst query (``What was Meta Platforms' operating income?'') looks
+fully specified. (2)~But it hides ambiguity along five axes (entity scope, metric
+definition, temporal scope, filing vintage, recognition policy): here \emph{entity
+scope} yields two defensible answers---\$62.87B (Family of Apps segment) vs.\
+\$46.75B (consolidated GAAP). (3)~A search-only agent retrieves evidence and
+commits to the plausible default; a conventional single-gold benchmark scores that
+as correct---the \emph{single-gold illusion}---overstating competence by up to
+$3\times$. (4)~\fininteract instead measures whether an agent resolves the
+ambiguity by asking: the best free-interaction accuracy is $20.2\%$ while the
+context-oracle ceiling is $93$--$95\%$, so the bottleneck is issuing the right
+clarification, not missing knowledge.}
 \label{fig:teaser}
 \end{figure*}
 
