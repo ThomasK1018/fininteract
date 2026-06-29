@@ -1,36 +1,36 @@
 {
   "qwen3-30b-a3b/answer+search+interact": {
     "n": 173,
-    "accuracy": 0.0,
-    "ir_rate": 0.948,
-    "avg_turns": 4.38,
-    "avg_asks": 2.85,
-    "axis_hit_rate": 0.2535,
-    "axis_hit_at1": 0.2744,
-    "any_axis_hit": 0.4573,
-    "wrong_axis_rate": 0.7323,
-    "generic_ask_rate": 0.002,
+    "accuracy": 0.1098,
+    "ir_rate": 0.9364,
+    "avg_turns": 4.39,
+    "avg_asks": 2.79,
+    "axis_hit_rate": 0.2609,
+    "axis_hit_at1": 0.2716,
+    "any_axis_hit": 0.4444,
+    "wrong_axis_rate": 0.7226,
+    "generic_ask_rate": 0.0021,
     "per_axis_accuracy": {
-      "entity_scope": 0.0,
-      "temporal_scope": 0.0,
-      "recognition_policy": 0.0,
-      "metric_definition": 0.0
+      "entity_scope": 0.117,
+      "temporal_scope": 0.1429,
+      "recognition_policy": 0.1111,
+      "metric_definition": 0.0741
     },
     "per_lang_accuracy": {
-      "en": 0.0,
-      "zh": 0.0
+      "en": 0.1321,
+      "zh": 0.1
     },
-    "mean_dise_plus_all": 0.0,
+    "mean_dise_plus_all": 0.1051,
     "median_dise_plus_all": 0.0,
-    "mean_dise_plus_interact": 0.0,
+    "mean_dise_plus_interact": 0.1051,
     "median_dise_plus_interact": 0.0,
-    "mean_dise": 0.999,
+    "mean_dise": 0.9948,
     "median_dise": 0.7925,
     "n_valid": 173,
     "n_skipped": 0,
     "by_complexity": {
-      "1": 0.0,
-      "2": 0.0
+      "1": 0.1271,
+      "2": 0.0425
     }
   }
 }
