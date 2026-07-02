@@ -1,7 +1,7 @@
 {
   "qwen3p5-35b-a3b/interp-oracle": {
     "n": 173,
-    "accuracy": 0.0173,
+    "accuracy": 0.0231,
     "ir_rate": 0.0,
     "avg_turns": 1,
     "avg_asks": 0,
@@ -14,13 +14,13 @@
       "entity_scope": 0.0213,
       "temporal_scope": 0.0,
       "recognition_policy": 0.0,
-      "metric_definition": 0.0093
+      "metric_definition": 0.0185
     },
     "per_lang_accuracy": {
       "en": 0.0189,
-      "zh": 0.0167
+      "zh": 0.025
     },
-    "mean_dise_plus_all": 0.0299,
+    "mean_dise_plus_all": 0.0414,
     "median_dise_plus_all": 0.0,
     "mean_dise_plus_interact": 0.0,
     "median_dise_plus_interact": 0.0,
@@ -29,7 +29,7 @@
     "n_valid": 173,
     "n_skipped": 0,
     "by_complexity": {
-      "1": 0.0404,
+      "1": 0.056,
       "2": 0.0
     }
   }

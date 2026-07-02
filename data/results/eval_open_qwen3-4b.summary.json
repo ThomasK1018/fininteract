@@ -35,9 +35,9 @@
   },
   "qwen3-4b/answer+search": {
     "n": 173,
-    "accuracy": 0.0,
+    "accuracy": 0.0809,
     "ir_rate": 0.0,
-    "avg_turns": 2.03,
+    "avg_turns": 2,
     "avg_asks": 0,
     "axis_hit_rate": null,
     "axis_hit_at1": null,
@@ -45,16 +45,16 @@
     "wrong_axis_rate": null,
     "generic_ask_rate": null,
     "per_axis_accuracy": {
-      "entity_scope": 0.0,
-      "temporal_scope": 0.0,
+      "entity_scope": 0.1064,
+      "temporal_scope": 0.1429,
       "recognition_policy": 0.0,
-      "metric_definition": 0.0
+      "metric_definition": 0.0278
     },
     "per_lang_accuracy": {
-      "en": 0.0,
-      "zh": 0.0
+      "en": 0.1698,
+      "zh": 0.0417
     },
-    "mean_dise_plus_all": 0.0,
+    "mean_dise_plus_all": 0.1321,
     "median_dise_plus_all": 0.0,
     "mean_dise_plus_interact": 0.0,
     "median_dise_plus_interact": 0.0,
@@ -63,41 +63,41 @@
     "n_valid": 173,
     "n_skipped": 0,
     "by_complexity": {
-      "1": 0.0,
+      "1": 0.1785,
       "2": 0.0
     }
   },
   "qwen3-4b/answer+search+interact": {
     "n": 173,
-    "accuracy": 0.0058,
-    "ir_rate": 0.6012,
-    "avg_turns": 4.05,
-    "avg_asks": 1.76,
-    "axis_hit_rate": 0.2303,
-    "axis_hit_at1": 0.25,
-    "any_axis_hit": 0.4712,
-    "wrong_axis_rate": 0.7566,
+    "accuracy": 0.1214,
+    "ir_rate": 0.2775,
+    "avg_turns": 2.53,
+    "avg_asks": 0.51,
+    "axis_hit_rate": 0.2045,
+    "axis_hit_at1": 0.2083,
+    "any_axis_hit": 0.2917,
+    "wrong_axis_rate": 0.7841,
     "generic_ask_rate": 0.0,
     "per_axis_accuracy": {
-      "entity_scope": 0.0106,
+      "entity_scope": 0.1596,
       "temporal_scope": 0.0,
-      "recognition_policy": 0.0,
-      "metric_definition": 0.0
+      "recognition_policy": 0.2222,
+      "metric_definition": 0.037
     },
     "per_lang_accuracy": {
-      "en": 0.0189,
-      "zh": 0.0
+      "en": 0.2075,
+      "zh": 0.0833
     },
-    "mean_dise_plus_all": 0.0092,
+    "mean_dise_plus_all": 0.1816,
     "median_dise_plus_all": 0.0,
-    "mean_dise_plus_interact": 0.0092,
+    "mean_dise_plus_interact": 0.0785,
     "median_dise_plus_interact": 0.0,
-    "mean_dise": 0.6948,
-    "median_dise": 0.3962,
+    "mean_dise": 0.3362,
+    "median_dise": 0.0,
     "n_valid": 173,
     "n_skipped": 0,
     "by_complexity": {
-      "1": 0.0124,
+      "1": 0.2455,
       "2": 0.0
     }
   }
