@@ -30,8 +30,8 @@
 %% ---- BEGIN DOCUMENT ----
 \begin{document}
 
-\title{\fininteract: A Bilingual Benchmark for Evaluating\\
-Financial Search Agents on Ambiguous Queries}
+\title{\fininteract: The Single-Gold Illusion and the\\
+Elicitation Bottleneck in Ambiguous Question Answering}
 
 \author{[Authors blinded for review]}
 \affiliation{%
@@ -63,36 +63,36 @@ Financial Search Agents on Ambiguous Queries}
 \ccsdesc[500]{Information systems~Question answering}
 \ccsdesc[300]{Computing methodologies~Natural language processing}
 
-\keywords{financial question answering, ambiguity resolution, interactive agents,
-  benchmark, disambiguation, large language models}
+\keywords{evaluation methodology, measurement validity, ambiguity resolution,
+  interactive agents, clarification, single-gold illusion, financial question
+  answering, large language models}
 
 \begin{abstract}
-Financial question answering benchmarks assume that every query is fully
-specified, yet real analyst queries routinely carry unresolved ambiguity:
-the same question—\emph{``What was Meta Platforms' operating income?''}—can
-yield answers differing by 34\% depending on whether the scope is consolidated
-total or the Family of Apps segment.
-We introduce \fininteract, a bilingual (English/Chinese) benchmark of 173
-instances that pairs each question $Q$ with a \emph{default interpretation}
-(the answer a non-expert would assume) and an \emph{intended interpretation}
-(uniquely identified by a disambiguating context $C$).
-Instances span five axes of financial ambiguity—temporal scope,
-metric definition, entity scope, filing vintage, and recognition policy—drawn
-from SEC EDGAR filings and A-share annual reports.
-We evaluate frontier models under three ReAct-based modes
-(Answer-only, Answer+Search, Answer+Search+Interact), reporting standard
-\emph{accuracy} alongside interaction-quality diagnostics (interaction rate,
-axis-targeting precision, calibration).
-A controlled re-grading shows that conventional single-gold scoring---which
-credits the naive default reading---over-states model competence by up to
-$3\times$, exactly the blind spot \fininteract is built to expose.
-Even allowed to ask clarifying questions, frontier agents leave $92\%$ of
-ambiguous queries unresolved (best model $20\%$; $72\%$ are solved by no model
-in any mode), yet when handed the resolved interpretation the same models answer
-$93$--$95\%$ correctly---so the $\approx$75-point gap is the cost of failing to \emph{elicit}
-the disambiguation, not missing knowledge. Forcing models to ask more does not
-close it (and often hurts), and the capability does not improve monotonically
-with model scale.
+Question-answering benchmarks grade each query against a single gold answer.
+When a query is genuinely ambiguous, this convention silently rewards a model
+for producing the \emph{most common} reading rather than for recognizing that
+the query is under-specified---so a model that blindly guesses the default and
+one that correctly identifies the ambiguity receive the same score. We call this
+the \emph{single-gold illusion}. The mechanism is domain-general---single-gold
+grading credits the default reading whatever the domain---so we study it where it
+can be measured most cleanly: finance, where the same query is routinely
+ambiguous (\emph{``What was Meta Platforms' operating income?''} is \$46.75B
+consolidated or \$62.87B for the Family of Apps segment, a 34\% gap) yet each
+reading's ground truth is exact and programmatically verifiable.
+We release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances
+that pairs each question with a \emph{default} interpretation (the reading a
+non-expert assumes) and an \emph{intended} interpretation fixed by a
+disambiguating context, across a five-axis taxonomy of ambiguity.
+Re-grading the \emph{same} model outputs against the intended rather than the
+default interpretation cuts apparent accuracy by up to $3\times$. The failure is
+elicitation, not knowledge: given the resolved interpretation models answer
+$93$--$95\%$ correctly, yet in free interaction the best model resolves only
+$20\%$, and \emph{adding} clarification turns lowers accuracy below plain search
+for every model but the strongest. Finally, the required skills \emph{dissociate}:
+some ambiguity axes are solved by scale alone, while others (recognition basis)
+remain a blind spot that resists both scale and targeted training. A per-axis
+skill metric turns ``the model was wrong'' into ``the model failed to elicit axis
+$X$''---a diagnostic single-gold grading cannot provide.
 \end{abstract}
 
 \maketitle
@@ -102,25 +102,25 @@ with model scale.
 \label{sec:intro}
 %% ============================================================
 
-Large language models are increasingly deployed in high-stakes financial
-workflows: earnings-call analysis, SEC filing review, analyst report
-generation, and investor query handling.
-Yet the benchmarks used to evaluate these models share a critical blind
-spot—they assume that every query is fully specified before the model begins
-to answer.
+Question-answering benchmarks grade each query against a single gold answer.
+This convention is invisible when queries are fully specified---but real queries
+often are not, and when a query is genuinely ambiguous, single-gold grading
+silently rewards a model for producing the \emph{most common} reading rather than
+for recognizing that the query is under-specified at all. A model that blindly
+guesses the default interpretation and a model that correctly identifies the
+ambiguity receive the \emph{same} score. The benchmark therefore cannot see the
+capability that matters most in deployment: knowing when to ask.
 
-Consider the question \emph{``What was Meta Platforms' operating income?''}
-(Figure~\ref{fig:teaser}).
-This question is genuinely ambiguous: should \emph{operating income} be the
-consolidated GAAP figure for the total company (\$46.75B for FY2023), or the
-Family of Apps segment figure (\$62.87B)?
-Both are correct under their respective interpretations; the answers differ
-by 34\%.
-A skilled financial analyst would not guess—they would ask a clarifying
-question.
-Existing benchmarks reward the model that guesses correctly; they do not
-distinguish a model that recognizes the ambiguity from one that happens to
-pick the default interpretation.
+We call this the \emph{single-gold illusion}, and we study it where it can be
+measured most cleanly. Financial question answering is an ideal instrument: the
+same query is routinely ambiguous---\emph{``What was Meta Platforms' operating
+income?''} (Figure~\ref{fig:teaser}) is \$46.75B as the consolidated GAAP figure
+for FY2023 or \$62.87B for the Family of Apps segment, a 34\% difference---yet the
+ground truth for each reading is exact and programmatically verifiable against SEC
+filings. A skilled analyst would not guess; they would ask a clarifying question.
+Existing benchmarks reward the model that guesses correctly and cannot distinguish
+it from one that recognizes the ambiguity---the same blind spot, we will argue,
+that any single-gold benchmark inherits on ambiguous inputs, in finance or out.
 
 \begin{figure*}[t]
 \centering
@@ -218,27 +218,43 @@ We hypothesize that this stagnation is more severe in finance, where
 a model that does not know what ``non-GAAP'' means cannot recognize that
 ``adjusted net income'' is under-specified.
 
-\paragraph{Our Proposal: \fininteract.}
-We adapt the \interactcomp methodology to the finance domain, introduce a
-five-axis financial ambiguity taxonomy, and release \fininteract—a
-bilingual benchmark of 173 instances (53 English / 120 Chinese) designed
-to measure whether financial search agents can recognize query ambiguity
-and resolve it through efficient interaction.
+\paragraph{Our Proposal.}
+We operationalize the single-gold illusion and measure its consequences. We
+release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances
+(53 English / 120 Chinese): each question $Q$ is paired with a \emph{default}
+interpretation (the reading a non-expert assumes) and an \emph{intended}
+interpretation fixed by a disambiguating context $C$, across a five-axis taxonomy
+of financial ambiguity. Grading the \emph{same} model outputs against the default
+versus the intended interpretation exposes the illusion directly; a per-axis
+skill metric then localizes \emph{which} clarification ability a model lacks.
+Finance is the instrument---chosen for exact, verifiable ground truth and endemic
+ambiguity---but the phenomenon it reveals is a general fact about how we grade
+ambiguous queries.
 
 \noindent\textbf{Contributions:}
 \begin{enumerate}[leftmargin=*]
-  \item \textbf{Benchmark}: 173 bilingual instances with paired
-    default/intended interpretations, both grounded in verbatim filing quotes,
-    verified by adversarial LLM trials and human annotation (\S\ref{sec:construction}).
-  \item \textbf{Error Taxonomy}: A seven-type error decomposition framework
-    (E1--E7) that maps observed evaluation signals to actionable failure modes
-    (ambiguity blindness, wrong-axis clarification, retrieval dominance,
-    grounding failure) and links them to existing metrics (\S\ref{sec:error}).
-  \item \textbf{Method Baseline}: Axis-Aware Clarification ReAct — a
-    three-component intervention (ambiguity pre-check, axis-conditioned
-    clarification, interpretation-state-gated answering) that directly targets
-    E1--E3 errors and is evaluated against standard ReAct and oracle baselines
-    (\S\ref{sec:error}).
+  \item \textbf{The single-gold illusion.} We identify and quantify a
+    measurement-validity failure: grading ambiguous queries against one gold
+    answer overstates model competence by up to $3\times$, because it credits the
+    default reading and cannot distinguish recognizing ambiguity from guessing it.
+    The mechanism is domain-general; we measure it precisely in finance
+    (\S\ref{sec:illusion}).
+  \item \textbf{An elicitation bottleneck, not a knowledge gap.} Given the
+    resolved interpretation, models answer $93$--$95\%$ correctly, yet the best
+    model resolves only $20\%$ under free interaction, and \emph{adding}
+    clarification turns \emph{lowers} accuracy below plain search for every model
+    but the strongest---isolating elicitation as the binding constraint
+    (\S\ref{sec:ceiling}).
+  \item \textbf{A per-axis skill decomposition and a capability dissociation.} We
+    turn accuracy into a skill metric (AxisHit) that localizes \emph{which}
+    clarification ability fails, and show the ambiguity axes are different
+    \emph{kinds} of skill: some are solved by scale alone while others (recognition
+    basis) remain a blind spot that resists both scale and targeted training
+    (\S\ref{sec:skills}).
+  \item \textbf{\fininteract, the instrument.} A bilingual benchmark of 173
+    verifiable, ambiguity-paired instances with a five-axis taxonomy, construction
+    pipeline, and evaluation harness that make the above measurable and
+    reproducible (\S\ref{sec:construction}).
 \end{enumerate}
 
 
