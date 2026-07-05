@@ -68,3 +68,6 @@ annotation/sheets/
 paper/main.fdb_latexmk
 paper/main.fls
 paper/main.xdv
+
+# General-domain replication: raw AmbigQA dump is re-downloadable
+data/general_domain/raw/

@@ -1,0 +1,26 @@
+{
+  "model": "gpt-4o-mini",
+  "summary": {
+    "answer-only": {
+      "n": 120,
+      "intended_acc": 0.0833,
+      "any_valid_acc": 0.2667,
+      "default_capture": 0.2167,
+      "ask_rate": 0.0
+    },
+    "oracle": {
+      "n": 120,
+      "intended_acc": 0.1333,
+      "any_valid_acc": 0.2417,
+      "default_capture": 0.1333,
+      "ask_rate": 0.0
+    },
+    "interact": {
+      "n": 120,
+      "intended_acc": 0.1083,
+      "any_valid_acc": 0.2667,
+      "default_capture": 0.2083,
+      "ask_rate": 0.125
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "model": "gpt-4o",
+  "summary": {
+    "answer-only": {
+      "n": 120,
+      "intended_acc": 0.1833,
+      "any_valid_acc": 0.475,
+      "default_capture": 0.375,
+      "ask_rate": 0.0
+    },
+    "oracle": {
+      "n": 120,
+      "intended_acc": 0.3083,
+      "any_valid_acc": 0.425,
+      "default_capture": 0.2083,
+      "ask_rate": 0.0
+    },
+    "interact": {
+      "n": 120,
+      "intended_acc": 0.2583,
+      "any_valid_acc": 0.4917,
+      "default_capture": 0.3583,
+      "ask_rate": 0.0083
+    }
+  }
+}
