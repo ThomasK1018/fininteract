@@ -17,7 +17,7 @@ Per instance we grade the SAME output against:
                                        not-the-specified answer)
 The illusion = any-valid >> intended; default-capture is its direct evidence.
 """
-import json, argparse, os, concurrent.futures as cf
+import json, argparse, os, time, concurrent.futures as cf
 from openai import OpenAI
 
 client = OpenAI()
@@ -31,17 +31,29 @@ GRADER_SYS = (
 )
 
 
+def _is_reasoning(model):
+    return model.startswith(("gpt-5", "o1", "o3", "o4"))
+
+
 def _chat(sys, user, model, temp=0.0, max_tokens=256):
-    for _ in range(4):
+    msgs = [{"role": "system", "content": sys}, {"role": "user", "content": user}]
+    last = None
+    for attempt in range(6):
         try:
-            r = client.chat.completions.create(
-                model=model, temperature=temp, max_tokens=max_tokens,
-                messages=[{"role": "system", "content": sys},
-                          {"role": "user", "content": user}])
-            return r.choices[0].message.content.strip()
-        except Exception:
-            continue
-    return ""
+            if _is_reasoning(model):
+                # reasoning models: no temperature; reasoning consumes the budget,
+                # so give ample room for the visible answer to survive.
+                r = client.chat.completions.create(
+                    model=model, max_completion_tokens=max(max_tokens, 2048),
+                    messages=msgs)
+            else:
+                r = client.chat.completions.create(
+                    model=model, temperature=temp, max_tokens=max_tokens, messages=msgs)
+            return (r.choices[0].message.content or "").strip()
+        except Exception as e:
+            last = e
+            time.sleep(min(2 ** attempt, 30))  # exp backoff for rate limits
+    raise RuntimeError(f"chat failed after retries: {last}")  # fail loud, don't corrupt
 
 
 def grade(question, aliases, predicted, grader_model):
@@ -120,10 +132,17 @@ def main(a):
     with cf.ThreadPoolExecutor(max_workers=a.workers) as ex:
         futs = {ex.submit(eval_instance, ins, a.model, a.grader, m): (ins, m)
                 for ins, m in jobs}
+        n_fail = 0
         for i, f in enumerate(cf.as_completed(futs), 1):
-            results.append(f.result())
+            try:
+                results.append(f.result())
+            except Exception as e:
+                n_fail += 1
+                print(f"  [skip] {e}", flush=True)
             if i % 25 == 0:
-                print(f"  {i}/{len(jobs)}")
+                print(f"  {i}/{len(jobs)}  (failed {n_fail})", flush=True)
+    if n_fail:
+        print(f"WARNING: {n_fail}/{len(jobs)} jobs failed after retries")
     Path = __import__("pathlib").Path
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     with open(a.out, "w") as fo:

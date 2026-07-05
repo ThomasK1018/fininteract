@@ -49,17 +49,20 @@ def readings_of(item):
     return readings
 
 
-def main(src, out, limit):
+def main(src, out, limit, intended_rule="longest"):
     data = json.load(open(src))
     instances = []
     for item in data:
         rs = readings_of(item)
         if len(rs) < 2:
             continue
-        # deterministic intended pick: most specific (longest disambig q),
-        # tie-broken by hash of id for reproducibility
         h = int(hashlib.md5(item["id"].encode()).hexdigest(), 16)
-        intended = max(rs, key=lambda r: (len(r["q"]), norm(r["answers"][0]), h))
+        if intended_rule == "hash":
+            # reproducible pseudo-random target: robustness control vs "longest"
+            intended = rs[h % len(rs)]
+        else:
+            # deterministic intended pick: most specific (longest disambig q)
+            intended = max(rs, key=lambda r: (len(r["q"]), norm(r["answers"][0]), h))
         others = [r for r in rs if r is not intended]
         instances.append({
             "instance_id": f"ambig_{item['id']}",
@@ -94,5 +97,6 @@ if __name__ == "__main__":
     p.add_argument("--src", default="data/general_domain/raw/dev_light.json")
     p.add_argument("--out", default="data/general_domain/ambig_instances.jsonl")
     p.add_argument("--limit", type=int, default=0)
+    p.add_argument("--intended", choices=["longest", "hash"], default="longest")
     a = p.parse_args()
-    main(a.src, a.out, a.limit)
+    main(a.src, a.out, a.limit, a.intended)
