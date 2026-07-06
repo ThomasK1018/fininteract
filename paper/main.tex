@@ -1334,41 +1334,75 @@ together over training.}
 \label{fig:grpo}
 \end{figure}
 
-\subsection{Can the Benchmark Refresh Itself? A Co-Evolution Probe}
+\subsection{When Can the Benchmark Refresh Itself? Two Co-Evolution Probes}
 \label{sec:coevolve}
 
 A benchmark that models eventually memorize stops measuring. Because \fininteract
 couples a grounded data-generation pipeline (\S\ref{sec:construction}) to a
 trainable policy (\S\ref{sec:grpo}), it can in principle \emph{co-evolve}: generate
-fresh instances on the axis the current model most fails, train on them, and
-repeat---a data$\leftrightarrow$model loop in the spirit of self-improving
+fresh instances on an axis the current model fails, train on them, and repeat---a
+data$\leftrightarrow$model loop in the spirit of self-improving
 generators~\cite{mae2025}, but \emph{grounded} in real filings rather than the
-ungrounded self-play those methods risk. We probe one gated round on the hardest,
-scale-invariant axis (\texttt{recognition\_policy}, \S\ref{sec:skills}).
+ungrounded self-play those methods risk. We run two gated rounds---one on the
+scale-\emph{invariant} axis (\texttt{recognition\_policy}) and one on a
+scale-\emph{solvable} axis (\texttt{entity\_scope}, \S\ref{sec:skills})---to ask
+not \emph{whether} the loop works but \emph{when}.
 
-The round runs end-to-end. From FY2024--25 EDGAR filings the
-Constructor$\to$Verifier pipeline yields hard recognition instances---every one
-passes the adversarial gate (the base model fails all of them answer-only)---and
-axis-guided SFT converges on them. Behaviourally it \emph{works}: interaction rate
-rises $67\!\to\!100\%$ and the \emph{off-target} axes improve (entity AxisHit
-$0.09\!\to\!0.79$, metric $0.05\!\to\!0.35$; the opposite of catastrophic
-forgetting). But on the target axis it fails: \texttt{recognition\_policy} AxisHit
-stays $0.00$ on held-out human items \emph{and} on held-out generated items from
-its own training distribution. Inspecting the transcripts, the trained model
-reverts to the \emph{salient} ambiguity (period/entity) rather than the subtle
-recognition-basis distinction the teacher demonstrated.
+\begin{table}[t]
+\centering
+\caption{Two co-evolution rounds (axis-guided SFT on a 4B policy). Targeting
+(AxisHit@1) is measured on a \emph{held-out human} probe never seen in training.
+The loop \emph{closes} on the learnable, abundant axis and fails on the invariant,
+scarce one---but even the success over-elicits, costing accuracy.}
+\label{tab:coevolve}
+\small
+\begin{tabular}{lcc}
+\toprule
+ & \texttt{entity\_scope} & \texttt{recognition\_policy} \\
+ & \footnotesize solvable/abundant & \footnotesize invariant/scarce \\
+\midrule
+Frontier instances generable        & 99 & 36 (ceiling) \\
+Targeting, base $\to$ evolved        & $.00\to\textbf{.68}$ & $.00\to.00$ \\
+\;\;on held-out \emph{generated}     & .40 & .00 \\
+Interaction rate                     & $40\to100\%$ & $67\to100\%$ \\
+De-leaked accuracy                   & $32.5\to22.5$ & $11.1\to11.1$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\textbf{Finding 12: one grounded co-evolution round installs general
-self-elicitation but not the target skill---and the rare axis is source-scarce.}
-The model learns to ask, and to target the \emph{easy} axes, but a single round
-does not overcome its prior toward salient ambiguity: the ``ask the obvious, not
-the gold axis'' failure reappears at the \emph{training} level. Compounding this,
-\texttt{recognition\_policy} is scarce at the source---only $30$ of $1{,}847$
-candidate passages carry it as the primary axis---so one round cannot assemble
-enough signal. Both point the same way: a self-refreshing \fininteract needs
-\emph{multi-round} curriculum co-evolution and fresh-filing ingestion, not a single
-pass. We report this as a negative result that scopes the open problem, not a
-solved method.
+Both rounds run end-to-end: the Constructor$\to$Verifier pipeline yields hard
+instances (every one passes the adversarial gate---the base fails it answer-only)
+and axis-guided SFT converges. They diverge exactly where the taxonomy predicts
+(Table~\ref{tab:coevolve}). On \texttt{entity\_scope}, Targeting
+\emph{generalizes to held-out human items} ($.00\to.68$, $\sim$4$\times$ the
+$+.15$ bar) and to held-out \emph{generated} items ($.40$): the loop closes, with
+no catastrophic forgetting (off-target metric AxisHit even rises). On
+\texttt{recognition\_policy} it does not move ($.00$ on both held-out sets), and
+the trained model reverts to the salient period/entity question rather than the
+recognition-basis distinction the teacher demonstrated. The contrast rules out a
+broken pipeline: the \emph{same} machinery that installs entity cannot install
+recognition.
+
+\textbf{Finding 12: grounded co-evolution works under stateable
+conditions---we have both a positive and a negative example.} Read together, the
+two rounds say a self-refreshing \fininteract is viable on an axis that is
+(i)~\emph{learnable}---scale-solvable, so the skill is representable (entity, not
+recognition, \S\ref{sec:skills}); and (ii)~\emph{source-abundant}---enough frontier
+instances are generable (entity's $99$ vs.\ recognition's $36$-instance ceiling from
+just $30/1{,}847$ primary passages). Both levers---scale (zero-shot, Finding~11) and
+training (this loop)---install entity/metric and neither installs recognition, a
+two-lever confirmation of the dissociation. A third condition governs whether the
+gain is \emph{net-positive}: (iii)~\emph{calibrated elicitation}. Even the
+successful entity round \emph{over-elicits}---SFT drives interaction $40\to100\%$,
+so the model asks on every item including ones it already answered outright,
+converting six previously-correct direct answers into wrong multi-turn ones and
+dropping accuracy $32.5\to22.5$. It learned \emph{which} axis to ask but not
+\emph{when asking is worth it}---the training-time face of the ``interaction can
+hurt versus plain answering'' effect seen at inference (\S\ref{sec:ceiling}). The
+actionable next step is therefore not more scale but a \emph{when-to-ask gate},
+plus multi-round curriculum and fresh-filing ingestion for the scarce axes. We
+report this as a scoped map of where self-refreshing evaluation is, and is not yet,
+viable.
 
 
 %% ============================================================
