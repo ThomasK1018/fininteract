@@ -56,16 +56,21 @@ python scripts/construct_fast.py --source data/sources/passages.jsonl \
 #   -> data/coevolve/metric/{gen_W,train_W,heldout_W}.jsonl   (mirror entity Step 1 exactly)
 ```
 
-**Step 2 — MODEL ARM.** Build axis-guided SFT demos EXACTLY as in the entity/round-0
-runs (privately reveal the gold axis=metric_definition to the teacher; hint NOT stored in
-the trajectory; emit `{messages, instance_id, reward}` → `data/coevolve/metric/demos/sft.jsonl`),
-then:
+**Step 2 — MODEL ARM.** Generate axis-guided SFT demos with the committed generator
+(privately reveals gold axis=metric_definition to the teacher; hint NOT stored in the
+saved trajectory; output byte-matches the entity demos), then SFT:
 ```bash
+python scripts/gen_axis_guided_demos.py \
+  --instances data/coevolve/metric/train_W.jsonl --axis metric_definition \
+  --teacher-model gpt-5-mini --out data/coevolve/metric/demos/sft.jsonl
+#   (local teacher instead of OpenAI: add --teacher-base-url http://localhost:8000/v1)
 accelerate launch experiments/gpu_eval/c2_sft_train_gc.py \
   --model Qwen/Qwen3-4B-Instruct --data data/coevolve/metric/demos/sft.jsonl \
   --output outputs/coevolve/sft_metric        # grad_accum 1, ~6 epochs, as entity
 # serve trained model on :8000
 ```
+> Parity check: `head -1 data/coevolve/metric/demos/sft.jsonl` should match the roles /
+> compact-JSON action format of the committed `data/coevolve/entity/demos/sft.jsonl`.
 
 **Step 3 — RE-MEASURE** on `probe_human_metric` + `heldout_W`; check forgetting on
 `entity_scope`/`recognition_policy`. (Mirror entity Step 3.)
