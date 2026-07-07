@@ -1404,6 +1404,67 @@ plus multi-round curriculum and fresh-filing ingestion for the scarce axes. We
 report this as a scoped map of where self-refreshing evaluation is, and is not yet,
 viable.
 
+\subsection{Predicting Co-Evolvability: Learnability, Abundance, and Salience}
+\label{sec:learnability}
+
+The two rounds suggest two conditions; measuring them across \emph{all five} axes
+turns a pair of anecdotes into a \emph{predictive} account of which axes a
+self-refreshing benchmark can improve. We operationalize each condition with a
+quantity already in our data.
+
+\textbf{Learnability} is the \emph{scale-slope} of Targeting---how AxisHit@1 moves
+across the Qwen3 $0.6\text{B}\!\to\!32\text{B}$ sweep. It is a gradient: entity rises
+steeply ($.12\!\to\!.89$), metric weakly ($.05\!\to\!.26$), recognition not at all
+($.00\!\to\!.00$), while temporal is already saturated at every scale. A positive
+slope means the targeting skill is \emph{representable and emerges} with scale; a
+flat one means scale never installs it. \textbf{Source-abundance} is the number of
+corpus passages carrying the axis as its \emph{primary} ambiguity---the data arm's
+supply of frontier instances (entity $905$, metric $498$, recognition $30$ of
+$1{,}847$).
+
+\begin{table}[t]
+\centering
+\caption{Predicting co-evolvability across the five axes. \emph{Salience} =
+primary$/$any-candidate passages (how often the axis is the \emph{dominant}
+ambiguity when present); \emph{Learnability} = AxisHit@1 scale-slope
+($4\text{B}\!\to\!32\text{B}$). The observed outcomes (entity GO, recognition NO-GO)
+fall exactly where salience predicts.}
+\label{tab:learnability}
+\small
+\begin{tabular}{lrrcc}
+\toprule
+Axis & Primary & Salience & AxisHit $4\!\to\!32$B & Co-evolve \\
+\midrule
+entity\_scope       & 905 & \textbf{0.92} & .12$\to$.89 & \textbf{GO} \\
+metric\_definition  & 498 & 0.48 & .05$\to$.26 & partial? \\
+temporal\_scope     & 150 & 0.15 & 1.0$\to$1.0 & moot (solved) \\
+filing\_vintage     & 264 & 0.33 & --          & untestable \\
+recognition\_policy &  30 & \textbf{0.04} & .00$\to$.00 & \textbf{NO-GO} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Finding 13: one property---\emph{salience}---gates both conditions, making
+co-evolvability predictable.} The two conditions are not independent knobs.
+\texttt{recognition\_policy} appears as a candidate axis in $796$ passages but is
+\emph{primary} in only $30$ (salience $0.04$): it is almost always the
+\emph{subordinate} ambiguity, behind a more salient entity or period axis in the
+same passage. That one property explains both failures---rarely dominant, so few
+frontier instances can be generated (scarcity); and a salient competitor always
+co-occurs, so the model's prior reaches for \emph{it} and training cannot redirect
+to the subtle axis (non-learnability). Salient axes behave oppositely: entity is
+primary in $905/980$ of the passages where it appears (salience $0.92$) and is both
+abundant and learnable. The lone informative exception is \texttt{temporal\_scope}
+---rarely primary ($0.15$) yet fully learnable---because it is trivially
+recognizable once it \emph{is} the question; corpus-salience and intrinsic
+recognizability are correlated but distinct, which is why we measure learnability
+(scale-slope) and abundance (primary count) separately. The account yields a
+testable prediction: \texttt{metric\_definition}, abundant ($498$) but only weakly
+learnable ($\Delta{+}0.21$), should co-evolve \emph{partially}---above recognition's
+$+0.00$ but short of entity's $+0.62$. For a practitioner, \textbf{salience is a
+cheap, up-front signal} of which axes a co-evolving benchmark can keep hard and
+which instead need fresh human curation.
+
 
 %% ============================================================
 \section{Related Work}
