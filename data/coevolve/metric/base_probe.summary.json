@@ -1,0 +1,34 @@
+{
+  "qwen3-4b/answer+search+interact": {
+    "n": 40,
+    "accuracy": 0.15,
+    "ir_rate": 0.5,
+    "avg_turns": 2.77,
+    "avg_asks": 0.68,
+    "axis_hit_rate": 0.0741,
+    "axis_hit_at1": 0.0,
+    "any_axis_hit": 0.1,
+    "wrong_axis_rate": 0.9259,
+    "generic_ask_rate": 0.0,
+    "per_axis_accuracy": {
+      "metric_definition": 0.15,
+      "entity_scope": 0.0
+    },
+    "per_lang_accuracy": {
+      "zh": 0.1667,
+      "en": 0.1
+    },
+    "mean_dise_plus_all": 0.3,
+    "median_dise_plus_all": 0.0,
+    "mean_dise_plus_interact": 0.1,
+    "median_dise_plus_interact": 0.0,
+    "mean_dise": 1.1196,
+    "median_dise": 0.2,
+    "n_valid": 40,
+    "n_skipped": 0,
+    "by_complexity": {
+      "1": 0.5,
+      "2": 0.0
+    }
+  }
+}
