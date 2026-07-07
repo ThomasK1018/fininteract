@@ -28,9 +28,10 @@ Entity decodability across the sweep (the two reliable axes; entity n=94, metric
 |---|--:|--:|
 | 4B  | 0.772 | 0.765 |
 | 8B  | 0.764 | 0.765 |
-| 14B | 0.764 | (probing) |
-| 32B | 0.784 | (probing) |
+| 14B | 0.764 | 0.765 |
+| 32B | 0.784 | 0.762 |
 
+Both reliable axes are **flat across the entire 4B→32B sweep** (entity ~0.77, metric ~0.765).
 **Decodability is flat across scale (~0.77)** — yet behavioural AxisHit rises steeply with
 scale (entity .12 → .89). So the axis is **equally represented at 4B and 32B**; only the
 *behaviour* of acting on it scales. Decodability does **not** track the scale-slope — the
@@ -81,5 +82,5 @@ representational presence.
 ## Deliverables
 `data/results/probe_peraxis_{4b,8b,14b,32b}.json`, `probe_peraxis_4b_augrec.json`,
 `probe_{entity,recognition}_sft.json`, `experiments/sft_vs_rl/probe_per_axis.py`, this file.
-(14B/32B non-entity axes still CPU-probing at write time; entity-across-scale, augmented
+(All 4 sizes x 4 axes complete; entity+metric flat across scale, augmented
 recognition, and the SFT-invariance results — the three claims — are complete.)
