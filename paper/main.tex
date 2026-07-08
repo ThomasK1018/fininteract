@@ -1334,7 +1334,7 @@ together over training.}
 \label{fig:grpo}
 \end{figure}
 
-\subsection{When Can the Benchmark Refresh Itself? Two Co-Evolution Probes}
+\subsection{When Can the Benchmark Refresh Itself? Three Co-Evolution Probes}
 \label{sec:coevolve}
 
 A benchmark that models eventually memorize stops measuring. Because \fininteract
@@ -1343,127 +1343,133 @@ trainable policy (\S\ref{sec:grpo}), it can in principle \emph{co-evolve}: gener
 fresh instances on an axis the current model fails, train on them, and repeat---a
 data$\leftrightarrow$model loop in the spirit of self-improving
 generators~\cite{mae2025}, but \emph{grounded} in real filings rather than the
-ungrounded self-play those methods risk. We run two gated rounds---one on the
-scale-\emph{invariant} axis (\texttt{recognition\_policy}) and one on a
-scale-\emph{solvable} axis (\texttt{entity\_scope}, \S\ref{sec:skills})---to ask
-not \emph{whether} the loop works but \emph{when}.
+ungrounded self-play those methods risk. We run three gated rounds---on the scarce,
+subordinate axis (\texttt{recognition\_policy}), the abundant, salient axis
+(\texttt{entity\_scope}), and the abundant-but-only-weakly-scale-learnable axis
+(\texttt{metric\_definition}, \S\ref{sec:skills})---to ask not \emph{whether} the
+loop works but \emph{when}.
 
 \begin{table}[t]
 \centering
-\caption{Two co-evolution rounds (axis-guided SFT on a 4B policy). Targeting
-(AxisHit@1) is measured on a \emph{held-out human} probe never seen in training.
-The loop \emph{closes} on the learnable, abundant axis and fails on the invariant,
-scarce one---but even the success over-elicits, costing accuracy.}
+\caption{Three co-evolution rounds (axis-guided SFT on a 4B policy). Targeting
+(AxisHit@1) is on a \emph{held-out human} probe never seen in training. The loop
+closes on both \emph{abundant} axes and fails only on the \emph{scarce} one; whether
+asking \emph{helps accuracy} flips on whether the base could already answer.}
 \label{tab:coevolve}
 \small
-\begin{tabular}{lcc}
+\begin{tabular}{lccc}
 \toprule
- & \texttt{entity\_scope} & \texttt{recognition\_policy} \\
- & \footnotesize solvable/abundant & \footnotesize invariant/scarce \\
+ & \texttt{entity} & \texttt{metric} & \texttt{recognition} \\
+ & \footnotesize abundant & \footnotesize abundant & \footnotesize scarce \\
 \midrule
-Frontier instances generable        & 99 & 36 (ceiling) \\
-Targeting, base $\to$ evolved        & $.00\to\textbf{.68}$ & $.00\to.00$ \\
-\;\;on held-out \emph{generated}     & .40 & .00 \\
-Interaction rate                     & $40\to100\%$ & $67\to100\%$ \\
-De-leaked accuracy                   & $32.5\to22.5$ & $11.1\to11.1$ \\
+Frontier instances generable        & 99 & 76 & 36 (ceiling) \\
+Targeting, base $\to$ evolved        & $.00\to\textbf{.68}$ & $.00\to\textbf{.58}$ & $.00\to.00$ \\
+\;\;on held-out \emph{generated}     & .40 & .88 & .00 \\
+Interaction rate                     & $40\to100$ & $50\to100$ & $67\to100$ \\
+De-leaked accuracy                   & $32.5\to22.5$ & $15\to\textbf{60}$ & $11\to11$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Both rounds run end-to-end: the Constructor$\to$Verifier pipeline yields hard
+All three rounds run end-to-end: the Constructor$\to$Verifier pipeline yields hard
 instances (every one passes the adversarial gate---the base fails it answer-only)
-and axis-guided SFT converges. They diverge exactly where the taxonomy predicts
-(Table~\ref{tab:coevolve}). On \texttt{entity\_scope}, Targeting
-\emph{generalizes to held-out human items} ($.00\to.68$, $\sim$4$\times$ the
-$+.15$ bar) and to held-out \emph{generated} items ($.40$): the loop closes, with
-no catastrophic forgetting (off-target metric AxisHit even rises). On
-\texttt{recognition\_policy} it does not move ($.00$ on both held-out sets), and
-the trained model reverts to the salient period/entity question rather than the
-recognition-basis distinction the teacher demonstrated. The contrast rules out a
-broken pipeline: the \emph{same} machinery that installs entity cannot install
-recognition.
+and axis-guided SFT converges. The outcome splits cleanly by \emph{abundance}, not
+by scale-learnability. On both abundant axes---\texttt{entity\_scope} and
+\texttt{metric\_definition}---Targeting generalizes to held-out \emph{human} items
+($.00\to.68$ and $.00\to.58$, each $\sim$4$\times$ the $+.15$ bar) and to held-out
+\emph{generated} items, with no catastrophic forgetting. On the scarce
+\texttt{recognition\_policy} it does not move ($.00$ on both held-out sets): the
+trained model reverts to the salient period/entity question rather than the
+recognition-basis distinction. The contrast rules out a broken pipeline---the
+\emph{same} machinery installs entity and metric but not recognition---and, because
+metric is only \emph{weakly} scale-learnable yet trains as well as entity, it rules
+out scale-learnability as the gate (\S\ref{sec:learnability}).
 
-\textbf{Finding 12: grounded co-evolution works under stateable
-conditions---we have both a positive and a negative example.} Read together, the
-two rounds say a self-refreshing \fininteract is viable on an axis that is
-(i)~\emph{learnable}---scale-solvable, so the skill is representable (entity, not
-recognition, \S\ref{sec:skills}); and (ii)~\emph{source-abundant}---enough frontier
-instances are generable (entity's $99$ vs.\ recognition's $36$-instance ceiling from
-just $30/1{,}847$ primary passages). Both levers---scale (zero-shot, Finding~11) and
-training (this loop)---install entity/metric and neither installs recognition, a
-two-lever confirmation of the dissociation. A third condition governs whether the
-gain is \emph{net-positive}: (iii)~\emph{calibrated elicitation}. Even the
-successful entity round \emph{over-elicits}---SFT drives interaction $40\to100\%$,
-so the model asks on every item including ones it already answered outright,
-converting six previously-correct direct answers into wrong multi-turn ones and
-dropping accuracy $32.5\to22.5$. It learned \emph{which} axis to ask but not
-\emph{when asking is worth it}---the training-time face of the ``interaction can
-hurt versus plain answering'' effect seen at inference (\S\ref{sec:ceiling}). The
-actionable next step is therefore not more scale but a \emph{when-to-ask gate},
-plus multi-round curriculum and fresh-filing ingestion for the scarce axes. We
-report this as a scoped map of where self-refreshing evaluation is, and is not yet,
-viable.
+\textbf{Finding 12: the loop closes on abundant axes and fails on scarce ones;
+whether elicitation \emph{helps} is a separate, per-axis property.} A self-refreshing
+\fininteract is viable wherever the data arm can supply enough frontier
+instances---both abundant axes install and generalize; the scarce axis
+(recognition's $36$-instance ceiling from just $30/1{,}847$ primary passages) does
+not. But installing on-axis elicitation is not automatically beneficial: it
+\emph{helps} metric (accuracy $15\to60$, $+45$---the base cannot answer without the
+metric definition, so the clarifying question \emph{supplies} it: $18$
+wrong$\to$correct, $0$ regressions) and \emph{hurts} entity (accuracy $32.5\to22.5$,
+$-10$---the base can often answer the entity directly, so forcing a question turns
+six correct direct answers into wrong multi-turn ones). Both drove interaction to
+$100\%$; the accuracy sign flips on whether the base could already answer---the
+training-time face of the ``interaction can hurt versus plain answering'' effect
+seen at inference (\S\ref{sec:ceiling}). The actionable step is a \emph{conditional
+when-to-ask gate}---elicit only where the model cannot already answer---plus
+multi-round curriculum and fresh-filing ingestion to lift the scarce axes above
+their availability ceiling.
 
-\subsection{Predicting Co-Evolvability: Learnability, Abundance, and Salience}
+\subsection{What Gates Co-Evolvability? A Falsification Test}
 \label{sec:learnability}
 
-The two rounds suggest two conditions; measuring them across \emph{all five} axes
-turns a pair of anecdotes into a \emph{predictive} account of which axes a
-self-refreshing benchmark can improve. We operationalize each condition with a
-quantity already in our data.
+The three rounds let us isolate \emph{which} axis property predicts whether the loop
+closes. Two candidates are natural---an axis's \emph{scale-learnability} (does
+zero-shot Targeting rise with model size?) and its \emph{source-abundance} (can the
+data arm supply frontier instances?)---and we had also hypothesized a
+representational version: \emph{learnable iff the axis is linearly decodable} from
+hidden states. The \texttt{metric\_definition} round was designed to discriminate the
+first two; a linear probe tests the third. Both tidy hypotheses fail.
 
-\textbf{Learnability} is the \emph{scale-slope} of Targeting---how AxisHit@1 moves
-across the Qwen3 $0.6\text{B}\!\to\!32\text{B}$ sweep. It is a gradient: entity rises
-steeply ($.12\!\to\!.89$), metric weakly ($.05\!\to\!.26$), recognition not at all
-($.00\!\to\!.00$), while temporal is already saturated at every scale. A positive
-slope means the targeting skill is \emph{representable and emerges} with scale; a
-flat one means scale never installs it. \textbf{Source-abundance} is the number of
-corpus passages carrying the axis as its \emph{primary} ambiguity---the data arm's
-supply of frontier instances (entity $905$, metric $498$, recognition $30$ of
-$1{,}847$).
+\textbf{Scale-learnability does not gate co-evolution.} \texttt{metric\_definition}
+is abundant ($498$ primary passages) but only \emph{weakly} scale-learnable
+(zero-shot AxisHit $.05\!\to\!.26$, slope $+0.21$, versus entity's $+0.77$). We
+pre-registered the two-factor prediction that it would co-evolve only
+\emph{partially}. It did not: metric is a \emph{full} GO (Targeting $+0.55$, matching
+entity's $+0.61$; Table~\ref{tab:coevolve}). What separates GO from NO-GO is not the
+scale-slope but \emph{abundance}---both abundant axes close the loop; only the scarce
+axis fails.
+
+\textbf{Representation does not gate it either, and is not the bottleneck.} A
+per-layer one-vs-rest linear probe decodes every axis from base hidden states, and
+the pattern \emph{anti}-tracks learnability: \texttt{recognition\_policy}---the
+un-learnable, NO-GO axis---is the \emph{most} decodable (AUROC $0.93$ on a
+size-matched sample, above entity/metric at $\sim0.77$); decodability is \emph{flat}
+across the $4\text{B}\!\to\!32\text{B}$ sweep even as behavioural AxisHit climbs
+$.12\!\to\!.89$; and axis-guided SFT leaves it unchanged. The axis is fully
+\emph{represented} at every scale, before and after training---the model simply does
+not \emph{act} on it, the ``represents-but-doesn't-act'' gap of
+\S\ref{sec:mechanistic}, now shown to hold even for the axis co-evolution cannot fix.
 
 \begin{table}[t]
 \centering
-\caption{Predicting co-evolvability across the five axes. \emph{Salience} =
-primary$/$any-candidate passages (how often the axis is the \emph{dominant}
-ambiguity when present); \emph{Learnability} = AxisHit@1 scale-slope
-($4\text{B}\!\to\!32\text{B}$). The observed outcomes (entity GO, recognition NO-GO)
-fall exactly where salience predicts.}
+\caption{What predicts co-evolvability. The observed outcomes track
+\emph{abundance/salience}---\emph{not} the AxisHit scale-slope (metric: low slope,
+GO) and \emph{not} decodability (recognition: highest AUROC, NO-GO). Salience =
+primary$/$any-candidate passages; decodability = peak one-vs-rest AUROC (recognition
+on a size-matched augmented sample; raw $n{=}9$ overfits to $1.0$).}
 \label{tab:learnability}
 \small
-\begin{tabular}{lrrcc}
+\begin{tabular}{lrrccc}
 \toprule
-Axis & Primary & Salience & AxisHit $4\!\to\!32$B & Co-evolve \\
+Axis & Primary & Salience & Slope & Decode & Co-evolve \\
 \midrule
-entity\_scope       & 905 & \textbf{0.92} & .12$\to$.89 & \textbf{GO} \\
-metric\_definition  & 498 & 0.48 & .05$\to$.26 & partial? \\
-temporal\_scope     & 150 & 0.15 & 1.0$\to$1.0 & moot (solved) \\
-filing\_vintage     & 264 & 0.33 & --          & untestable \\
-recognition\_policy &  30 & \textbf{0.04} & .00$\to$.00 & \textbf{NO-GO} \\
+entity\_scope       & 905 & \textbf{0.92} & $+0.77$ & 0.77 & \textbf{GO} \\
+metric\_definition  & 498 & 0.48 & $+0.21$ & 0.77 & \textbf{GO} \\
+temporal\_scope     & 150 & 0.15 & sat.    & 0.92 & solved \\
+filing\_vintage     & 264 & 0.33 & --      & --   & untestable \\
+recognition\_policy &  30 & \textbf{0.04} & $+0.00$ & \textbf{0.93} & \textbf{NO-GO} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Finding 13: one property---\emph{salience}---gates both conditions, making
-co-evolvability predictable.} The two conditions are not independent knobs.
-\texttt{recognition\_policy} appears as a candidate axis in $796$ passages but is
-\emph{primary} in only $30$ (salience $0.04$): it is almost always the
-\emph{subordinate} ambiguity, behind a more salient entity or period axis in the
-same passage. That one property explains both failures---rarely dominant, so few
-frontier instances can be generated (scarcity); and a salient competitor always
-co-occurs, so the model's prior reaches for \emph{it} and training cannot redirect
-to the subtle axis (non-learnability). Salient axes behave oppositely: entity is
-primary in $905/980$ of the passages where it appears (salience $0.92$) and is both
-abundant and learnable. The lone informative exception is \texttt{temporal\_scope}
----rarely primary ($0.15$) yet fully learnable---because it is trivially
-recognizable once it \emph{is} the question; corpus-salience and intrinsic
-recognizability are correlated but distinct, which is why we measure learnability
-(scale-slope) and abundance (primary count) separately. The account yields a
-testable prediction: \texttt{metric\_definition}, abundant ($498$) but only weakly
-learnable ($\Delta{+}0.21$), should co-evolve \emph{partially}---above recognition's
-$+0.00$ but short of entity's $+0.62$. For a practitioner, \textbf{salience is a
-cheap, up-front signal} of which axes a co-evolving benchmark can keep hard and
-which instead need fresh human curation.
+\textbf{Finding 13: co-evolvability is gated by source \emph{abundance}---driven by
+\emph{salience}---not by scale-learnability or representational decodability.} What
+survives both falsifications is a single upstream cause. \texttt{recognition\_policy}
+is a candidate axis in $796$ passages but \emph{primary} in only $30$ (salience
+$0.04$): it is almost always the \emph{subordinate} ambiguity, behind a more salient
+entity or period axis in the same passage. Low salience produces both the scarcity
+that starves the data arm and the salient competitor the model's prior reaches for
+instead---so the representation is present but never acted on and cannot be cheaply
+trained in. Salient axes behave oppositely (entity, salience $0.92$: abundant and
+trainable). For a practitioner, \textbf{salience---not scale curves or probe
+accuracy---is the cheap, up-front signal} of which axes a co-evolving benchmark can
+keep hard and which need fresh human curation. The corollary for evaluation is
+sharper: the hardest ambiguity to make models \emph{handle} is not the one they
+cannot represent, but the one that is always someone else's more-obvious question.
 
 
 %% ============================================================
