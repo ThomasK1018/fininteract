@@ -1502,8 +1502,13 @@ FinanceQA further shows that frontier models fail $\sim$60\% of realistic
 analyst tasks, but attributes this to numerical rigor rather than ambiguity.
 FinEval~\cite{guo2023fineval}, a large Chinese financial-knowledge benchmark,
 incidentally identifies an ``ambiguity handling weakness'' error type in its
-agent tasks but does not isolate or control it. \fininteract is the first to
-make query ambiguity the central, controlled construct---via paired
+agent tasks but does not isolate or control it. Recent \emph{agentic} financial
+benchmarks raise task realism---Finance Agent Benchmark~\cite{bigeard2025financeagent}
+(537 expert research tasks, where the best model reaches only $46.8\%$) and
+FinAgentBench~\cite{choi2025finagentbench} (agentic retrieval over EDGAR)---but both
+remain single-turn and single-gold, evaluating analysis and retrieval rather than
+whether an agent recognizes that a query is under-specified. \fininteract is the
+first to make query ambiguity the central, controlled construct---via paired
 default/intended interpretations and multi-turn interaction---in the financial
 domain.
 
@@ -1530,6 +1535,10 @@ FinBen~\cite{xie2024finben}
   & multi-task & partial & -- & -- & partial & auto & mixed \\
 FinanceQA~\cite{mateega2025financeqa}
   & multi-task & -- & -- & -- & -- & expert & SEC \\
+Finance Agent Bench.~\cite{bigeard2025financeagent}
+  & 537 & -- & -- & -- & -- & expert & SEC \\
+FinAgentBench~\cite{choi2025finagentbench}
+  & 26K & -- & -- & -- & -- & auto & SEC \\
 FinEval~\cite{guo2023fineval}
   & 8,351 & -- & -- & -- & ZH & expert & exams \\
 \midrule
@@ -1545,8 +1554,25 @@ ASQA~\cite{stelmakh2022asqa},
 CondAmbigQA~\cite{li2025condambigqa}, and
 CLAM~\cite{kuhn2022clam}
 have matured in the general (Wikipedia) domain.
-We adapt their formalism to finance, replacing human-judged ambiguity labels
-with programmatically verifiable XBRL-grounded evidence pairs.
+More recent benchmarks target the agent's \emph{own} ability to ask:
+CLAMBER~\cite{zhang2024clamber} evaluates whether models identify and clarify
+ambiguous information needs, and QuestBench~\cite{li2025questbench} tests whether
+they can ask the minimal necessary question in reasoning tasks. Both are
+general-domain and judge a single clarifying step; \fininteract adds \emph{per-axis}
+targeting (AxisHit), programmatically verifiable financial grounding, and---via the
+co-evolution rounds (\S\ref{sec:coevolve})---an analysis of \emph{when} asking helps
+versus hurts. We adapt this line's formalism to finance, replacing human-judged
+ambiguity labels with programmatically verifiable XBRL-grounded evidence pairs.
+
+\paragraph{Clarifying Questions.}
+Asking clarifying questions is a long-standing goal in information retrieval and
+dialogue. Rao and Daum\'e III~\cite{rao2018clarification} rank clarification
+questions by expected value of perfect information; ClariQ~\cite{aliannejadi2020clariq}
+established a shared task for generating clarifying questions in open-domain dialogue;
+and the mixed-initiative paradigm is surveyed in Conversational Information
+Seeking~\cite{zamani2023cis}. \fininteract instantiates this lineage with a
+leak-proof, per-axis measure of \emph{which} clarification an agent should issue and a
+verifiable outcome for whether issuing it resolves the query.
 
 \paragraph{Interactive Search Agents.}
 \interactcomp~\cite{interactcomp2026} is the direct methodological ancestor.
