@@ -94,7 +94,8 @@ remain a blind spot that resists both scale and targeted training. A per-axis
 skill metric turns ``the model was wrong'' into ``the model failed to elicit axis
 $X$''---a diagnostic single-gold grading cannot provide. A replication on the
 general-domain AmbigQA benchmark confirms the illusion is not finance-specific:
-single-gold grading overstates competence $2.6$--$3.2\times$ there too.
+across three models, single-gold grading overstates competence over $2\times$ there
+too ($2.1$--$2.3\times$).
 \end{abstract}
 
 \maketitle
@@ -240,8 +241,8 @@ ambiguous queries.
     answer overstates model competence by up to $3\times$, because it credits the
     default reading and cannot distinguish recognizing ambiguity from guessing it.
     We measure it precisely in finance (\S\ref{sec:illusion}) and confirm it
-    replicates on the general-domain AmbigQA benchmark, where it overstates
-    competence $2.6$--$3.2\times$ (\S\ref{sec:general}).
+    replicates on the general-domain AmbigQA benchmark across three models, where it
+    overstates competence $2.1$--$2.3\times$ (\S\ref{sec:general}).
   \item \textbf{An elicitation bottleneck, not a knowledge gap.} Given the
     resolved interpretation, models answer $93$--$95\%$ correctly, yet the best
     model resolves only $20\%$ under free interaction, and \emph{adding}
@@ -793,11 +794,12 @@ capability single-gold benchmarks are structurally blind to, and what
 \begin{table}[t]
 \centering
 \caption{The single-gold illusion replicates on AmbigQA (general domain,
-$n{=}120$, \emph{same} grading methodology). \emph{Intended}: accuracy against a
+$n{=}200$, three models, \emph{same} grading methodology; the grader retries with
+backoff so no answer is silently dropped). \emph{Intended}: accuracy against a
 specified target reading. \emph{Any-valid}: accuracy against \emph{any} accepted
 reading---what a lenient single-gold benchmark credits. \emph{Def.-cap}: fraction
-producing a valid but non-target reading. \emph{Ask}: fraction that asks a
-clarifying question when permitted.}
+producing a valid but non-target reading. \emph{Ask}: fraction that asks when
+permitted. gpt-5-mini interact omitted (it asks ${<}1\%$).}
 \label{tab:general}
 \small
 \begin{tabular}{llcccc}
@@ -805,32 +807,41 @@ clarifying question when permitted.}
 Model & Mode & Intended & Any-valid & Def.-cap & Ask \\
 \midrule
 \multirow{3}{*}{gpt-4o-mini}
- & Answer-only & 8.3  & 26.7 & 21.7 & 0 \\
- & Oracle      & 13.3 & 24.2 & 13.3 & 0 \\
- & Interact    & 10.8 & 26.7 & 20.8 & 12.5 \\
+ & Answer-only & 31.5 & 72.5 & 55.0 & 0 \\
+ & Oracle      & 49.5 & 68.5 & 31.0 & 0 \\
+ & Interact    & 43.5 & 81.0 & 53.0 & 27.0 \\
 \midrule
 \multirow{3}{*}{gpt-4o}
- & Answer-only & 18.3 & 47.5 & 37.5 & 0 \\
- & Oracle      & 30.8 & 42.5 & 20.8 & 0 \\
- & Interact    & 25.8 & 49.2 & 35.8 & 0.8 \\
+ & Answer-only & 39.0 & 84.0 & 65.5 & 0 \\
+ & Oracle      & 68.5 & 81.5 & 31.5 & 0 \\
+ & Interact    & 43.0 & 86.0 & 64.0 & 2.5 \\
+\midrule
+\multirow{2}{*}{gpt-5-mini}
+ & Answer-only & 36.0 & 77.0 & 62.5 & 0 \\
+ & Oracle      & 62.0 & 73.5 & 27.5 & 0 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \textbf{Finding 0b: the single-gold illusion is domain-general.} Running the
 identical default-vs-intended measurement on AmbigQA~\cite{min2020ambigqa}
-(Table~\ref{tab:general}) reproduces all three effects outside finance. Grading the
-\emph{same} answer-only outputs against any accepted reading rather than a specified
-target overstates competence by $3.2\times$ (gpt-4o-mini) and $2.6\times$ (gpt-4o);
-gpt-4o returns a valid but non-target reading $37.5\%$ of the time---essentially its
-finance default-capture rate ($37\%$). Elicitation is again underused: even permitted
-to ask, models clarify on under $13\%$ of ambiguous queries (gpt-4o: $0.8\%$), and
-interaction does not close the gap. The one honest difference is the oracle ceiling---
-$13$--$31\%$ here versus $93$--$95\%$ in finance---because open-domain factoids stay
-hard even once disambiguated, so general knowledge is itself a limiter. This is
-exactly why finance is the sharper instrument: its exact, injectable ground truth
-isolates \emph{elicitation} from \emph{knowledge} in a way general-domain QA cannot.
-The illusion itself, however, is a property of single-gold grading, not of finance.
+(Table~\ref{tab:general}) reproduces all three effects outside finance,
+\emph{consistently across three models}. Grading the \emph{same} answer-only outputs
+against any accepted reading rather than a specified target overstates competence by
+$2.1$--$2.3\times$ (gpt-4o-mini $2.3$, gpt-4o $2.2$, gpt-5-mini $2.1$), and the effect
+is robust to how the target reading is chosen---a random-target assignment gives
+$2.1\times$, versus our most-specific-reading default. Models return a valid but
+non-target reading $55$--$66\%$ of the time---direct evidence the error is
+ambiguity-blindness, not noise. Elicitation is again underused: even permitted to ask,
+models clarify on at most $27\%$ of ambiguous queries and usually far less (gpt-4o
+$2.5\%$, gpt-5-mini ${<}1\%$), and interaction leaves intended accuracy far below the
+any-valid ceiling (gpt-4o-mini $43.5$ vs.\ $81$). The one honest difference is the
+oracle ceiling---$50$--$69\%$ here versus $93$--$95\%$ in finance---because
+open-domain factoids stay hard even once disambiguated, so general knowledge is itself
+a limiter. This is exactly why finance is the sharper instrument: its exact,
+injectable ground truth isolates \emph{elicitation} from \emph{knowledge} in a way
+general-domain QA cannot. The illusion itself, however, is a property of single-gold
+grading, not of finance.
 
 \subsection{Findings}
 

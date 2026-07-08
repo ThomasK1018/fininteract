@@ -1,0 +1,12 @@
+{
+  "model": "gpt-4o-mini",
+  "summary": {
+    "answer-only": {
+      "n": 200,
+      "intended_acc": 0.35,
+      "any_valid_acc": 0.745,
+      "default_capture": 0.53,
+      "ask_rate": 0.0
+    }
+  }
+}

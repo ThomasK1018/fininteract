@@ -1,5 +1,17 @@
 # General-domain replication of the single-gold illusion (AmbigQA)
 
+> **CORRECTION (supersedes the n=120 numbers below).** The original n=120 runs
+> predate the `run_illusion.py` backoff/fail-loud fix: the **gpt-4o-mini n=120 run had
+> 53% empty predictions** (silent API failures graded as wrong), artificially
+> depressing every number; gpt-4o n=120 was clean but noisy at small n. The reliable
+> results are the **n=200, 3-model, backoff (0 failures)** runs
+> (`hard_{gpt4omini,gpt4o,gpt5mini}.summary.json`, `robust_hash.summary.json`):
+> answer-only overstatement **2.1–2.3× across all three models** (gpt-4o-mini 2.30,
+> gpt-4o 2.15, gpt-5-mini 2.14), **robust to the intended-rule** (hash-random target
+> 2.13×), **default-capture 55–66%**, oracle ceiling 50–69%, interaction still leaves
+> intended far below any-valid. `tab:general`/Finding 0b in the paper use these n=200
+> numbers. The n=120 section below is retained for provenance only.
+
 **Goal (Route A).** Show the single-gold illusion is not finance-specific by running
 the *same methodology* (LLM answer-grader + simulated responder) on a real
 general-domain ambiguous-QA benchmark.
