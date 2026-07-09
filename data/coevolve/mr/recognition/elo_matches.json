@@ -1,0 +1,54 @@
+{
+  "n_rounds": 4,
+  "axis": "recognition",
+  "matches": [
+    {
+      "gen_round": 0,
+      "solver_round": 0,
+      "solver_wins": 0,
+      "n": 7
+    },
+    {
+      "gen_round": 0,
+      "solver_round": 1,
+      "solver_wins": 0,
+      "n": 7
+    },
+    {
+      "gen_round": 0,
+      "solver_round": 2,
+      "solver_wins": 0,
+      "n": 7
+    },
+    {
+      "gen_round": 0,
+      "solver_round": 3,
+      "solver_wins": 0,
+      "n": 7
+    },
+    {
+      "gen_round": 1,
+      "solver_round": 0,
+      "solver_wins": 0,
+      "n": 1
+    },
+    {
+      "gen_round": 1,
+      "solver_round": 1,
+      "solver_wins": 0,
+      "n": 1
+    },
+    {
+      "gen_round": 1,
+      "solver_round": 2,
+      "solver_wins": 0,
+      "n": 1
+    },
+    {
+      "gen_round": 1,
+      "solver_round": 3,
+      "solver_wins": 0,
+      "n": 1
+    }
+  ]
+}

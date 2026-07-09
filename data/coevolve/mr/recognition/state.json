@@ -1,0 +1,71 @@
+{
+  "rounds": [
+    {
+      "round": 0,
+      "diversity": {
+        "n": 40,
+        "distinct_entities": 29,
+        "mean_pairwise_dist": 0.8655451315387365
+      },
+      "frontier_yield": {
+        "generated": 40,
+        "frontier": 35,
+        "train": 28,
+        "battle": 7
+      },
+      "human_axishit_next_solver": {
+        "axishit1_of_asked": 0.0,
+        "axishit1_uncond": 0.0,
+        "resolve_acc": 0.111,
+        "n": 9,
+        "n_ask": 6,
+        "ir": 0.667
+      }
+    },
+    {
+      "round": 1,
+      "diversity": {
+        "n": 1,
+        "distinct_entities": 1,
+        "mean_pairwise_dist": null
+      },
+      "frontier_yield": {
+        "generated": 1,
+        "frontier": 1,
+        "train": 0,
+        "battle": 1
+      },
+      "human_axishit_next_solver": {
+        "axishit1_of_asked": 0.0,
+        "axishit1_uncond": 0.0,
+        "resolve_acc": 0.111,
+        "n": 9,
+        "n_ask": 6,
+        "ir": 0.667
+      }
+    },
+    {
+      "round": 2,
+      "diversity": {
+        "n": 0,
+        "distinct_entities": 0,
+        "mean_pairwise_dist": null
+      },
+      "frontier_yield": {
+        "generated": 0,
+        "frontier": 0,
+        "train": 0,
+        "battle": 0
+      },
+      "human_axishit_next_solver": {
+        "axishit1_of_asked": 0.0,
+        "axishit1_uncond": 0.0,
+        "resolve_acc": 0.111,
+        "n": 9,
+        "n_ask": 6,
+        "ir": 0.667
+      }
+    }
+  ],
+  "used_pids": []
+}
