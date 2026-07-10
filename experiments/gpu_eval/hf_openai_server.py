@@ -37,6 +37,11 @@ _t0 = time.time()
 tok = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_ID, torch_dtype=torch.bfloat16, device_map="auto", trust_remote_code=True)
+_ADAPTER = os.environ.get("HF_ADAPTER")
+if _ADAPTER:
+    from peft import PeftModel
+    model = PeftModel.from_pretrained(model, _ADAPTER)
+    print(f"[server] loaded LoRA adapter: {_ADAPTER}", flush=True)
 model.eval()
 INPUT_DEV = next(model.parameters()).device
 if tok.pad_token_id is None:

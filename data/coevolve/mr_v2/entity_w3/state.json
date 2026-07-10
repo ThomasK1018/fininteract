@@ -1,0 +1,25 @@
+{
+  "rounds": [
+    {
+      "round": 0,
+      "val_axishit": 0.625,
+      "promoted": true,
+      "test_human_axishit": 0.675,
+      "slice": 30
+    },
+    {
+      "round": 1,
+      "val_axishit": 0.8,
+      "promoted": true,
+      "test_human_axishit": 0.875,
+      "slice": 30
+    },
+    {
+      "round": 2,
+      "val_axishit": 0.725,
+      "promoted": false,
+      "test_human_axishit": 0.875,
+      "slice": 19
+    }
+  ]
+}

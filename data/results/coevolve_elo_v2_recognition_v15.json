@@ -1,0 +1,25 @@
+{
+  "axis": "recognition",
+  "n_rounds": 3,
+  "solver_elo": [
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0
+  ],
+  "generator_elo": [
+    2546.5,
+    2546.5,
+    2546.5,
+    2546.5
+  ],
+  "gap_per_round": [
+    -1546.5,
+    -1546.5,
+    -1546.5,
+    -1546.5
+  ],
+  "solver_gain": 0.0,
+  "generator_gain": 0.0,
+  "verdict": "STALL (both flat) -- availability ceiling / not learnable"
+}

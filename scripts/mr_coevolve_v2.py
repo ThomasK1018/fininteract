@@ -120,8 +120,10 @@ def instance_hit(r):
 
 def main(a):
     axis_id = AXIS_ID[a.axis]
-    root = REPO / "data/coevolve/mr_v2" / a.axis
-    outdir = REPO / "outputs/coevolve/mr_v2" / a.axis
+    tag = a.axis if a.train_window == 1 else f"{a.axis}_w{a.train_window}"   # namespace non-default windows
+    if a.val_size != 40: tag += f"_v{a.val_size}"                            # namespace non-default val
+    root = REPO / "data/coevolve/mr_v2" / tag
+    outdir = REPO / "outputs/coevolve/mr_v2" / tag
     root.mkdir(parents=True, exist_ok=True); outdir.mkdir(parents=True, exist_ok=True)
     env = base_env(); server = Server(a.cuda, a.port); K = a.k
     state_path = root / "state.json"
@@ -194,30 +196,31 @@ def main(a):
             log(f"round {i}: TEST human AxisHit(S{i+1})={test_ah:.3f}")
 
         # ---------------------------------------------------------- MINER + AxisHit TOURNAMENT
-        # generator role = miner: battle_g = the instances S_g targets WORST on the fixed val set.
+        # generator role = miner: battle_g = the instances S_g targets WORST on the FIXED val set.
+        # WIN(g,s) = # of battle_g instances S_s hits. Computed by LOOKUP from each solver's val
+        # AxisHit (val_S{g}_forminer) -- NOT by re-serving battle files (which lack instance fields
+        # and errored 'question' -> all-zero). Free and correct.
         log("===== TOURNAMENT (AxisHit; fixed val + miner battles) =====")
-        battles = {}
+        H = {}  # solver g -> {instance_id: 0/1 AxisHit}
         for g in range(K + 1):
             gr = eval_axishit(server, solver.get(g), root / "val_fixed.jsonl",
                               root / f"val_S{g}_forminer.jsonl", env)
-            gr_sorted = sorted(gr, key=lambda r: (instance_hit(r), r["instance_id"]))  # misses first
-            hard = gr_sorted[:a.battle_size]
-            write_jsonl(root / f"battle_g{g}.jsonl", hard)
-            battles[g] = root / f"battle_g{g}.jsonl"
+            H[g] = {r["instance_id"]: instance_hit(r) for r in gr}
+        server.stop()
         matches = []
         for g in range(K + 1):
+            order = sorted(H[g], key=lambda iid: (H[g][iid], iid))    # S_g's worst first
+            battle = order[:a.battle_size]
+            write_jsonl(root / f"battle_g{g}.jsonl", [{"instance_id": iid} for iid in battle])
             for s in range(K + 1):
-                out = root / f"tourney_g{g}_s{s}.jsonl"
-                rows = eval_axishit(server, solver.get(s), battles[g], out, env)
-                w = sum(instance_hit(r) for r in rows)          # WIN = AxisHit hit (not resolution)
-                matches.append({"gen_round": g, "solver_round": s, "solver_wins": w, "n": len(rows)})
-                log(f"tourney g{g} s{s}: AxisHit {w}/{len(rows)}")
-        server.stop()
+                w = sum(H[s].get(iid, 0) for iid in battle)          # WIN = S_s AxisHit on S_g's hard set
+                matches.append({"gen_round": g, "solver_round": s, "solver_wins": w, "n": len(battle)})
+                log(f"tourney g{g} s{s}: AxisHit {w}/{len(battle)}")
         mj = root / "elo_matches.json"
         json.dump({"n_rounds": K, "axis": a.axis, "matches": matches}, open(mj, "w"), indent=2)
         run([PY_EVAL, str(REPO / "scripts/coevolve_elo.py"), "--matches", str(mj),
-             "--out", str(REPO / f"data/results/coevolve_elo_v2_{a.axis}.json"),
-             "--fig", str(REPO / f"data/results/coevolve_elo_v2_{a.axis}.png")],
+             "--out", str(REPO / f"data/results/coevolve_elo_v2_{tag}.json"),
+             "--fig", str(REPO / f"data/results/coevolve_elo_v2_{tag}.png")],
             env, str(root / "elo.log"))
         log(f"===== axis={a.axis} DONE (best val AxisHit={best_val_ah:.3f}) =====")
     finally:

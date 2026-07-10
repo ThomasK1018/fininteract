@@ -1,0 +1,108 @@
+{
+  "n_rounds": 4,
+  "axis": "entity",
+  "names": [
+    "base",
+    "single_sft_entity",
+    "multi_S1",
+    "multi_S3"
+  ],
+  "matches": [
+    {
+      "gen_round": 0,
+      "solver_round": 0,
+      "solver_wins": 0,
+      "n": 20
+    },
+    {
+      "gen_round": 0,
+      "solver_round": 1,
+      "solver_wins": 10,
+      "n": 20
+    },
+    {
+      "gen_round": 0,
+      "solver_round": 2,
+      "solver_wins": 12,
+      "n": 20
+    },
+    {
+      "gen_round": 0,
+      "solver_round": 3,
+      "solver_wins": 16,
+      "n": 20
+    },
+    {
+      "gen_round": 1,
+      "solver_round": 0,
+      "solver_wins": 1,
+      "n": 20
+    },
+    {
+      "gen_round": 1,
+      "solver_round": 1,
+      "solver_wins": 2,
+      "n": 20
+    },
+    {
+      "gen_round": 1,
+      "solver_round": 2,
+      "solver_wins": 7,
+      "n": 20
+    },
+    {
+      "gen_round": 1,
+      "solver_round": 3,
+      "solver_wins": 10,
+      "n": 20
+    },
+    {
+      "gen_round": 2,
+      "solver_round": 0,
+      "solver_wins": 1,
+      "n": 20
+    },
+    {
+      "gen_round": 2,
+      "solver_round": 1,
+      "solver_wins": 6,
+      "n": 20
+    },
+    {
+      "gen_round": 2,
+      "solver_round": 2,
+      "solver_wins": 6,
+      "n": 20
+    },
+    {
+      "gen_round": 2,
+      "solver_round": 3,
+      "solver_wins": 11,
+      "n": 20
+    },
+    {
+      "gen_round": 3,
+      "solver_round": 0,
+      "solver_wins": 1,
+      "n": 20
+    },
+    {
+      "gen_round": 3,
+      "solver_round": 1,
+      "solver_wins": 7,
+      "n": 20
+    },
+    {
+      "gen_round": 3,
+      "solver_round": 2,
+      "solver_wins": 10,
+      "n": 20
+    },
+    {
+      "gen_round": 3,
+      "solver_round": 3,
+      "solver_wins": 7,
+      "n": 20
+    }
+  ]
+}
