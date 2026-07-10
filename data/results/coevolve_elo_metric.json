@@ -1,0 +1,28 @@
+{
+  "axis": "metric",
+  "n_rounds": 4,
+  "solver_elo": [
+    1000.0,
+    1000.0,
+    1000.0,
+    1000.0,
+    1602.8
+  ],
+  "generator_elo": [
+    2479.7,
+    2479.7,
+    2260.0,
+    1602.8,
+    1602.8
+  ],
+  "gap_per_round": [
+    -1479.7,
+    -1479.7,
+    -1260.0,
+    -602.8,
+    0.0
+  ],
+  "solver_gain": 602.8,
+  "generator_gain": -876.9,
+  "verdict": "SOLVER RUNAWAY -- solver improves, generator cannot produce harder frontier"
+}

@@ -1,0 +1,50 @@
+{
+  "rounds": [
+    {
+      "round": 0,
+      "diversity": {
+        "n": 40,
+        "distinct_entities": 24,
+        "mean_pairwise_dist": 0.9846153846153847
+      },
+      "frontier_yield": {
+        "generated": 40,
+        "frontier": 40,
+        "train": 32,
+        "battle": 8
+      },
+      "human_axishit_next_solver": null
+    },
+    {
+      "round": 1,
+      "diversity": {
+        "n": 40,
+        "distinct_entities": 26,
+        "mean_pairwise_dist": 0.9884615384615385
+      },
+      "frontier_yield": {
+        "generated": 40,
+        "frontier": 40,
+        "train": 32,
+        "battle": 8
+      },
+      "human_axishit_next_solver": null
+    },
+    {
+      "round": 2,
+      "diversity": {
+        "n": 13,
+        "distinct_entities": 12,
+        "mean_pairwise_dist": 0.9871794871794872
+      },
+      "frontier_yield": {
+        "generated": 13,
+        "frontier": 13,
+        "train": 11,
+        "battle": 2
+      },
+      "human_axishit_next_solver": null
+    }
+  ],
+  "used_pids": []
+}
