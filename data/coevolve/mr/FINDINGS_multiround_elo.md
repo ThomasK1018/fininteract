@@ -1,5 +1,13 @@
 # Multi-round co-evolution + Elo arms race — findings
 
+> **⚠️ PARTIAL RETRACTION (see `data/coevolve/mr_v2/FINDINGS_multiround_elo_v2.md`).**
+> The "multi-round OVERFITS → zero human transfer" result below is an **artifact**: the eval
+> server was not loading the LoRA adapter (a `git reset --hard` had dropped the uncommitted
+> `HF_ADAPTER` patch), so every checkpoint here was scored as *base*. Re-evaluated with the
+> fixed server, these same v1 adapters transfer to the human probe at **entity 0.78–0.90,
+> metric-S2 0.75** (v1 reported 0/0/0). The **frontier-yield abundance result stands**; the
+> **overfit/no-transfer conclusion does not**. Use v2 for the human-AxisHit numbers.
+
 K=3 curriculum over four axes spanning the salience gradient (entity 0.92, metric 0.48,
 temporal 0.15, recognition 0.04). Tool: `scripts/mr_coevolve.py`. Branch `coevolve/multiround`.
 

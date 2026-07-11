@@ -122,6 +122,7 @@ def main(a):
     axis_id = AXIS_ID[a.axis]
     tag = a.axis if a.train_window == 1 else f"{a.axis}_w{a.train_window}"   # namespace non-default windows
     if a.val_size != 40: tag += f"_v{a.val_size}"                            # namespace non-default val
+    if a.seed != 1234: tag += f"_s{a.seed}"                                  # namespace non-default seed
     root = REPO / "data/coevolve/mr_v2" / tag
     outdir = REPO / "outputs/coevolve/mr_v2" / tag
     root.mkdir(parents=True, exist_ok=True); outdir.mkdir(parents=True, exist_ok=True)
@@ -131,7 +132,7 @@ def main(a):
 
     # ---- fixed pool -> disjoint TRAIN pool + frozen VAL set (validation/tournament) --------
     pool = read_jsonl(REPO / "data/coevolve/mr/_pools" / f"{axis_id}.jsonl")
-    random.Random(1234).shuffle(pool)
+    random.Random(a.seed).shuffle(pool)
     val = pool[:a.val_size]                 # FROZEN held-out val (selection + tournament); never trained
     train_pool = pool[a.val_size:]
     write_jsonl(root / "val_fixed.jsonl", val)
@@ -240,4 +241,5 @@ if __name__ == "__main__":
                    help="capped-cumulative window (rounds). 1=non-cumulative (single-round strength); "
                         "raise to test whether accumulation helps once overfit is guarded")
     p.add_argument("--tol", type=float, default=0.03, help="val-AxisHit tolerance for promotion")
+    p.add_argument("--seed", type=int, default=1234, help="pool-shuffle seed (val/train split); namespaced if !=1234")
     main(p.parse_args())

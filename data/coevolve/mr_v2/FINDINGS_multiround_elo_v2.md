@@ -91,6 +91,42 @@ validation guard, not the number of rounds.**
   miner); it is *not* a clean two-sided "HEALTHY" race — grounded generation can't manufacture
   adversarially harder targeting items, same structural limit noted in v1.
 
+## Follow-up runs (metric axis + seed robustness + full v1 retraction)
+
+### Peak is at 2 rounds, not 3 — the guard rejects round 3 (correction)
+In every entity run the val AxisHit peaks at **S2 (round 1)** and round 2's S3 does **not** improve:
+seed1234 w1 0.675/**0.775**/0.725, w3 0.625/**0.800**/0.725 (S3 rolled back both); seed7 w3
+0.775/**0.900**/0.875 (S3 ≤ S2). So the claim is **"two guarded rounds peak; the third overfits
+and the guard rejects/does-not-exceed it,"** NOT monotone "more rounds better." Robust across seeds.
+
+### Metric (salience 0.48) — accumulation is REQUIRED (unlike entity)
+| metric run | val r0/r1/r2 | human r0/r1/r2 | solver Elo | verdict |
+|---|:--:|:--:|:--:|:--|
+| w1 (single 30-slice) | 0.0/0.0/0.0 | 0/0/0 | flat 1000 | **STALL** |
+| w3 (accumulate) | 0.0/**0.975**/0.0 | 0.025/**0.75**/0.75 | 1000→1000→**3066** | SOLVER-RUNAWAY |
+
+A single 30-instance slice teaches metric targeting **not at all** (w1 dead flat); **two
+accumulated slices (~53) reach val 0.975 / human 0.75**; the third overfits (S3 0.0, guard rolls
+back to S2). So for metric, **guarded accumulation clearly beats single-round (0.75 vs 0.0)** —
+the opposite of entity, where w1≈w3. Reproduced independently by v1's own metric adapters
+(S1 0.0 / **S2 0.75** / S3 0.05 below). The salience→data-need gradient: **entity (0.92) learns
+from one slice; metric (0.48) needs to accumulate two; recognition (0.04) doesn't reliably learn.**
+
+### Full v1 retraction table (human AxisHit@1, adapters re-evaluated with the fixed server)
+`scripts/mrv2_v1_retraction_eval.py`; probes held out, n(entity)=n(metric)=40, n(recognition)=9.
+
+| axis | v1 *reported* | S1 corrected | S2 corrected | S3 corrected |
+|---|:--:|:--:|:--:|:--:|
+| entity | 0 / 0 / 0 | **0.875** | **0.900** | **0.775** |
+| metric | (no v1 probe) | 0.0 | **0.75** | 0.05 |
+| recognition | 0 / 0 / 0 | **0.444** | 0.0 | 0.0 |
+
+**entity's v1 "0/0/0" was entirely the adapter-less-server artifact** — the same checkpoints
+transfer to humans at 0.78–0.90. **Honest nuance:** recognition S1 corrected to **0.444 (4/9)** —
+so recognition is *not* a perfectly clean stall; on the tiny 9-instance probe it is noisy and
+inconsistent (S2/S3 fall back to 0, and the v2 val15 run reads 0.067). Report recognition as
+**weakly/unreliably learnable on a scarce, noisy axis**, not "cannot learn at all."
+
 ## Deliverables
 `scripts/mr_coevolve_v2.py` (fixed miner + Elo path), `scripts/mrv2_step0_derisk.py`,
 `scripts/plot_multiround_v2.py`, `experiments/gpu_eval/hf_openai_server.py` (adapter load),

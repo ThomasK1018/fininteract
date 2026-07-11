@@ -7,8 +7,9 @@ import matplotlib.pyplot as plt
 
 RUNS = [("entity",         "entity  w1 (single-round)", "#1f77b4", "-o"),
         ("entity_w3",      "entity  w3 (accumulate)",   "#2b6cb0", "--s"),
-        ("recognition_v15","recognition (val15, train26)","#d62728", "-o"),
-        ("recognition",    "recognition (val40, train1)","#e07b7b", "--s")]
+        ("metric",         "metric  w1 (single-round)", "#8c564b", "-o"),
+        ("metric_w3",      "metric  w3 (accumulate)",   "#2ca02c", "--s"),
+        ("recognition_v15","recognition (val15, train26)","#d62728", "-o")]
 ROOT = "data/coevolve/mr_v2"
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4.6))
