@@ -90,7 +90,7 @@ $93$--$95\%$ correctly, yet in free interaction the best model resolves only
 $20\%$, and \emph{adding} clarification turns lowers accuracy below plain search
 for every model but the strongest. Finally, the required skills \emph{dissociate}:
 some ambiguity axes are solved by scale alone, while others (recognition basis)
-remain a blind spot that resists both scale and targeted training. A per-axis
+resist scale and are reached by targeted training only unreliably. A per-axis
 skill metric turns ``the model was wrong'' into ``the model failed to elicit axis
 $X$''---a diagnostic single-gold grading cannot provide. A replication on the
 general-domain AmbigQA benchmark confirms the illusion is not finance-specific:
@@ -253,7 +253,7 @@ ambiguous queries.
     turn accuracy into a skill metric (AxisHit) that localizes \emph{which}
     clarification ability fails, and show the ambiguity axes are different
     \emph{kinds} of skill: some are solved by scale alone while others (recognition
-    basis) remain a blind spot that resists both scale and targeted training
+    basis) resist scale and are only unreliably teachable
     (\S\ref{sec:skills}).
   \item \textbf{\fininteract, the instrument.} A bilingual benchmark of 173
     verifiable, ambiguity-paired instances with a five-axis taxonomy, construction
@@ -1401,7 +1401,7 @@ whether elicitation \emph{helps} is a separate, per-axis property.} A self-refre
 \fininteract is viable wherever the data arm can supply enough frontier
 instances---both abundant axes install and generalize; the scarce axis
 (recognition's $36$-instance ceiling from just $30/1{,}847$ primary passages) does
-not. But installing on-axis elicitation is not automatically beneficial: it
+not reliably (Finding~14). But installing on-axis elicitation is not automatically beneficial: it
 \emph{helps} metric (accuracy $15\to60$, $+45$---the base cannot answer without the
 metric definition, so the clarifying question \emph{supplies} it: $18$
 wrong$\to$correct, $0$ regressions) and \emph{hurts} entity (accuracy $32.5\to22.5$,
@@ -1449,9 +1449,13 @@ not \emph{act} on it, the ``represents-but-doesn't-act'' gap of
 \centering
 \caption{What predicts co-evolvability. The observed outcomes track
 \emph{abundance/salience}---\emph{not} the AxisHit scale-slope (metric: low slope,
-GO) and \emph{not} decodability (recognition: highest AUROC, NO-GO). Salience =
-primary$/$any-candidate passages; decodability = peak one-vs-rest AUROC (recognition
-on a size-matched augmented sample; raw $n{=}9$ overfits to $1.0$).}
+GO) and \emph{not} decodability (recognition: highest AUROC, yet does not
+co-evolve). Salience = primary$/$any-candidate passages; decodability = peak
+one-vs-rest AUROC (recognition on a size-matched augmented sample; raw $n{=}9$
+overfits to $1.0$). $^*$metric is a GO but needs ${\sim}2$ accumulated slices
+(${\sim}50$ instances); one $30$-instance slice teaches it nothing (Finding~14).
+$^\ddagger$recognition is \emph{unreliable} rather than a clean fail: held-out human
+AxisHit ranges $0$--$0.44$ across training runs on the scarce $n{=}9$ probe.}
 \label{tab:learnability}
 \small
 \begin{tabular}{lrrccc}
@@ -1459,10 +1463,10 @@ on a size-matched augmented sample; raw $n{=}9$ overfits to $1.0$).}
 Axis & Primary & Salience & Slope & Decode & Co-evolve \\
 \midrule
 entity\_scope       & 905 & \textbf{0.92} & $+0.77$ & 0.77 & \textbf{GO} \\
-metric\_definition  & 498 & 0.48 & $+0.21$ & 0.77 & \textbf{GO} \\
+metric\_definition  & 498 & 0.48 & $+0.21$ & 0.77 & \textbf{GO}$^*$ \\
 temporal\_scope     & 150 & 0.15 & sat.    & 0.92 & solved \\
 filing\_vintage     & 264 & 0.33 & --      & --   & untestable \\
-recognition\_policy &  30 & \textbf{0.04} & $+0.00$ & \textbf{0.93} & \textbf{NO-GO} \\
+recognition\_policy &  30 & \textbf{0.04} & $+0.00$ & \textbf{0.93} & weak$^{\ddagger}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1481,6 +1485,41 @@ accuracy---is the cheap, up-front signal} of which axes a co-evolving benchmark 
 keep hard and which need fresh human curation. The corollary for evaluation is
 sharper: the hardest ambiguity to make models \emph{handle} is not the one they
 cannot represent, but the one that is always someone else's more-obvious question.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_multiround.png}
+\caption{Multi-round co-evolution with a validation guard. \emph{Left}: validation
+AxisHit@1 (selection metric) per round. \emph{Right}: held-out \emph{human}-probe
+AxisHit (never used for selection). Entity learns targeting from a single $30$-instance
+slice and transfers to humans ($0.63\!\to\!0.93$); metric needs \emph{accumulation}
+(one slice teaches nothing---brown, flat---while two accumulated slices reach
+$0.75$---green); recognition stays at base ($\approx0.05$) even with a fair
+$26$-instance set. The guard preserves human transfer (it rolls back the round-3
+candidate, which regresses on validation).}
+\label{fig:multiround}
+\end{figure}
+
+\textbf{Finding 14: salience predicts an axis's \emph{data-need}, not just a binary
+outcome---and a validation-guarded arms race confirms it.} Extending each axis to a
+multi-round curriculum (Fig.~\ref{fig:multiround}), with checkpoints selected on a
+frozen validation set and reported on the held-out human probe, refines the binary
+gate into a gradient that tracks salience. \textbf{Entity} (salience $0.92$) learns
+axis-targeting from a \emph{single} $30$-instance slice and transfers to human
+ambiguity at $0.88$--$0.93$. \textbf{Metric} ($0.48$) needs \emph{accumulation}: one
+slice yields $0.0$, two accumulated slices reach $0.75$---so its earlier single-round
+GO used ${\sim}60$ instances precisely because that is roughly what the axis requires.
+\textbf{Recognition} ($0.04$) is \emph{unreliable}: across training runs its human
+AxisHit ranges only $0$--$0.44$ on the scarce $n{=}9$ probe---weak and inconsistent,
+not a clean zero. Scoring the same runs as an \emph{Elo arms race} between the solver
+and a hard-example miner (win $=$ AxisHit, which---unlike recall-walled resolution---%
+varies across checkpoints) makes the instrument non-degenerate: entity is
+\emph{solver-runaway} (solver Elo $1000\!\to\!1551$, outpacing a corpus-bounded miner
+that cannot synthesize adversarially harder targeting), while recognition
+\emph{stalls} (flat). Two guarded rounds peak; the third overfits and is rolled back.
+The practical reading: salience is an up-front estimate not just of \emph{whether} an
+axis co-evolves but of \emph{how much} data it needs---and one well-targeted round,
+guarded on held-out validation, is close to the sweet spot.
 
 
 %% ============================================================
