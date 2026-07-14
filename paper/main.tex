@@ -88,11 +88,13 @@ default interpretation cuts apparent accuracy by up to $3\times$. The failure is
 elicitation, not knowledge: given the resolved interpretation models answer
 $93$--$95\%$ correctly, yet in free interaction the best model resolves only
 $20\%$, and \emph{adding} clarification turns lowers accuracy below plain search
-for every model but the strongest. Finally, the required skills \emph{dissociate}:
-some ambiguity axes are solved by scale alone, while others (recognition basis)
-resist scale and are reached by targeted training only unreliably. A per-axis
-skill metric turns ``the model was wrong'' into ``the model failed to elicit axis
-$X$''---a diagnostic single-gold grading cannot provide. A replication on the
+for every model but the strongest. Finally, the required skills \emph{dissociate},
+and their trainability follows a \emph{salience-graded data-need}: axis-guided
+self-training installs the salient entity axis from a single batch, the mid-salience
+metric axis only after accumulating several, and the least-salient axis (recognition
+basis) resists scale and is reached only unreliably. A per-axis skill metric turns
+``the model was wrong'' into ``the model failed to elicit axis $X$''---a diagnostic
+single-gold grading cannot provide. A replication on the
 general-domain AmbigQA benchmark confirms the illusion is not finance-specific:
 across three models, single-gold grading overstates competence over $2\times$ there
 too ($2.1$--$2.3\times$).
