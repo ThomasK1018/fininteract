@@ -27,6 +27,14 @@
 \newcommand{\disep}{$\text{DisE}^+$\xspace}
 \newcommand{\disei}{$\text{DisE}^+$\xspace}
 
+%% venue metadata (placeholder; set for the chosen venue before submission).
+%% Suppresses the acmart default "Conference'17 / Woodstock, NY" boilerplate.
+\setcopyright{none}
+\settopmatter{printacmref=false}
+\acmConference[Preprint]{Preprint, under review}{2026}{}
+\acmYear{2026}
+\copyrightyear{2026}
+
 %% ---- BEGIN DOCUMENT ----
 \begin{document}
 
@@ -69,35 +77,28 @@ Elicitation Bottleneck in Ambiguous Question Answering}
 
 \begin{abstract}
 Question-answering benchmarks grade each query against a single gold answer.
-When a query is genuinely ambiguous, this convention silently rewards a model
-for producing the \emph{most common} reading rather than for recognizing that
-the query is under-specified---so a model that blindly guesses the default and
-one that correctly identifies the ambiguity receive the same score. We call this
-the \emph{single-gold illusion}. The mechanism is domain-general---single-gold
-grading credits the default reading whatever the domain---so we study it where it
-can be measured most cleanly: finance, where the same query is routinely
-ambiguous (\emph{``What was Meta Platforms' operating income?''} is \$46.75B
-consolidated or \$62.87B for the Family of Apps segment, a 34\% gap) yet each
-reading's ground truth is exact and programmatically verifiable.
-We release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances
-that pairs each question with a \emph{default} interpretation (the reading a
-non-expert assumes) and an \emph{intended} interpretation fixed by a
-disambiguating context, across a five-axis taxonomy of ambiguity.
-Re-grading the \emph{same} model outputs against the intended rather than the
-default interpretation cuts apparent accuracy by up to $3\times$. The failure is
-elicitation, not knowledge: given the resolved interpretation models answer
-$93$--$95\%$ correctly, yet in free interaction the best model resolves only
-$20\%$, and \emph{adding} clarification turns lowers accuracy below plain search
-for every model but the strongest. Finally, the required skills \emph{dissociate},
-and their trainability follows a \emph{salience-graded data-need}: axis-guided
-self-training installs the salient entity axis from a single batch, the mid-salience
-metric axis only after accumulating several, and the least-salient axis (recognition
-basis) resists scale and is reached only unreliably. A per-axis skill metric turns
-``the model was wrong'' into ``the model failed to elicit axis $X$''---a diagnostic
-single-gold grading cannot provide. A replication on the
-general-domain AmbigQA benchmark confirms the illusion is not finance-specific:
-across three models, single-gold grading overstates competence over $2\times$ there
-too ($2.1$--$2.3\times$).
+When a query is genuinely ambiguous, this rewards a model for producing the
+\emph{most common} reading rather than for recognizing that the query is
+under-specified: a model that guesses the default and one that identifies the
+ambiguity score the same. We call this the \emph{single-gold illusion}. Because
+single-gold grading credits the default reading in any domain, we study it where
+it is measured most cleanly: finance, where the same query is routinely ambiguous
+(Meta Platforms' ``operating income'' is \$46.75B consolidated or \$62.87B for the
+Family of Apps segment, a 34\% gap) yet each reading's ground truth is exact and
+programmatically verifiable. We release \fininteract, a bilingual (English/Chinese)
+benchmark of 173 instances that pairs each question with a \emph{default} and an
+\emph{intended} interpretation (fixed by a disambiguating context) across a
+five-axis ambiguity taxonomy. Re-grading the \emph{same} outputs against the
+intended rather than default interpretation cuts apparent accuracy by up to
+$3\times$. The failure is elicitation, not knowledge: given the resolved
+interpretation models answer $93$--$95\%$ correctly, yet the best model resolves
+only $20\%$ under free interaction, and \emph{adding} clarification lowers accuracy
+below plain search for all but the strongest model. A per-axis skill metric turns
+``the model was wrong'' into ``the model failed to elicit axis $X$'', and shows the
+required skills dissociate by \emph{salience}: axis-guided self-training installs
+salient axes from little data but reaches the least-salient (recognition basis)
+only unreliably. A replication on general-domain AmbigQA confirms the illusion is
+not finance-specific ($2.1$--$2.3\times$ across three models).
 \end{abstract}
 
 \maketitle
@@ -108,7 +109,7 @@ too ($2.1$--$2.3\times$).
 %% ============================================================
 
 Question-answering benchmarks grade each query against a single gold answer.
-This convention is invisible when queries are fully specified---but real queries
+This convention is invisible when queries are fully specified, but real queries
 often are not, and when a query is genuinely ambiguous, single-gold grading
 silently rewards a model for producing the \emph{most common} reading rather than
 for recognizing that the query is under-specified at all. A model that blindly
@@ -118,13 +119,13 @@ capability that matters most in deployment: knowing when to ask.
 
 We call this the \emph{single-gold illusion}, and we study it where it can be
 measured most cleanly. Financial question answering is an ideal instrument: the
-same query is routinely ambiguous---\emph{``What was Meta Platforms' operating
+same query is routinely ambiguous. \emph{``What was Meta Platforms' operating
 income?''} (Figure~\ref{fig:teaser}) is \$46.75B as the consolidated GAAP figure
-for FY2023 or \$62.87B for the Family of Apps segment, a 34\% difference---yet the
+for FY2023 or \$62.87B for the Family of Apps segment, a 34\% difference, yet the
 ground truth for each reading is exact and programmatically verifiable against SEC
 filings. A skilled analyst would not guess; they would ask a clarifying question.
 Existing benchmarks reward the model that guesses correctly and cannot distinguish
-it from one that recognizes the ambiguity---the same blind spot, we will argue,
+it from one that recognizes the ambiguity, the same blind spot, we will argue,
 that any single-gold benchmark inherits on ambiguous inputs, in finance or out.
 
 \begin{figure*}[t]
@@ -134,10 +135,10 @@ that any single-gold benchmark inherits on ambiguous inputs, in finance or out.
 (1)~A real analyst query (``What was Meta Platforms' operating income?'') looks
 fully specified. (2)~But it hides ambiguity along five axes (entity scope, metric
 definition, temporal scope, filing vintage, recognition policy): here \emph{entity
-scope} yields two defensible answers---\$62.87B (Family of Apps segment) vs.\
+scope} yields two defensible answers: \$62.87B (Family of Apps segment) vs.\
 \$46.75B (consolidated GAAP). (3)~A search-only agent retrieves evidence and
 commits to the plausible default; a conventional single-gold benchmark scores that
-as correct---the \emph{single-gold illusion}---overstating competence by up to
+as correct, the \emph{single-gold illusion}, overstating competence by up to
 $3\times$. (4)~\fininteract instead measures whether an agent resolves the
 ambiguity by asking: the best free-interaction accuracy is $20.2\%$ while the
 context-oracle ceiling is $93$--$95\%$, so the bottleneck is issuing the right
@@ -232,8 +233,8 @@ interpretation fixed by a disambiguating context $C$, across a five-axis taxonom
 of financial ambiguity. Grading the \emph{same} model outputs against the default
 versus the intended interpretation exposes the illusion directly; a per-axis
 skill metric then localizes \emph{which} clarification ability a model lacks.
-Finance is the instrument---chosen for exact, verifiable ground truth and endemic
-ambiguity---but the phenomenon it reveals is a general fact about how we grade
+Finance is the instrument, chosen for exact, verifiable ground truth and endemic
+ambiguity, but the phenomenon it reveals is a general fact about how we grade
 ambiguous queries.
 
 \noindent\textbf{Contributions:}
@@ -249,7 +250,7 @@ ambiguous queries.
     resolved interpretation, models answer $93$--$95\%$ correctly, yet the best
     model resolves only $20\%$ under free interaction, and \emph{adding}
     clarification turns \emph{lowers} accuracy below plain search for every model
-    but the strongest---isolating elicitation as the binding constraint
+    but the strongest, isolating elicitation as the binding constraint
     (\S\ref{sec:ceiling}).
   \item \textbf{A per-axis skill decomposition and a capability dissociation.} We
     turn accuracy into a skill metric (AxisHit) that localizes \emph{which}
@@ -389,7 +390,7 @@ two secondary axes where the passage genuinely supports additional ambiguity.
 Viable structured ambiguity is far more available for some axes than others:
 cleanly paired, independently verifiable ambiguity is abundant for entity scope
 and metric definition but rare for the other three in public filings
-(Appendix~\ref{app:cost}). The released corpus reflects this---entity scope
+(Appendix~\ref{app:cost}). The released corpus reflects this, entity scope
 (54\%) and metric definition (37\%) dominate, with recognition policy (5\%),
 temporal scope (4\%), and filing vintage ($0\%$) sparse. We therefore position
 \fininteract as an \textbf{entity/metric-dominant} financial-ambiguity benchmark
@@ -438,7 +439,7 @@ answer-only, +search, +interact, and Axis-Aware ReAct modes. \textbf{(4)~Score a
 diagnose:} accuracy on the intended interpretation is primary; the intended-vs-default
 comparison exposes the single-gold illusion, and interaction-quality (IR, AxisHit@1,
 wrong-axis / generic-ask rates), calibration (ECE), and efficiency ($\text{DisE}^+$)
-localize the core bottleneck---issuing the correct follow-up clarification.}
+localize the core bottleneck, issuing the correct follow-up clarification.}
 \label{fig:framework}
 \end{figure*}
 
@@ -560,16 +561,16 @@ per-item raw agreement is $0.82$--$0.97$. Because the labels are heavily skewed
 toward ``yes'' ($>85\%$ per item), Cohen's $\kappa$ is degenerate under the
 Feinstein--Cicchetti prevalence paradox; we therefore report the prevalence-robust
 Gwet's AC1, which is \textbf{$0.85$ on average} (range $0.78$--$0.97$) and
-$1.00$ for the axis label (H7)---substantial-to-near-perfect agreement. Only one
+$1.00$ for the axis label (H7), substantial-to-near-perfect agreement. Only one
 instance was rejected by \emph{both} annotators on the same item (consensus
 rejection $1.7\%$); adjudication confirmed it as an axis over-reach (a
 revenue-recognition-timing pairing whose plausible default is the firm's total
 revenue, not a disaggregation component). We quarantine it from the public
 release (\texttt{v1.1}, $N{=}172$); all experiments below are computed on the
 frozen \texttt{v1.0} evaluation snapshot ($N{=}173$), which retains it. The
-instance is unsolved by every model in every \emph{interactive} mode---it is
+instance is unsolved by every model in every \emph{interactive} mode; it is
 answerable only when the resolving context is supplied outright (context-oracle),
-where removing it shifts the ceiling by $<\!0.05$pp ($93$--$95\%$ unchanged)---so
+where removing it shifts the ceiling by $<\!0.05$pp ($93$--$95\%$ unchanged), so
 no reported finding depends on it.
 
 \subsection{Dataset Statistics}
@@ -659,7 +660,7 @@ conventional single-gold benchmark would have scored (\S\ref{sec:illusion}).
 
 \textbf{Interaction diagnostics} (secondary, descriptive): \emph{IR}
 (interaction rate, \% of instances with $\geq 1$ ask), \emph{Round} (mean
-turns), and \emph{AxisHit}---for each interact action GPT-4o-mini classifies
+turns), and \emph{AxisHit}, for each interact action GPT-4o-mini classifies
 whether the clarifying question targets a true ambiguity axis for that instance;
 we report AxisHit@1, AnyAxisHit, WrongAxisRate, and GenericAskRate. These
 characterize \emph{how} a model interacts; they do not rank models.
@@ -678,7 +679,7 @@ which is positive only when the agent asked at least one question and then
 answered correctly, and decreases with redundant asks. We restrict it to the
 asked-and-correct case precisely to avoid the perverse incentive of an
 all-instances variant, which would award its maximum to a confident
-\emph{zero-ask} answer---rewarding the very behavior the benchmark penalizes.
+\emph{zero-ask} answer, rewarding the very behavior the benchmark penalizes.
 DisE$^+$ is a diagnostic of clarification efficiency, never the ranking metric.
 
 
@@ -699,7 +700,7 @@ are evaluated; remaining other-vendor rows in progress.
 The human baseline is the single interaction condition (passage + one yes/no
 clarification + answer) on a stratified 50-instance subset; see \S\ref{sec:humanbaseline}.
 Open-MoE +Search/+Interact accuracy is measured over the full retrieval corpus;
-for both MoE models---as for GPT-4o---added interaction \emph{underperforms} plain
+for both MoE models, as for GPT-4o, added interaction \emph{underperforms} plain
 search, while only GPT-5 converts interaction into a gain.}
 \label{tab:main}
 \small
@@ -736,8 +737,8 @@ Before analyzing model behavior, we establish the core motivation empirically:
 \emph{a conventional single-gold financial-QA benchmark cannot see the failure
 \fininteract measures.} Existing benchmarks (FinanceBench, FinQA, DocFinQA)
 attach one gold answer per question. Built from the same filings, such a
-benchmark would almost always adopt the \emph{default} reading---the headline
-figure a non-expert assumes---as that gold. Our paired construction lets us
+benchmark would almost always adopt the \emph{default} reading, the headline
+figure a non-expert assumes, as that gold. Our paired construction lets us
 quantify the consequence directly: every instance carries both an intended and a
 default answer, so we re-grade the \emph{identical} model outputs under both
 conventions (Table~\ref{tab:illusion}).
@@ -777,12 +778,12 @@ $3\times$, and the gap is the benchmark's reason to exist.} In the
 retrieval-augmented regime where current single-gold benchmarks operate, the
 larger models return the \emph{default} reading more often than the intended one:
 GPT-4o is graded $37.0\%$ correct against the default but only $12.1\%$ against
-the intended answer---a single-gold benchmark would report $3.1\times$ its true
+the intended answer, a single-gold benchmark would report $3.1\times$ its true
 competence. The model is not reasoning to the right answer; it is confidently
 producing a well-grounded answer to the \emph{wrong reading of the question},
 which a single-gold benchmark rewards and therefore cannot detect. (GPT-5-mini is
 the instructive exception: it captures \emph{neither} reading because it asks
-rather than commits (Finding~6), so single-gold grading does not flatter it---but
+rather than commits (Finding~6), so single-gold grading does not flatter it, but
 nor does it answer.) Critically,
 interaction is the \emph{only} mode where intended accuracy exceeds
 default-capture (GPT-5: $20.2$ vs.\ $12.1$): asking is what converts a
@@ -799,7 +800,7 @@ capability single-gold benchmarks are structurally blind to, and what
 $n{=}200$, three models, \emph{same} grading methodology; the grader retries with
 backoff so no answer is silently dropped). \emph{Intended}: accuracy against a
 specified target reading. \emph{Any-valid}: accuracy against \emph{any} accepted
-reading---what a lenient single-gold benchmark credits. \emph{Def.-cap}: fraction
+reading, what a lenient single-gold benchmark credits. \emph{Def.-cap}: fraction
 producing a valid but non-target reading. \emph{Ask}: fraction that asks when
 permitted. gpt-5-mini interact omitted (it asks ${<}1\%$).}
 \label{tab:general}
@@ -831,14 +832,14 @@ identical default-vs-intended measurement on AmbigQA~\cite{min2020ambigqa}
 \emph{consistently across three models}. Grading the \emph{same} answer-only outputs
 against any accepted reading rather than a specified target overstates competence by
 $2.1$--$2.3\times$ (gpt-4o-mini $2.3$, gpt-4o $2.2$, gpt-5-mini $2.1$), and the effect
-is robust to how the target reading is chosen---a random-target assignment gives
+is robust to how the target reading is chosen, a random-target assignment gives
 $2.1\times$, versus our most-specific-reading default. Models return a valid but
-non-target reading $55$--$66\%$ of the time---direct evidence the error is
+non-target reading $55$--$66\%$ of the time, direct evidence the error is
 ambiguity-blindness, not noise. Elicitation is again underused: even permitted to ask,
 models clarify on at most $27\%$ of ambiguous queries and usually far less (gpt-4o
 $2.5\%$, gpt-5-mini ${<}1\%$), and interaction leaves intended accuracy far below the
 any-valid ceiling (gpt-4o-mini $43.5$ vs.\ $81$). The one honest difference is the
-oracle ceiling---$50$--$69\%$ here versus $93$--$95\%$ in finance---because
+oracle ceiling, $50$--$69\%$ here versus $93$--$95\%$ in finance, because
 open-domain factoids stay hard even once disambiguated, so general knowledge is itself
 a limiter. This is exactly why finance is the sharper instrument: its exact,
 injectable ground truth isolates \emph{elicitation} from \emph{knowledge} in a way
@@ -847,14 +848,14 @@ grading, not of finance.
 
 \subsection{Findings}
 
-We report results for the full OpenAI tier ladder---GPT-5, GPT-4o, and
-GPT-5-mini---across all three modes (Table~\ref{tab:main}); other-vendor models
+We report results for the full OpenAI tier ladder, GPT-5, GPT-4o, and
+GPT-5-mini, across all three modes (Table~\ref{tab:main}); other-vendor models
 are in progress. All headline accuracy comparisons below are reported with
 bootstrap $95\%$ CIs over instances, and we test each within-model mode
 transition with a two-sided paired bootstrap ($n{=}173$). Six findings emerge
 here, with a seventh (the latent-capacity ceiling) in \S\ref{sec:ceiling}.
 
-\textbf{Finding 1: Interaction is a capability, not a free lever --- it helps
+\textbf{Finding 1: Interaction is a capability, not a free lever, it helps
 the strong model and \emph{harms} the weak one.} Adding interaction raises
 GPT-5 from 6.4\% to 20.2\% (95\% CI $[14.5,26.6]$; paired bootstrap $p{<}0.001$),
 but \emph{lowers} GPT-4o from 12.1\% to 4.6\% ($p{=}0.002$). Forcing the weaker
@@ -879,18 +880,18 @@ inability to ask.} GPT-4o asks readily (IR 99\%, 4.7 questions on average) but
 fails to \emph{integrate} the user's responses: 87\% of its interactive errors
 are non-committal refusals (e.g.\ ``please specify the exact period'') issued
 \emph{after} the simulator has answered. It can recognize ambiguity and ask, but
-cannot close the loop and commit --- a multi-turn integration gap, not a protocol
+cannot close the loop and commit, a multi-turn integration gap, not a protocol
 artifact (only 2\% produced no answer at all).
 
 \textbf{Finding 5: Models are severely overconfident on ambiguous queries.}
 Expected Calibration Error ranges from 0.53 (GPT-5, interact) to 0.95 (GPT-4o,
 answer-only); models report 85--95\% confidence while answering 0--20\%
-correctly. Both models also ask imprecisely --- AxisHit@1 is only 0.38 (GPT-5)
+correctly. Both models also ask imprecisely, AxisHit@1 is only 0.38 (GPT-5)
 and 0.37 (GPT-4o), so even when a model asks, it targets the correct ambiguity
 axis barely a third of the time, motivating the axis-conditioned policy of
 \S\ref{sec:error}.
 
-\textbf{Finding 6: A smaller model collapses into ill-formed clarification ---
+\textbf{Finding 6: A smaller model collapses into ill-formed clarification, 
 it asks the most but commits the least.} GPT-5-mini scores $0.6/0.0/0.0\%$ across
 the three modes. The cause is not ambiguity-blindness but the opposite: it is the
 \emph{most} eager to clarify (interact IR $96\%$, $4.6$ asks/instance), yet it
@@ -899,7 +900,7 @@ issues \emph{open-ended} questions (``which fiscal year? please paste the 2023 a
 all $173$ interact trajectories, $63\%$ terminate on an unanswered open-ended
 question and $35\%$ exhaust the $10$-round budget still asking; only $1$ instance
 ever commits a value (also wrong), and just $1.3\%$ were format-unparseable. Even
-in Answer+Search---where no interact channel exists---it asks instead of
+in Answer+Search, where no interact channel exists, it asks instead of
 answering, capturing \emph{neither} the intended nor the default reading
 ($0.0/0.0\%$). This is an extreme form of Finding~4's integration gap and a
 distinct failure mode: clarification without commitment.
@@ -932,7 +933,7 @@ To locate the bottleneck we bracket interactive accuracy with two ablations
 $n{=}4$ clarifying questions before answering. \textbf{Context-oracle} hands the
 model the disambiguating context $C$ (which fixes the intended interpretation)
 together with a passage containing \emph{both} the intended and the default
-evidence spans, then asks it to answer---the ambiguity is pre-resolved but the
+evidence spans, then asks it to answer, the ambiguity is pre-resolved but the
 model must still ground the correct value.
 
 \begin{table}[t]
@@ -940,7 +941,7 @@ model must still ground the correct value.
 \caption{The disambiguation bottleneck. Forcing more clarification does not help
 (and often hurts), but \emph{resolving} the ambiguity lifts every model to
 $93$--$95\%$. The $\approx$75-point gap between the oracle ceiling and free
-interaction is attributable to the model's inability to elicit $C$ itself---not
+interaction is attributable to the model's inability to elicit $C$ itself, not
 to missing knowledge or grounding. ($^\dagger$GPT-5 forced capped at $n{=}65$.
 Open-MoE interact accuracy is now measured over the full retrieval corpus.)}
 \label{tab:ceiling}
@@ -958,11 +959,11 @@ Qwen3.5-35B-A3B & 0.6 & 28.9 & -- & \textbf{91.9} \\
 \end{tabular}
 \end{table}
 
-\textbf{Finding 7: Models can answer once the ambiguity is resolved---they
+\textbf{Finding 7: Models can answer once the ambiguity is resolved, they
 cannot resolve it themselves.} The context-oracle ceiling is $93$--$95\%$ for all
 three models, including GPT-5-mini, which scores $0\%$ under free interaction.
 Latent answering capacity is therefore near-ceiling and roughly scale-invariant;
-what varies---and what \fininteract measures---is whether a model can
+what varies, and what \fininteract measures, is whether a model can
 \emph{elicit} the disambiguating context. Crucially, \emph{forcing} clarification
 does not recover this capacity: requiring four asks leaves GPT-4o and GPT-5-mini
 near $0\%$ ($0.0\%$ and $0.6\%$) and \emph{lowers} GPT-5 from $20.2\%$ to $1.5\%$, because forced asks
@@ -973,8 +974,8 @@ scale nor brute-force asking supplies.
 \subsection{Human Baseline}
 \label{sec:humanbaseline}
 
-To bound the task from above under \emph{realistic} interaction---where the
-disambiguating context must be \emph{elicited}, not handed over---we collect a
+To bound the task from above under \emph{realistic} interaction, where the
+disambiguating context must be \emph{elicited}, not handed over, we collect a
 human baseline on a stratified 50-instance subset (32 EN / 18 ZH, balanced by
 axis). Two finance-literate annotators (one bilingual) face the same input a
 model does in the search regime: the ambiguous question and a retrieved passage
@@ -985,7 +986,7 @@ the agent's \texttt{search}$\to$\texttt{interact}$\to$\texttt{answer} loop, so t
 human row is directly comparable to the +Interact column; we grade it with the
 identical GPT-4o-mini grader.
 
-\textbf{Finding 8: Even humans who can ask resolve only $30\%$---the task is hard,
+\textbf{Finding 8: Even humans who can ask resolve only $30\%$, the task is hard,
 not merely mis-specified for models.} Annotators reach $30.0\%$ accuracy overall
 ($34.4\%$ EN, $22.2\%$ ZH), above every model's $\le 20.2\%$ but far from the
 $93$--$95\%$ context-oracle ceiling. The gap between the oracle ceiling and the
@@ -996,21 +997,21 @@ even for experts. Humans ask far more on-target questions than any model
 of the time. The asymmetry is sharpest in Chinese: ZH annotators ask the
 \emph{best}-targeted questions ($0.72$ AxisHit) but post the \emph{lowest}
 accuracy ($22.2\%$) and highest default-capture ($72.2\%$). Chinese instances are
-therefore harder to \emph{resolve}, not harder to \emph{recognize}---the
+therefore harder to \emph{resolve}, not harder to \emph{recognize}, the
 归母/扣非 (parent-attributable vs.\ deduction-of-nonrecurring) net-income
-distinction is sticky even once correctly surfaced---corroborating the
+distinction is sticky even once correctly surfaced, corroborating the
 language-asymmetry caveat in \S\ref{sec:limitations} with a mechanism.
 
 \subsection{Per-Axis Skills: Which Clarification Abilities Do Models Lack?}
 \label{sec:skills}
 
-The five axes are not just data strata; each names a distinct \emph{skill}---the
+The five axes are not just data strata; each names a distinct \emph{skill}, the
 ability to recognize that a question is under-specified \emph{along that axis} and
 ask the question that resolves it. We make this measurable by decomposing each
 model's per-axis \texttt{+interact} competence into three components:
-\textbf{Recognition} (interaction rate---does it ask when it should?),
-\textbf{Targeting} (AxisHit@1---does it ask about the \emph{right} axis?), and
-\textbf{Resolution} (accuracy---does asking yield the intended answer?). A model
+\textbf{Recognition} (interaction rate, does it ask when it should?),
+\textbf{Targeting} (AxisHit@1, does it ask about the \emph{right} axis?), and
+\textbf{Resolution} (accuracy, does asking yield the intended answer?). A model
 ``has'' an axis skill only when all three are high; a low value localizes the
 failure to not-asking, asking-wrong, or asking-right-but-still-wrong.
 Table~\ref{tab:skills} reports Targeting, the decisive component.
@@ -1042,11 +1043,11 @@ figure is recognized point-in-time vs.\ over time), yet all reach $\geq0.95$ on
 \texttt{temporal\_scope}; entity and metric sit in between ($0.13$--$0.41$).
 Resolution follows the same shape (e.g.\ GPT-5 resolves $57\%$ of temporal but
 $\leq23\%$ of entity/metric). The gap is therefore not uniform incompetence but
-\emph{missing specific skills}---which is precisely the target an intervention
+\emph{missing specific skills}, which is precisely the target an intervention
 should aim at (\S\ref{sec:grpo}). We also tested whether failures cluster by axis
 in per-instance behavior space (PCA over per-model correct/ask/AxisHit/default);
 they do not (k-means ARI $\approx0.01$, $p\approx0.15$), a floor effect of the
-near-zero accuracies---the axis structure lives in the aggregate targeting
+near-zero accuracies, the axis structure lives in the aggregate targeting
 profile, not in coarse per-instance behavior. Clustering the \emph{text of the
 asked clarifying questions} is the sharper test and is left to future work.
 
@@ -1054,7 +1055,7 @@ asked clarifying questions} is the sharper test and is left to future work.
 \centering
 \caption{Zero-shot Targeting (AxisHit@1) by base-model scale (Qwen3,
 \texttt{+interact}; denominator = instances where the model asked). Entity and
-metric scale steeply---entity is nearly solved at 32B---while recognition policy
+metric scale steeply, entity is nearly solved at 32B, while recognition policy
 stays $0$ at \emph{every} scale, including the same 32B that targets entity well.
 The rare axis is underpowered ($n{\le}9$ asked-on) but flat throughout.}
 \label{tab:scaledissoc}
@@ -1070,17 +1071,17 @@ recognition\_policy & \textbf{.00} & \textbf{.00} & \textbf{.00} \\
 \end{tabular}
 \end{table}
 
-\textbf{Finding 11: the axes are different \emph{kinds} of skill---some
+\textbf{Finding 11: the axes are different \emph{kinds} of skill, some
 scale-solvable, one a scale-invariant blind spot.} Zero-shot targeting across a
 controlled scale ladder (Qwen3 $4\text{B}\!\to\!32\text{B}$;
 Table~\ref{tab:scaledissoc}) separates the axes sharply. \texttt{entity\_scope}
-and \texttt{metric\_definition} rise steeply with scale---entity is nearly
-\emph{solved} at 32B ($0.89$)---so there capability is largely a matter of scale.
+and \texttt{metric\_definition} rise steeply with scale, entity is nearly
+\emph{solved} at 32B ($0.89$), so there capability is largely a matter of scale.
 \texttt{recognition\_policy}, by contrast, is $0.00$ at every scale, including the
 same 32B model that has clearly learned to target entity: more parameters buy no
 recognition-basis targeting at all. The dissociation confirms the taxonomy carves
 genuine capability boundaries rather than arbitrary strata, and it pinpoints where
-scale stops helping---the axis a targeted intervention must address
+scale stops helping, the axis a targeted intervention must address
 (\S\ref{sec:coevolve}).
 
 \subsection{Mechanistic Case Study: Where Ambiguity Lives in the Network}
@@ -1101,14 +1102,14 @@ conditions, and score any hidden state by its (mean-centered) projection onto th
 tracing this across layers gives a depth profile of how strongly each layer separates an
 under-specified question from a disambiguated one. Independently, on the two larger models we
 train a per-layer linear probe to decode the ambiguity \emph{type} (entity\_scope vs.\
-metric\_definition), which---unlike a context-presence detector---cannot be solved trivially.
+metric\_definition), which, unlike a context-presence detector, cannot be solved trivially.
 
 \paragraph{Result.} Figure~\ref{fig:crossmodel}(a) overlays the depth profiles (normalized for
 differing depth and scale). On all four models the signal is near-zero through most of the stack
 and rises sharply to a peak in the \emph{final few layers} ($\approx$95--98\% relative depth:
 layers 35/37, 32/33, 48/49, 40/41). Figure~\ref{fig:crossmodel}(b) shows that the ambiguity
 \emph{type} is linearly decodable at $0.80$ accuracy (majority baseline $0.60$) on both larger
-models, though it becomes available at different depths---early ($\approx$27\%) in Qwen3-30B and
+models, though it becomes available at different depths, early ($\approx$27\%) in Qwen3-30B and
 late ($\approx$85\%) in Qwen3.5-35B. Across four models, two scales, and three architecture
 families, the representation is consistent: financial-query ambiguity, and its axis, is linearly
 encoded, emerging toward the top of the network.
@@ -1123,7 +1124,7 @@ gold axis more often (AxisHit $0.40$ vs.\ $0.16$). With the full retrieval corpu
 place their accuracy is now measured, and it exposes a sharper pattern: plain search
 reaches $28.3\%$/$35.8\%$, but \emph{adding} interaction \emph{lowers} accuracy to
 $11.6\%$/$28.9\%$ ($-16.8$/$-6.9$ points). Interaction is thus net-negative relative
-to search for both open models---as it is for GPT-4o ($12.1\to4.6$)---and only the
+to search for both open models, as it is for GPT-4o ($12.1\to4.6$), and only the
 strongest model, GPT-5, converts clarification into a gain ($6.4\to20.2$). An
 interpretation-oracle control (the resolved interpretation supplied but no evidence)
 scores $\approx0\%$ for both MoE models, so the residual gap to the oracle ceiling is
@@ -1148,7 +1149,7 @@ split (peaks $0.71$/$0.74$ vs.\ baseline $0.60$).
 from 4B to 35B and across dense and MoE architectures.} The representation is type-specific
 (entity vs.\ metric decodable at $0.80$) and robust to scale and architecture, yet behaviorally
 these same models still default rather than clarify. The behavioral gap is thus better read as a
-failure to \emph{act} on a represented ambiguity than a failure to register it---though
+failure to \emph{act} on a represented ambiguity than a failure to register it, though
 establishing this causally (e.g.\ via activation steering) remains future work.
 
 \paragraph{Scope and caveats.} This is mechanistic evidence on open proxies, not the closed
@@ -1159,7 +1160,7 @@ behavioral conclusions from these open models' free-form generations, where surf
 markers, retrieval that surfaces the evidence span) confound naive clarification counts; the
 asking-behavior claims come solely from the graded closed-model evaluation in \S\ref{sec:exp}.
 That the axis is \emph{represented but not acted on} frames the bottleneck as an action
-problem on an available signal---and motivates the axis-conditioned interventions of
+problem on an available signal, and motivates the axis-conditioned interventions of
 \S\ref{sec:error}, which target exactly that signal.
 
 
@@ -1172,13 +1173,13 @@ Our results converge on a single diagnosis. The benchmark localizes the
 bottleneck to \emph{eliciting} the disambiguation: agents answer $93$--$95\%$
 correctly once the intended interpretation is supplied
 (\S\ref{sec:ceiling}) but resolve only $\sim$8\% on their own, and the
-mechanistic probe shows why---open models \emph{linearly represent} the ambiguity
+mechanistic probe shows why, open models \emph{linearly represent} the ambiguity
 \emph{axis} yet do not act on it (\S\ref{sec:mechanistic}). The remaining gap is
 thus an \emph{action} problem on an already-available signal, and the
 \emph{axis} is its natural unit. This section turns that diagnosis into
 intervention: we first catalog how acting fails (a seven-type error taxonomy),
-then present two interventions that share one idea---\textbf{condition on the
-axis}---instantiated at inference time (Axis-Aware ReAct, \S\ref{sec:axisreact})
+then present two interventions that share one idea, \textbf{condition on the
+axis}, instantiated at inference time (Axis-Aware ReAct, \S\ref{sec:axisreact})
 and at training time (axis-guided SFT/GRPO, \S\ref{sec:grpo}).
 
 \subsection{Error Taxonomy}
@@ -1271,13 +1272,13 @@ remaining bottleneck after the E1--E3 errors are addressed.
 \label{sec:grpo}
 
 The per-axis skill analysis (\S\ref{sec:skills}) gives this intervention a precise
-target: models do not lack clarification ability uniformly---they lack \emph{specific}
+target: models do not lack clarification ability uniformly, they lack \emph{specific}
 axis skills (AxisHit $=0$ on recognition policy, partial on metric). The question is
 whether those missing skills can be installed by training rather than prompting.
-The second intervention applies the \emph{same} idea---condition on the
-axis---but in the weights rather than the prompt, showing the benchmark is not
+The second intervention applies the \emph{same} idea, condition on the
+axis, but in the weights rather than the prompt, showing the benchmark is not
 only diagnosable but \emph{trainable}. Starting from Qwen3-4B-Instruct (4-bit
-QLoRA), we run an RLVR ladder---supervised fine-tuning (SFT), KTO, then GRPO---on
+QLoRA), we run an RLVR ladder, supervised fine-tuning (SFT), KTO, then GRPO, on
 the \fininteract training split, with all user simulators, graders, and axis
 judges served locally (zero API cost). We score each stage with the two
 \emph{leak-proof} metrics, AxisHit@1 and interaction rate (Table~\ref{tab:grpo});
@@ -1286,12 +1287,12 @@ retrieval returns the disambiguated evidence span, so it is partly leaked and is
 \emph{not} a reliable learning signal.
 
 \textbf{The axis-guided teacher.} The decisive ingredient is how SFT
-demonstrations are generated. An uninformed teacher---even a 72B model---almost
+demonstrations are generated. An uninformed teacher, even a 72B model, almost
 always asks the \emph{obvious} ambiguity (typically the reporting period) and
 rarely the subtle gold axis (entity scope, recognition policy), yielding
 $\sim$0\% on-axis demonstrations. Privately revealing the gold axis to the teacher
 while generating demonstrations (the hint is \emph{not} stored in the trajectory)
-lifts the on-axis yield to $\sim$79\%---a reusable recipe for any axis-structured
+lifts the on-axis yield to $\sim$79\%, a reusable recipe for any axis-structured
 clarification task.
 
 \begin{table}[t]
@@ -1314,19 +1315,19 @@ Base (Qwen3-4B)          & 25.0 & 54.9 & 84.3 & 0.96 \\
 \end{table}
 
 \textbf{SFT does the heavy lifting.} The leak-proof signals jump almost entirely
-at the supervised stage---AxisHit@1 rises $25\to69$ and interaction $55\to100$
-(Figure~\ref{fig:grpo}a)---while KTO and GRPO move within run-to-run noise at
+at the supervised stage, AxisHit@1 rises $25\to69$ and interaction $55\to100$
+(Figure~\ref{fig:grpo}a), while KTO and GRPO move within run-to-run noise at
 $n{=}51$. Training teaches the model to \emph{always interact and target the
 correct axis}, the behavior \fininteract is built to elicit. Whether this gain
 reflects a sharpened internal \emph{representation} of the axis or only a rewired
-output \emph{policy}---probing the trained model as in \S\ref{sec:mechanistic}---is
+output \emph{policy}, probing the trained model as in \S\ref{sec:mechanistic}, is
 a direct test of the diagnosis and a target for future work.
 
 \textbf{True multi-turn GRPO.} The ladder above optimizes a single-turn
 approximation. We additionally confirm the full multi-turn episode is trainable
 end-to-end: optimizing the 4B policy over entire ReAct episodes (loss masked on
 simulator and retrieval tokens) for 15 steps raises mean reward $0.55\to1.08$
-while clarifying turns rise $5.7\to8.6$ (Figure~\ref{fig:grpo}b)---the axis-aware
+while clarifying turns rise $5.7\to8.6$ (Figure~\ref{fig:grpo}b), the axis-aware
 reward is teaching the policy to ask more. We report this as a learning-signal
 demonstration, not a converged model.
 
@@ -1334,8 +1335,8 @@ demonstration, not a converged model.
 teacher are local Qwen2.5-32B/72B models (weaker than GPT-4o, and siblings of the
 policy); the terminal reward is partly leaked; and GRPO is run for tens of steps,
 not to convergence. We therefore frame this as evidence that \fininteract is
-\emph{trainable}---an axis-guided SFT seed instills axis-targeted
-clarification---rather than as a state-of-the-art accuracy result.
+\emph{trainable}, an axis-guided SFT seed instills axis-targeted
+clarification, rather than as a state-of-the-art accuracy result.
 
 \begin{figure}[t]
 \centering
@@ -1353,13 +1354,13 @@ together over training.}
 A benchmark that models eventually memorize stops measuring. Because \fininteract
 couples a grounded data-generation pipeline (\S\ref{sec:construction}) to a
 trainable policy (\S\ref{sec:grpo}), it can in principle \emph{co-evolve}: generate
-fresh instances on an axis the current model fails, train on them, and repeat---a
+fresh instances on an axis the current model fails, train on them, and repeat, a
 data$\leftrightarrow$model loop in the spirit of self-improving
 generators~\cite{mae2025}, but \emph{grounded} in real filings rather than the
-ungrounded self-play those methods risk. We run three gated rounds---on the scarce,
+ungrounded self-play those methods risk. We run three gated rounds, on the scarce,
 subordinate axis (\texttt{recognition\_policy}), the abundant, salient axis
 (\texttt{entity\_scope}), and the abundant-but-only-weakly-scale-learnable axis
-(\texttt{metric\_definition}, \S\ref{sec:skills})---to ask not \emph{whether} the
+(\texttt{metric\_definition}, \S\ref{sec:skills}), to ask not \emph{whether} the
 loop works but \emph{when}.
 
 \begin{table}[t]
@@ -1385,34 +1386,34 @@ De-leaked accuracy                   & $32.5\to22.5$ & $15\to\textbf{60}$ & $11\
 \end{table}
 
 All three rounds run end-to-end: the Constructor$\to$Verifier pipeline yields hard
-instances (every one passes the adversarial gate---the base fails it answer-only)
+instances (every one passes the adversarial gate: the base fails it answer-only)
 and axis-guided SFT converges. The outcome splits cleanly by \emph{abundance}, not
-by scale-learnability. On both abundant axes---\texttt{entity\_scope} and
-\texttt{metric\_definition}---Targeting generalizes to held-out \emph{human} items
+by scale-learnability. On both abundant axes, \texttt{entity\_scope} and
+\texttt{metric\_definition}, Targeting generalizes to held-out \emph{human} items
 ($.00\to.68$ and $.00\to.58$, each $\sim$4$\times$ the $+.15$ bar) and to held-out
 \emph{generated} items, with no catastrophic forgetting. On the scarce
 \texttt{recognition\_policy} it does not move ($.00$ on both held-out sets): the
 trained model reverts to the salient period/entity question rather than the
-recognition-basis distinction. The contrast rules out a broken pipeline---the
-\emph{same} machinery installs entity and metric but not recognition---and, because
+recognition-basis distinction. The contrast rules out a broken pipeline, the
+\emph{same} machinery installs entity and metric but not recognition, and, because
 metric is only \emph{weakly} scale-learnable yet trains as well as entity, it rules
 out scale-learnability as the gate (\S\ref{sec:learnability}).
 
 \textbf{Finding 12: the loop closes on abundant axes and fails on scarce ones;
 whether elicitation \emph{helps} is a separate, per-axis property.} A self-refreshing
 \fininteract is viable wherever the data arm can supply enough frontier
-instances---both abundant axes install and generalize; the scarce axis
+instances, both abundant axes install and generalize; the scarce axis
 (recognition's $36$-instance ceiling from just $30/1{,}847$ primary passages) does
 not reliably (Finding~14). But installing on-axis elicitation is not automatically beneficial: it
-\emph{helps} metric (accuracy $15\to60$, $+45$---the base cannot answer without the
+\emph{helps} metric (accuracy $15\to60$, $+45$: the base cannot answer without the
 metric definition, so the clarifying question \emph{supplies} it: $18$
 wrong$\to$correct, $0$ regressions) and \emph{hurts} entity (accuracy $32.5\to22.5$,
-$-10$---the base can often answer the entity directly, so forcing a question turns
+$-10$: the base can often answer the entity directly, so forcing a question turns
 six correct direct answers into wrong multi-turn ones). Both drove interaction to
-$100\%$; the accuracy sign flips on whether the base could already answer---the
+$100\%$; the accuracy sign flips on whether the base could already answer, the
 training-time face of the ``interaction can hurt versus plain answering'' effect
 seen at inference (\S\ref{sec:ceiling}). The actionable step is a \emph{conditional
-when-to-ask gate}---elicit only where the model cannot already answer---plus
+when-to-ask gate}, elicit only where the model cannot already answer, plus
 multi-round curriculum and fresh-filing ingestion to lift the scarce axes above
 their availability ceiling.
 
@@ -1420,9 +1421,9 @@ their availability ceiling.
 \label{sec:learnability}
 
 The three rounds let us isolate \emph{which} axis property predicts whether the loop
-closes. Two candidates are natural---an axis's \emph{scale-learnability} (does
+closes. Two candidates are natural, an axis's \emph{scale-learnability} (does
 zero-shot Targeting rise with model size?) and its \emph{source-abundance} (can the
-data arm supply frontier instances?)---and we had also hypothesized a
+data arm supply frontier instances?), and we had also hypothesized a
 representational version: \emph{learnable iff the axis is linearly decodable} from
 hidden states. The \texttt{metric\_definition} round was designed to discriminate the
 first two; a linear probe tests the third. Both tidy hypotheses fail.
@@ -1433,24 +1434,24 @@ is abundant ($498$ primary passages) but only \emph{weakly} scale-learnable
 pre-registered the two-factor prediction that it would co-evolve only
 \emph{partially}. It did not: metric is a \emph{full} GO (Targeting $+0.55$, matching
 entity's $+0.61$; Table~\ref{tab:coevolve}). What separates GO from NO-GO is not the
-scale-slope but \emph{abundance}---both abundant axes close the loop; only the scarce
+scale-slope but \emph{abundance}, both abundant axes close the loop; only the scarce
 axis fails.
 
 \textbf{Representation does not gate it either, and is not the bottleneck.} A
 per-layer one-vs-rest linear probe decodes every axis from base hidden states, and
-the pattern \emph{anti}-tracks learnability: \texttt{recognition\_policy}---the
-un-learnable, NO-GO axis---is the \emph{most} decodable (AUROC $0.93$ on a
+the pattern \emph{anti}-tracks learnability: \texttt{recognition\_policy}, the
+un-learnable, NO-GO axis, is the \emph{most} decodable (AUROC $0.93$ on a
 size-matched sample, above entity/metric at $\sim0.77$); decodability is \emph{flat}
 across the $4\text{B}\!\to\!32\text{B}$ sweep even as behavioural AxisHit climbs
 $.12\!\to\!.89$; and axis-guided SFT leaves it unchanged. The axis is fully
-\emph{represented} at every scale, before and after training---the model simply does
+\emph{represented} at every scale, before and after training: the model simply does
 not \emph{act} on it, the ``represents-but-doesn't-act'' gap of
 \S\ref{sec:mechanistic}, now shown to hold even for the axis co-evolution cannot fix.
 
 \begin{table}[t]
 \centering
 \caption{What predicts co-evolvability. The observed outcomes track
-\emph{abundance/salience}---\emph{not} the AxisHit scale-slope (metric: low slope,
+\emph{abundance/salience}, \emph{not} the AxisHit scale-slope (metric: low slope,
 GO) and \emph{not} decodability (recognition: highest AUROC, yet does not
 co-evolve). Salience = primary$/$any-candidate passages; decodability = peak
 one-vs-rest AUROC (recognition on a size-matched augmented sample; raw $n{=}9$
@@ -1473,17 +1474,17 @@ recognition\_policy &  30 & \textbf{0.04} & $+0.00$ & \textbf{0.93} & weak$^{\dd
 \end{tabular}
 \end{table}
 
-\textbf{Finding 13: co-evolvability is gated by source \emph{abundance}---driven by
-\emph{salience}---not by scale-learnability or representational decodability.} What
+\textbf{Finding 13: co-evolvability is gated by source \emph{abundance}, driven by
+\emph{salience}, not by scale-learnability or representational decodability.} What
 survives both falsifications is a single upstream cause. \texttt{recognition\_policy}
 is a candidate axis in $796$ passages but \emph{primary} in only $30$ (salience
 $0.04$): it is almost always the \emph{subordinate} ambiguity, behind a more salient
 entity or period axis in the same passage. Low salience produces both the scarcity
 that starves the data arm and the salient competitor the model's prior reaches for
-instead---so the representation is present but never acted on and cannot be cheaply
+instead, so the representation is present but never acted on and cannot be cheaply
 trained in. Salient axes behave oppositely (entity, salience $0.92$: abundant and
-trainable). For a practitioner, \textbf{salience---not scale curves or probe
-accuracy---is the cheap, up-front signal} of which axes a co-evolving benchmark can
+trainable). For a practitioner, \textbf{salience, not scale curves or probe
+accuracy, is the cheap, up-front signal} of which axes a co-evolving benchmark can
 keep hard and which need fresh human curation. The corollary for evaluation is
 sharper: the hardest ambiguity to make models \emph{handle} is not the one they
 cannot represent, but the one that is always someone else's more-obvious question.
@@ -1495,32 +1496,32 @@ cannot represent, but the one that is always someone else's more-obvious questio
 AxisHit@1 (selection metric) per round. \emph{Right}: held-out \emph{human}-probe
 AxisHit (never used for selection). Entity learns targeting from a single $30$-instance
 slice and transfers to humans ($0.63\!\to\!0.93$); metric needs \emph{accumulation}
-(one slice teaches nothing---brown, flat---while two accumulated slices reach
-$0.75$---green); recognition stays at base ($\approx0.05$) even with a fair
+(one slice teaches nothing, brown, flat, while two accumulated slices reach
+$0.75$, green); recognition stays at base ($\approx0.05$) even with a fair
 $26$-instance set. The guard preserves human transfer (it rolls back the round-3
 candidate, which regresses on validation).}
 \label{fig:multiround}
 \end{figure}
 
 \textbf{Finding 14: salience predicts an axis's \emph{data-need}, not just a binary
-outcome---and a validation-guarded arms race confirms it.} Extending each axis to a
+outcome, and a validation-guarded arms race confirms it.} Extending each axis to a
 multi-round curriculum (Fig.~\ref{fig:multiround}), with checkpoints selected on a
 frozen validation set and reported on the held-out human probe, refines the binary
 gate into a gradient that tracks salience. \textbf{Entity} (salience $0.92$) learns
 axis-targeting from a \emph{single} $30$-instance slice and transfers to human
 ambiguity at $0.88$--$0.93$. \textbf{Metric} ($0.48$) needs \emph{accumulation}: one
-slice yields $0.0$, two accumulated slices reach $0.75$---so its earlier single-round
+slice yields $0.0$, two accumulated slices reach $0.75$, so its earlier single-round
 GO used ${\sim}60$ instances precisely because that is roughly what the axis requires.
 \textbf{Recognition} ($0.04$) is \emph{unreliable}: across training runs its human
-AxisHit ranges only $0$--$0.44$ on the scarce $n{=}9$ probe---weak and inconsistent,
+AxisHit ranges only $0$--$0.44$ on the scarce $n{=}9$ probe, weak and inconsistent,
 not a clean zero. Scoring the same runs as an \emph{Elo arms race} between the solver
-and a hard-example miner (win $=$ AxisHit, which---unlike recall-walled resolution---%
+and a hard-example miner (win $=$ AxisHit, which, unlike recall-walled resolution, %
 varies across checkpoints) makes the instrument non-degenerate: entity is
 \emph{solver-runaway} (solver Elo $1000\!\to\!1551$, outpacing a corpus-bounded miner
 that cannot synthesize adversarially harder targeting), while recognition
 \emph{stalls} (flat). Two guarded rounds peak; the third overfits and is rolled back.
 The practical reading: salience is an up-front estimate not just of \emph{whether} an
-axis co-evolves but of \emph{how much} data it needs---and one well-targeted round,
+axis co-evolves but of \emph{how much} data it needs, and one well-targeted round,
 guarded on held-out validation, is close to the sweet spot.
 
 
@@ -1544,16 +1545,16 @@ analyst tasks, but attributes this to numerical rigor rather than ambiguity.
 FinEval~\cite{guo2023fineval}, a large Chinese financial-knowledge benchmark,
 incidentally identifies an ``ambiguity handling weakness'' error type in its
 agent tasks but does not isolate or control it. Recent \emph{agentic} financial
-benchmarks raise task realism---Finance Agent Benchmark~\cite{bigeard2025financeagent}
+benchmarks raise task realism, Finance Agent Benchmark~\cite{bigeard2025financeagent}
 (537 expert research tasks, where the best model reaches only $46.8\%$) and
-FinAgentBench~\cite{choi2025finagentbench} (agentic retrieval over EDGAR)---but both
+FinAgentBench~\cite{choi2025finagentbench} (agentic retrieval over EDGAR), but both
 remain single-turn and single-gold, evaluating analysis and retrieval rather than
 whether an agent recognizes that a query is under-specified. \fininteract is the
-first to make query ambiguity the central, controlled construct---via paired
-default/intended interpretations and multi-turn interaction---in the financial
+first to make query ambiguity the central, controlled construct, via paired
+default/intended interpretations and multi-turn interaction, in the financial
 domain.
 
-\begin{table*}[b]
+\begin{table*}[t]
 \centering
 \caption{Comparison of financial QA benchmarks.
 \checkmark = supported; -- = not applicable or not evaluated.}
@@ -1600,8 +1601,8 @@ CLAMBER~\cite{zhang2024clamber} evaluates whether models identify and clarify
 ambiguous information needs, and QuestBench~\cite{li2025questbench} tests whether
 they can ask the minimal necessary question in reasoning tasks. Both are
 general-domain and judge a single clarifying step; \fininteract adds \emph{per-axis}
-targeting (AxisHit), programmatically verifiable financial grounding, and---via the
-co-evolution rounds (\S\ref{sec:coevolve})---an analysis of \emph{when} asking helps
+targeting (AxisHit), programmatically verifiable financial grounding, and, via the
+co-evolution rounds (\S\ref{sec:coevolve}), an analysis of \emph{when} asking helps
 versus hurts. We adapt this line's formalism to finance, replacing human-judged
 ambiguity labels with programmatically verifiable XBRL-grounded evidence pairs.
 
@@ -1661,16 +1662,16 @@ financial search agents on genuinely ambiguous queries.
 The five-axis financial ambiguity taxonomy, paired default/intended
 interpretation design, and adversarial verifier-based construction pipeline
 yield 173 high-quality instances that resist trivial disambiguation.
-One unit organizes the whole story---the ambiguity \emph{axis}: it structures the
+One unit organizes the whole story, the ambiguity \emph{axis}: it structures the
 taxonomy, is what an agent must elicit (single-gold grading overstates competence
 up to $3\times$ when models commit to the wrong axis-reading), is
 \emph{linearly represented} inside open models yet left unacted-on, and is the
-lever for intervention. Our central finding is that interaction capability---not
-financial knowledge---is the bottleneck: agents answer $93$--$95\%$ correctly once
+lever for intervention. Our central finding is that interaction capability, not
+financial knowledge, is the bottleneck: agents answer $93$--$95\%$ correctly once
 the axis is resolved but $\sim$8\% on their own, amplifying the stagnation
 \interactcomp identified in the general domain. We turn this diagnosis into
-intervention with two axis-conditioned methods---at inference (Axis-Aware ReAct)
-and at training (axis-guided SFT/GRPO)---and release \fininteract with full
+intervention with two axis-conditioned methods, at inference (Axis-Aware ReAct)
+and at training (axis-guided SFT/GRPO), and release \fininteract with full
 construction, evaluation, and training code for reproducible follow-on work.
 
 
@@ -1686,7 +1687,7 @@ A practical concern for any LLM-assisted benchmark is the cost to reproduce or
 scale it. We instrument the construction pipeline (\S\ref{sec:construction}) and
 report measured API costs. All figures use list prices at construction time
 (per~1M tokens: GPT-5 \$1.25 in / \$10.00 out; GPT-5-mini \$0.25 / \$2.00;
-GPT-4o-mini \$0.15 / \$0.60) and count API fees only---they exclude the one-time
+GPT-4o-mini \$0.15 / \$0.60) and count API fees only, they exclude the one-time
 filing-collection compute and the human spot-check labor ($10$--$20\%$ of
 accepted instances).
 
@@ -1696,7 +1697,7 @@ a sharp funnel (Table~\ref{tab:cost}). Only $11.5\%$ of keyword-tagged candidate
 passages survive the constructor, which rejects the rest as containing
 \emph{no viable ambiguity} for the target axis; but of those that survive,
 $98.5\%$ pass the $10$-trial adversarial verifier. In other words, the
-construction prompt is strict and the verifier rarely needs to fire---the cost
+construction prompt is strict and the verifier rarely needs to fire, the cost
 of the benchmark is dominated by constructor calls spent on candidate passages
 that turn out not to support a genuine ambiguity, not by verification.
 
@@ -1729,8 +1730,8 @@ Blended cost per candidate passage              & \$0.035 \\
 accepted instances requires $\approx N/0.113$ candidate passages and the
 following API spend: $173$ instances (the current release) $\approx\$54$;
 $500$ instances $\approx\$155$; $1000$ instances $\approx\$309$. The
-benchmark is therefore inexpensive to scale in API terms---an order of
-\$300 takes it to $1000$ instances---and the true constraint is the supply of
+benchmark is therefore inexpensive to scale in API terms, an order of
+\$300 takes it to $1000$ instances, and the true constraint is the supply of
 candidate passages that contain structured, verifiable ambiguity. This favors
 \emph{better passage pre-selection} (raising the $11.5\%$ viability rate) over
 brute-force compute, and explains why the rare axes (e.g.\ filing\_vintage),
