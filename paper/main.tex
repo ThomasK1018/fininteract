@@ -1,79 +1,39 @@
-%% CIKM 2026 Resource Track — 8 pages + references
-%% ACM two-column format
-\documentclass[sigconf]{acmart}
-\AtBeginDocument{%
-  \providecommand\BibTeX{{%
-    \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
-
-%% Packages
+%% AAAI-27 submission (anonymous). Compile with pdflatex.
+\documentclass[letterpaper]{article} % DO NOT CHANGE THIS
+\usepackage[submission]{aaai2027}  % DO NOT CHANGE THIS
+\usepackage[hyphens]{url}  % DO NOT CHANGE THIS
+\usepackage{graphicx} % DO NOT CHANGE THIS
+\urlstyle{rm} % DO NOT CHANGE THIS
+\def\UrlFont{\rm}  % DO NOT CHANGE THIS
+\usepackage{natbib}  % DO NOT CHANGE THIS AND DO NOT ADD ANY OPTIONS TO IT
+\usepackage{caption} % DO NOT CHANGE THIS AND DO NOT ADD ANY OPTIONS TO IT
+\frenchspacing  % DO NOT CHANGE THIS
 \usepackage{booktabs}
 \usepackage{multirow}
-\usepackage{xspace}
 \usepackage{amsmath}
 \usepackage{enumitem}
-\usepackage{xeCJK}
-%\setCJKmainfont{STSong}  % set a CJK font for local builds (Overleaf falls back to its default)
-\usepackage{microtype}
+\usepackage{xspace}
 \usepackage{tikz}
 \usetikzlibrary{positioning, arrows.meta, calc}
+\pdfinfo{/TemplateVersion (2027.1)}
+\setcounter{secnumdepth}{2}
+
 %% portable check / cross (drawn, not font glyphs)
 \newcommand{\cmark}{\tikz[baseline=-0.55ex]{\draw[green!55!black,line width=0.9pt] (0,0.6pt)--(2pt,-1.4pt)--(5pt,3.6pt);}}
 \newcommand{\xmark}{\tikz[baseline=-0.55ex]{\draw[red!75!black,line width=0.9pt] (0,0)--(4pt,4pt) (0,4pt)--(4pt,0);}}
-
-%% Macros
+\newcommand{\checkmark}{\cmark}  % acmart provided \checkmark; AAAI does not
 \newcommand{\fininteract}{\textsc{FinInteract}\xspace}
 \newcommand{\interactcomp}{\textsc{InteractComp}\xspace}
 \newcommand{\HO}{$H_0$\xspace}
 \newcommand{\disep}{$\text{DisE}^+$\xspace}
 \newcommand{\disei}{$\text{DisE}^+$\xspace}
 
-%% venue metadata (placeholder; set for the chosen venue before submission).
-%% Suppresses the acmart default "Conference'17 / Woodstock, NY" boilerplate.
-\setcopyright{none}
-\settopmatter{printacmref=false}
-\acmConference[Preprint]{Preprint, under review}{2026}{}
-\acmYear{2026}
-\copyrightyear{2026}
+\title{FinInteract: The Single-Gold Illusion and the Elicitation Bottleneck in Ambiguous Question Answering}
+\author{Anonymous Submission}
+\affiliations{Paper under double-blind review}
 
-%% ---- BEGIN DOCUMENT ----
 \begin{document}
-
-\title{\fininteract: The Single-Gold Illusion and the\\
-Elicitation Bottleneck in Ambiguous Question Answering}
-
-\author{[Authors blinded for review]}
-\affiliation{%
-  \institution{[Institution blinded for review]}
-  \city{[City]}
-  \country{[Country]}
-}
-
-\begin{CCSXML}
-<ccs2012>
-<concept>
-  <concept_id>10002951.10003317.10003347.10003350</concept_id>
-  <concept_desc>Information systems~Question answering</concept_desc>
-  <concept_significance>500</concept_significance>
-</concept>
-<concept>
-  <concept_id>10002951.10003317.10003347.10003348</concept_id>
-  <concept_desc>Information systems~Question answering~Factoid question answering</concept_desc>
-  <concept_significance>300</concept_significance>
-</concept>
-<concept>
-  <concept_id>10010147.10010178.10010179</concept_id>
-  <concept_desc>Computing methodologies~Natural language processing</concept_desc>
-  <concept_significance>300</concept_significance>
-</concept>
-</ccs2012>
-\end{CCSXML}
-
-\ccsdesc[500]{Information systems~Question answering}
-\ccsdesc[300]{Computing methodologies~Natural language processing}
-
-\keywords{evaluation methodology, measurement validity, ambiguity resolution,
-  interactive agents, clarification, single-gold illusion, financial question
-  answering, large language models}
+\maketitle
 
 \begin{abstract}
 Question-answering benchmarks grade each query against a single gold answer.
@@ -100,8 +60,6 @@ salient axes from little data but reaches the least-salient (recognition basis)
 only unreliably. A replication on general-domain AmbigQA confirms the illusion is
 not finance-specific ($2.1$--$2.3\times$ across three models).
 \end{abstract}
-
-\maketitle
 
 %% ============================================================
 \section{Introduction}
@@ -180,13 +138,13 @@ Default span &
 \end{table}
 
 \paragraph{Limitations of Existing Benchmarks.}
-FinanceBench~\cite{islam2023financebench} provides 150 expert-curated
+FinanceBench~\citep{islam2023financebench} provides 150 expert-curated
 questions over SEC filings, each with a unique correct answer verified against
 the source document; queries are pre-disambiguated by construction.
-FinQA~\cite{chen2021finqa} and DocFinQA~\cite{reddy2024docfinqa} target
+FinQA~\citep{chen2021finqa} and DocFinQA~\citep{reddy2024docfinqa} target
 numerical reasoning over earnings reports but give the model the exact evidence
 table alongside the question, bypassing retrieval and interaction entirely.
-BizBench~\cite{krumdick2024bizbench} and FinBen~\cite{xie2024finben}
+BizBench~\citep{krumdick2024bizbench} and FinBen~\citep{xie2024finben}
 aggregate multiple financial tasks but treat QA as closed-book or
 retrieval-augmented reading comprehension.
 None of these benchmarks ask whether a model \emph{recognizes} that a
@@ -195,24 +153,24 @@ through strategic interaction with a user.
 
 \paragraph{The Ambiguous-QA Gap in Finance.}
 The ambiguous-QA literature has matured in the general domain:
-AmbigQA~\cite{min2020ambigqa} introduced multi-answer formulations;
-CondAmbigQA~\cite{li2025condambigqa} added condition-structured annotations;
-CLAM~\cite{kuhn2022clam} demonstrated that clarification pipelines improve
+AmbigQA~\citep{min2020ambigqa} introduced multi-answer formulations;
+CondAmbigQA~\citep{li2025condambigqa} added condition-structured annotations;
+CLAM~\citep{kuhn2022clam} demonstrated that clarification pipelines improve
 accuracy on ambiguous queries.
 However, all of this work operates on general-domain Wikipedia questions.
 Finance is structurally different in three ways.
-First, financial ambiguity is \emph{endemic and systematic}—a single
+First, financial ambiguity is \emph{endemic and systematic}, a single
 number such as ``net income'' can legitimately differ by 30--40\% depending
 on reporting scope, accounting basis, and filing vintage.
-Second, \emph{misanswers are costly}—an investor acting on the wrong revenue
+Second, \emph{misanswers are costly}, an investor acting on the wrong revenue
 figure or a compliance officer citing the wrong filing version can cause real
 financial harm.
-Third, \emph{ground truth is programmatically verifiable}—SEC filings
+Third, \emph{ground truth is programmatically verifiable}, SEC filings
 and XBRL facts provide exact machine-readable values for every metric,
 period, and scope.
 
 \paragraph{The Interaction Stagnation Hypothesis.}
-\interactcomp~\cite{interactcomp2026} established an important longitudinal
+\interactcomp~\citep{interactcomp2026} established an important longitudinal
 finding: while retrieval accuracy on web search benchmarks has improved
 rapidly with model scale, interaction capability has not kept pace.
 Across eight frontier models on general-domain tasks, fewer than 14\% of
@@ -288,7 +246,7 @@ $(Q,\, C,\, A,\, A_d,\, \mathcal{I}_\text{int},\, \mathcal{I}_\text{def})$:
 \end{itemize}
 
 An agent reading $Q$ alone (without $C$) must find it genuinely
-ambiguous—both $A$ and $A_d$ are defensible from publicly available filings.
+ambiguous, both $A$ and $A_d$ are defensible from publicly available filings.
 This \emph{default-vs-intended pairing} generalizes \interactcomp's
 target-distractor design to the financial domain.
 
@@ -311,12 +269,12 @@ $C$ specifies scope constraints but not the numeric value $A$ itself.
 
 \subsection{Agent Interaction Model}
 
-We follow \interactcomp's ReAct framework~\cite{yao2023react}.
+We follow \interactcomp's ReAct framework~\citep{yao2023react}.
 The agent may issue three types of actions:
-\textbf{search}($q$)—retrieves a passage from the filing corpus;
-\textbf{interact}($q$)—presents a yes/no question to a simulated user who
+\textbf{search}($q$), retrieves a passage from the filing corpus;
+\textbf{interact}($q$), presents a yes/no question to a simulated user who
 answers based on $C$;
-\textbf{answer}($v$)—submits a final answer.
+\textbf{answer}($v$), submits a final answer.
 We evaluate agents in three primary modes (Table~\ref{tab:modes}) and four
 ablation modes.
 
@@ -446,26 +404,26 @@ localize the core bottleneck, issuing the correct follow-up clarification.}
 \subsection{Data Sources}
 
 \textbf{English (EN, $\sim$80\% of pool).}
-\textit{DocFinQA}—780 long-context passages extracted from 10-K and 10-Q
+\textit{DocFinQA}, 780 long-context passages extracted from 10-K and 10-Q
 filings, with verified candidate answers from annotated QA pairs.
-\textit{EDGAR (XBRL-derived)}—111 passages built from machine-readable XBRL
+\textit{EDGAR (XBRL-derived)}, 111 passages built from machine-readable XBRL
 facts for S\&P 500 and Russell 1000 companies (FY2024--2025).
 Because instances are newly constructed from structured facts requiring fresh
 ambiguity pairs, memorization risk is substantially reduced relative to
-benchmarks that reuse published QA pairs directly—though we do not claim
+benchmarks that reuse published QA pairs directly, though we do not claim
 absolute contamination safety.
 
 \textbf{Chinese (ZH, $\sim$20\% of pool).}
-\textit{CNINFO/akshare}—237 passages derived from A-share annual reports
-(上证50 + 沪深300 constituents) via structured financial statement APIs.
-Three passage types: (1) metric definition—扣非净利润 vs.\ 归母净利润
+\textit{CNINFO/akshare}, 237 passages derived from A-share annual reports
+(SSE~50 + CSI~300 constituents) via structured financial statement APIs.
+Three passage types: (1) metric definition, \emph{kou-fei} vs.\ \emph{gui-mu}
 (non-recurring-excluded profit vs.\ parent-attributable profit);
-(2) entity scope—归母净利润 vs.\ 净利润
+(2) entity scope, \emph{gui-mu} vs.\ \emph{jing-lirun}
 (parent-attributable vs.\ fully consolidated including minority interest);
-(3) temporal scope—year-over-year revenue growth.
+(3) temporal scope, year-over-year revenue growth.
 ZH instances are expected to be harder for current models due to sparser
 training data on A-share filings and more complex corporate structure
-nomenclature (e.g., A/H-share distinctions, 集团 vs.\ 子公司 scope).
+nomenclature (e.g., A/H-share distinctions, \emph{jituan} (group) vs.\ \emph{zi-gongsi} (subsidiary) scope).
 
 \subsection{Three-Role Construction Pipeline}
 
@@ -596,7 +554,7 @@ Property & Value \\
 Total instances        & 173 \\
 Language (EN / ZH)     & 53 / 120 \\
 Source (EDGAR / CSRC-CNINFO / DocFinQA) & 50 / 120 / 3 \\
-Filing type (10-K / 年报) & 53 / 120 \\
+Filing type (10-K / annual report) & 53 / 120 \\
 Unique companies       & 61 \\
 Filing years (2022/23/24/25) & 40 / 53 / 58 / 19 \\
 \midrule
@@ -827,7 +785,7 @@ Model & Mode & Intended & Any-valid & Def.-cap & Ask \\
 \end{table}
 
 \textbf{Finding 0b: the single-gold illusion is domain-general.} Running the
-identical default-vs-intended measurement on AmbigQA~\cite{min2020ambigqa}
+identical default-vs-intended measurement on AmbigQA~\citep{min2020ambigqa}
 (Table~\ref{tab:general}) reproduces all three effects outside finance,
 \emph{consistently across three models}. Grading the \emph{same} answer-only outputs
 against any accepted reading rather than a specified target overstates competence by
@@ -998,7 +956,7 @@ of the time. The asymmetry is sharpest in Chinese: ZH annotators ask the
 \emph{best}-targeted questions ($0.72$ AxisHit) but post the \emph{lowest}
 accuracy ($22.2\%$) and highest default-capture ($72.2\%$). Chinese instances are
 therefore harder to \emph{resolve}, not harder to \emph{recognize}, the
-归母/扣非 (parent-attributable vs.\ deduction-of-nonrecurring) net-income
+\emph{gui-mu}/\emph{kou-fei} (parent-attributable vs.\ deduction-of-nonrecurring) net-income
 distinction is sticky even once correctly surfaced, corroborating the
 language-asymmetry caveat in \S\ref{sec:limitations} with a mechanism.
 
@@ -1356,7 +1314,7 @@ couples a grounded data-generation pipeline (\S\ref{sec:construction}) to a
 trainable policy (\S\ref{sec:grpo}), it can in principle \emph{co-evolve}: generate
 fresh instances on an axis the current model fails, train on them, and repeat, a
 data$\leftrightarrow$model loop in the spirit of self-improving
-generators~\cite{mae2025}, but \emph{grounded} in real filings rather than the
+generators~\citep{mae2025}, but \emph{grounded} in real filings rather than the
 ungrounded self-play those methods risk. We run three gated rounds, on the scarce,
 subordinate axis (\texttt{recognition\_policy}), the abundant, salient axis
 (\texttt{entity\_scope}), and the abundant-but-only-weakly-scale-learnable axis
@@ -1533,21 +1491,21 @@ guarded on held-out validation, is close to the sweet spot.
 \paragraph{Financial QA Benchmarks.}
 Table~\ref{tab:comparison} compares \fininteract to major financial QA
 benchmarks.
-FinanceBench~\cite{islam2023financebench},
-FinQA~\cite{chen2021finqa},
-DocFinQA~\cite{reddy2024docfinqa},
-BizBench~\cite{krumdick2024bizbench},
-FinBen~\cite{xie2024finben}, and
-FinanceQA~\cite{mateega2025financeqa}
+FinanceBench~\citep{islam2023financebench},
+FinQA~\citep{chen2021finqa},
+DocFinQA~\citep{reddy2024docfinqa},
+BizBench~\citep{krumdick2024bizbench},
+FinBen~\citep{xie2024finben}, and
+FinanceQA~\citep{mateega2025financeqa}
 all enforce single-gold-answer conventions and evaluate models in a single turn;
 FinanceQA further shows that frontier models fail $\sim$60\% of realistic
 analyst tasks, but attributes this to numerical rigor rather than ambiguity.
-FinEval~\cite{guo2023fineval}, a large Chinese financial-knowledge benchmark,
+FinEval~\citep{guo2023fineval}, a large Chinese financial-knowledge benchmark,
 incidentally identifies an ``ambiguity handling weakness'' error type in its
 agent tasks but does not isolate or control it. Recent \emph{agentic} financial
-benchmarks raise task realism, Finance Agent Benchmark~\cite{bigeard2025financeagent}
+benchmarks raise task realism, Finance Agent Benchmark~\citep{bigeard2025financeagent}
 (537 expert research tasks, where the best model reaches only $46.8\%$) and
-FinAgentBench~\cite{choi2025finagentbench} (agentic retrieval over EDGAR), but both
+FinAgentBench~\citep{choi2025finagentbench} (agentic retrieval over EDGAR), but both
 remain single-turn and single-gold, evaluating analysis and retrieval rather than
 whether an agent recognizes that a query is under-specified. \fininteract is the
 first to make query ambiguity the central, controlled construct, via paired
@@ -1565,23 +1523,23 @@ domain.
 Benchmark & Scale & Ambiguity & Interaction & Multi-turn & Bilingual
          & Evidence & Grounding \\
 \midrule
-FinanceBench~\cite{islam2023financebench}
+FinanceBench~\citep{islam2023financebench}
   & 150 & -- & -- & -- & -- & human & SEC \\
-FinQA~\cite{chen2021finqa}
+FinQA~\citep{chen2021finqa}
   & 8,281 & -- & -- & -- & -- & human & 10-K/Q \\
-DocFinQA~\cite{reddy2024docfinqa}
+DocFinQA~\citep{reddy2024docfinqa}
   & 7,437 & -- & -- & -- & -- & human & 10-K/Q \\
-BizBench~\cite{krumdick2024bizbench}
+BizBench~\citep{krumdick2024bizbench}
   & multi-task & -- & -- & -- & -- & auto & mixed \\
-FinBen~\cite{xie2024finben}
+FinBen~\citep{xie2024finben}
   & multi-task & partial & -- & -- & partial & auto & mixed \\
-FinanceQA~\cite{mateega2025financeqa}
+FinanceQA~\citep{mateega2025financeqa}
   & multi-task & -- & -- & -- & -- & expert & SEC \\
-Finance Agent Bench.~\cite{bigeard2025financeagent}
+Finance Agent Bench.~\citep{bigeard2025financeagent}
   & 537 & -- & -- & -- & -- & expert & SEC \\
-FinAgentBench~\cite{choi2025finagentbench}
+FinAgentBench~\citep{choi2025finagentbench}
   & 26K & -- & -- & -- & -- & auto & SEC \\
-FinEval~\cite{guo2023fineval}
+FinEval~\citep{guo2023fineval}
   & 8,351 & -- & -- & -- & ZH & expert & exams \\
 \midrule
 \fininteract (ours)
@@ -1591,14 +1549,14 @@ FinEval~\cite{guo2023fineval}
 \end{table*}
 
 \paragraph{Ambiguous QA.}
-AmbigQA~\cite{min2020ambigqa},
-ASQA~\cite{stelmakh2022asqa},
-CondAmbigQA~\cite{li2025condambigqa}, and
-CLAM~\cite{kuhn2022clam}
+AmbigQA~\citep{min2020ambigqa},
+ASQA~\citep{stelmakh2022asqa},
+CondAmbigQA~\citep{li2025condambigqa}, and
+CLAM~\citep{kuhn2022clam}
 have matured in the general (Wikipedia) domain.
 More recent benchmarks target the agent's \emph{own} ability to ask:
-CLAMBER~\cite{zhang2024clamber} evaluates whether models identify and clarify
-ambiguous information needs, and QuestBench~\cite{li2025questbench} tests whether
+CLAMBER~\citep{zhang2024clamber} evaluates whether models identify and clarify
+ambiguous information needs, and QuestBench~\citep{li2025questbench} tests whether
 they can ask the minimal necessary question in reasoning tasks. Both are
 general-domain and judge a single clarifying step; \fininteract adds \emph{per-axis}
 targeting (AxisHit), programmatically verifiable financial grounding, and, via the
@@ -1608,19 +1566,19 @@ ambiguity labels with programmatically verifiable XBRL-grounded evidence pairs.
 
 \paragraph{Clarifying Questions.}
 Asking clarifying questions is a long-standing goal in information retrieval and
-dialogue. Rao and Daum\'e III~\cite{rao2018clarification} rank clarification
-questions by expected value of perfect information; ClariQ~\cite{aliannejadi2020clariq}
+dialogue. Rao and Daum\'e III~\citep{rao2018clarification} rank clarification
+questions by expected value of perfect information; ClariQ~\citep{aliannejadi2020clariq}
 established a shared task for generating clarifying questions in open-domain dialogue;
 and the mixed-initiative paradigm is surveyed in Conversational Information
-Seeking~\cite{zamani2023cis}. \fininteract instantiates this lineage with a
+Seeking~\citep{zamani2023cis}. \fininteract instantiates this lineage with a
 leak-proof, per-axis measure of \emph{which} clarification an agent should issue and a
 verifiable outcome for whether issuing it resolves the query.
 
 \paragraph{Interactive Search Agents.}
-\interactcomp~\cite{interactcomp2026} is the direct methodological ancestor.
+\interactcomp~\citep{interactcomp2026} is the direct methodological ancestor.
 We extend its general-domain setting to finance with a domain-specific
 ambiguity taxonomy and bilingual evaluation.
-BrowseComp~\cite{wei2025browsecomp} tracks longitudinal retrieval trends;
+BrowseComp~\citep{wei2025browsecomp} tracks longitudinal retrieval trends;
 we test whether the interaction-capability gap identified there persists in
 finance.
 
@@ -1631,7 +1589,7 @@ finance.
 %% ============================================================
 
 \textbf{Scale.} At 173 instances FinInteract is small (comparable to
-FinanceBench's 150~\cite{islam2023financebench}); we prioritize per-instance
+FinanceBench's 150~\citep{islam2023financebench}); we prioritize per-instance
 construction rigor (every item is adversarially verified and R14-discriminating)
 over raw size, and Appendix~\ref{app:cost} shows the pipeline scales at
 \$0.31/instance. \textbf{Language balance.} The English split (53) is smaller
@@ -1676,9 +1634,9 @@ construction, evaluation, and training code for reproducible follow-on work.
 
 
 %% ============================================================
-\clearpage
-\appendix
+\bibliography{refs}
 
+\appendix
 \section{Curation Cost to Replicate the Benchmark}
 \label{app:cost}
 %% ============================================================
@@ -1767,7 +1725,7 @@ construction, and analysis scripts are released.
 
 \textbf{Provenance.} English instances derive from public SEC EDGAR filings
 (10-K, FY2022--2025) and a small DocFinQA-sourced set; Chinese instances derive
-from public CSRC annual reports (年报) retrieved via CNINFO/akshare. All source
+from public CSRC annual reports retrieved via CNINFO/akshare. All source
 documents are public regulatory filings; no proprietary, paywalled, or
 personal data is used. \textbf{Schema.} Each instance is a JSON record with
 fields: \texttt{instance\_id}, \texttt{language}, \texttt{source}, \texttt{ticker},
@@ -1786,7 +1744,4 @@ respective public-domain (EDGAR) and regulatory-disclosure (CSRC) terms.
 planned EN-split expansion will be issued as numbered releases.
 
 %% ============================================================
-\bibliographystyle{ACM-Reference-Format}
-\bibliography{refs}
-
 \end{document}
