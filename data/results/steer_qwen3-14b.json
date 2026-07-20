@@ -1,0 +1,69 @@
+{
+  "model": "Qwen/Qwen3-14B",
+  "n_layers": 40,
+  "steer_layers": [
+    16,
+    24,
+    32
+  ],
+  "n_dir": 50,
+  "n_test": 123,
+  "by_alpha": {
+    "-16.0": {
+      "IR": 36.58536585365854,
+      "AxisHit@1": 0.8222222222222222,
+      "answer_rate": 0.0,
+      "search_rate": 63.41463414634146,
+      "noparse_rate": 0.0,
+      "n_ask": 45
+    },
+    "-8.0": {
+      "IR": 39.02439024390244,
+      "AxisHit@1": 0.8333333333333334,
+      "answer_rate": 0.0,
+      "search_rate": 60.97560975609756,
+      "noparse_rate": 0.0,
+      "n_ask": 48
+    },
+    "-4.0": {
+      "IR": 39.83739837398374,
+      "AxisHit@1": 0.8367346938775511,
+      "answer_rate": 0.0,
+      "search_rate": 60.16260162601626,
+      "noparse_rate": 0.0,
+      "n_ask": 49
+    },
+    "0.0": {
+      "IR": 39.83739837398374,
+      "AxisHit@1": 0.8367346938775511,
+      "answer_rate": 0.0,
+      "search_rate": 60.16260162601626,
+      "noparse_rate": 0.0,
+      "n_ask": 49
+    },
+    "4.0": {
+      "IR": 39.83739837398374,
+      "AxisHit@1": 0.8367346938775511,
+      "answer_rate": 0.0,
+      "search_rate": 60.16260162601626,
+      "noparse_rate": 0.0,
+      "n_ask": 49
+    },
+    "8.0": {
+      "IR": 38.21138211382114,
+      "AxisHit@1": 0.8085106382978723,
+      "answer_rate": 0.0,
+      "search_rate": 61.78861788617886,
+      "noparse_rate": 0.0,
+      "n_ask": 47
+    },
+    "16.0": {
+      "IR": 35.77235772357724,
+      "AxisHit@1": 0.7954545454545454,
+      "answer_rate": 0.0,
+      "search_rate": 64.22764227642277,
+      "noparse_rate": 0.0,
+      "n_ask": 44
+    }
+  }
+}
