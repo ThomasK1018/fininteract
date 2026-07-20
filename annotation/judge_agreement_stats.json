@@ -1,0 +1,22 @@
+{
+  "answer_grading": {
+    "task": "answer_grading",
+    "n": 79,
+    "raw_agreement": 0.924,
+    "cohen_kappa": 0.848,
+    "gwet_ac1": 0.849,
+    "judge_false_positive_rate": 0.025,
+    "judge_false_negative_rate": 0.128,
+    "human_human_agreement": 0.856
+  },
+  "axishit": {
+    "task": "axishit",
+    "n": 80,
+    "raw_agreement": 0.525,
+    "cohen_kappa": 0.05,
+    "gwet_ac1": 0.154,
+    "judge_false_positive_rate": 0.125,
+    "judge_false_negative_rate": 0.825,
+    "human_human_agreement": 0.73
+  }
+}

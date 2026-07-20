@@ -1,0 +1,10 @@
+{
+  "n_commitments": 338,
+  "n_items": 60,
+  "pct_match_default_Ad": 52.7,
+  "pct_match_intended_Ai": 21.9,
+  "pct_match_neither": 25.4,
+  "interannotator_AC1_on_Ad_match": 0.952,
+  "mean_item_answer_entropy_bits": 0.06,
+  "pct_noticed_second_answer": 7.7
+}

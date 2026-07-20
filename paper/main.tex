@@ -195,7 +195,16 @@ Finance is the instrument, chosen for exact, verifiable ground truth and endemic
 ambiguity, but the phenomenon it reveals is a general fact about how we grade
 ambiguous queries.
 
-\noindent\textbf{Contributions:}
+\paragraph{Research Questions.}
+We organize the study around three questions.
+\textbf{RQ1 (Detection and resolution).} Do frontier models recognize financial-report
+ambiguity, and does interactive clarification improve resolution over autonomous search?
+\textbf{RQ2 (Where the bottleneck lies).} Is the binding constraint knowing \emph{when}
+and on \emph{which} axis to ask (elicitation) rather than access to evidence (grounding)?
+\textbf{RQ3 (Intervention).} Can targeted interventions on the ambiguity axis, at inference
+time and through training, measurably improve resolution?
+
+\noindent\textbf{Contributions.} Our contributions answer these questions in turn.
 \begin{enumerate}[leftmargin=*]
   \item \textbf{The single-gold illusion.} We identify and quantify a
     measurement-validity failure: grading ambiguous queries against one gold
@@ -204,18 +213,23 @@ ambiguous queries.
     We measure it precisely in finance (\S\ref{sec:illusion}) and confirm it
     replicates on the general-domain AmbigQA benchmark across three models, where it
     overstates competence $2.1$--$2.3\times$ (\S\ref{sec:general}).
-  \item \textbf{An elicitation bottleneck, not a knowledge gap.} Given the
+  \item \textbf{An elicitation bottleneck, not a knowledge gap (RQ2).} Given the
     resolved interpretation, models answer $93$--$95\%$ correctly, yet the best
     model resolves only $20\%$ under free interaction, and \emph{adding}
     clarification turns \emph{lowers} accuracy below plain search for every model
     but the strongest, isolating elicitation as the binding constraint
     (\S\ref{sec:ceiling}).
-  \item \textbf{A per-axis skill decomposition and a capability dissociation.} We
+  \item \textbf{A per-axis skill decomposition and a capability dissociation (RQ1).} We
     turn accuracy into a skill metric (AxisHit) that localizes \emph{which}
     clarification ability fails, and show the ambiguity axes are different
     \emph{kinds} of skill: some are solved by scale alone while others (recognition
     basis) resist scale and are only unreliably teachable
     (\S\ref{sec:skills}).
+  \item \textbf{Interventions on the ambiguity axis (RQ3).} We show the benchmark is
+    actionable: an inference-time Axis-Aware ReAct policy and a training-time
+    axis-guided fine-tuning recipe both raise resolution over their untargeted
+    counterparts, turning the evaluation signal into measurable improvement
+    (\S\ref{sec:axisreact}, \S\ref{sec:grpo}).
   \item \textbf{\fininteract, the instrument.} A bilingual benchmark of 173
     verifiable, ambiguity-paired instances with a five-axis taxonomy, construction
     pipeline, and evaluation harness that make the above measurable and
@@ -250,7 +264,20 @@ ambiguous, both $A$ and $A_d$ are defensible from publicly available filings.
 This \emph{default-vs-intended pairing} generalizes \interactcomp's
 target-distractor design to the financial domain.
 
-\subsection{Design Principles}
+\subsection{Design Goals and Principles}
+
+\textbf{Design goals.} \fininteract targets four goals.
+\textbf{(G1) Representative coverage.} Real ambiguity drawn from public filings across a
+five-axis taxonomy and two languages, so the benchmark reflects how the ambiguity actually
+arises rather than a synthetic proxy.
+\textbf{(G2) Fine-grained diagnosis.} Every instance is labeled with its ambiguity axis and
+paired with a default and an intended reading, so evaluation localizes \emph{which}
+clarification ability a model lacks instead of reporting one aggregate score.
+\textbf{(G3) Low-cost, leak-safe construction.} A semi-automated three-role pipeline builds
+and verifies instances at scale while keeping the answer out of the disambiguating context.
+\textbf{(G4) High, human-validated quality.} Ground truth is programmatically verifiable and
+both the instances and the automatic judges are validated against human annotators.
+The principles below operationalize these goals.
 
 \textbf{Easy to verify, Ambiguous to resolve.}
 Adopted from \interactcomp: ground truth is programmatically verifiable
@@ -620,8 +647,12 @@ conventional single-gold benchmark would have scored (\S\ref{sec:illusion}).
 (interaction rate, \% of instances with $\geq 1$ ask), \emph{Round} (mean
 turns), and \emph{AxisHit}, for each interact action GPT-4o-mini classifies
 whether the clarifying question targets a true ambiguity axis for that instance;
-we report AxisHit@1, AnyAxisHit, WrongAxisRate, and GenericAskRate. These
-characterize \emph{how} a model interacts; they do not rank models.
+we report AxisHit@1, AnyAxisHit, WrongAxisRate, and GenericAskRate. Because
+clarifications are often compound (one question can name an entity, a period, and a metric
+at once), we report AxisHit@1 in two forms: a lenient \emph{touch} form (the question names
+any true axis) and a strict \emph{central} form (the single most-central axis is a true
+axis). The touch form is validated against human annotators (\S\ref{sec:humanval}). These
+metrics characterize \emph{how} a model interacts and do not rank models.
 
 \textbf{Calibration}: 5-bin Expected Calibration Error (ECE) between stated
 confidence and correctness, capturing overconfidence on ambiguous queries.
@@ -651,7 +682,11 @@ DisE$^+$ is a diagnostic of clarification efficiency, never the ranking metric.
 \caption{Main results. \textbf{Accuracy (\%)} graded against the intended
 interpretation is the primary metric (per mode); the interact mode additionally
 reports the secondary interaction diagnostics IR (\% asked), AxisHit@1, and ECE.
-DisE$^+$ and the default-capture comparison are reported separately
+AxisHit@1 here is the human-validated \emph{touch} form (the clarifying question names
+a true ambiguity axis, agreement $0.75$ with human annotators, matching inter-annotator
+agreement $0.73$). A stricter central-axis form is analyzed in \S\ref{sec:skills}.
+$^{\dagger}$The human AxisHit@1 was computed with the earlier classifier and awaits
+recomputation. DisE$^+$ and the default-capture comparison are reported separately
 (Table~\ref{tab:illusion}). AxisHit is undefined when no question is asked.
 The OpenAI tier ladder and two open MoE models (Qwen3-30B-A3B, Qwen3.5-35B-A3B)
 are evaluated at full scale; a seven-model, six-vendor panel of current frontier
@@ -670,21 +705,21 @@ search, while only GPT-5 converts interaction into a gain.}
 \cmidrule(lr){2-3}\cmidrule(lr){4-7}
 Model & Ans-only & +Search & Acc & IR & AHit@1 & ECE \\
 \midrule
-GPT-5           & 0.6 & 6.4  & \textbf{20.2} & 98.8 & .38 & .53 \\
-GPT-4o          & 0.6 & 12.1 & 4.6 & 99.4 & .37 & .82 \\
-GPT-5-mini      & 0.6 & 0.0 & 0.0 & 96.0 & .34 & .00 \\
+GPT-5           & 0.6 & 6.4  & \textbf{20.2} & 98.8 & .86 & .53 \\
+GPT-4o          & 0.6 & 12.1 & 4.6 & 99.4 & .94 & .82 \\
+GPT-5-mini      & 0.6 & 0.0 & 0.0 & 96.0 & .94 & .00 \\
 Claude-Sonnet-4 & -- & -- & -- & -- & -- & -- \\
 Claude-Opus-4   & -- & -- & -- & -- & -- & -- \\
 DeepSeek-V3.1   & -- & -- & -- & -- & -- & -- \\
 Qwen3-235B      & -- & -- & -- & -- & -- & -- \\
 GLM-4.5         & -- & -- & -- & -- & -- & -- \\
-Qwen3-30B-A3B   & 1.2 & 28.3 & 11.6 & 72 & .16 & -- \\
-Qwen3.5-35B-A3B & 0.6 & \textbf{35.8} & 28.9 & 36 & .40 & -- \\
+Qwen3-30B-A3B   & 1.2 & 28.3 & 11.6 & 72 & .90 & -- \\
+Qwen3.5-35B-A3B & 0.6 & \textbf{35.8} & 28.9 & 36 & .81 & -- \\
 \midrule
 \multicolumn{7}{l}{\textit{Proposed method baseline (GPT-5 backbone)}} \\
 Axis-Aware ReAct & -- & -- & -- & -- & -- & -- \\
 \midrule
-Human (50-inst) & -- & -- & \textbf{30.0} & 100 & \textbf{.68} & -- \\
+Human (50-inst) & -- & -- & \textbf{30.0} & 100 & \textbf{.68}$^{\dagger}$ & -- \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -698,8 +733,9 @@ full evaluation; they are directional, not final (at $N{=}50$ one instance ${=}2
 points, so $|\Delta|{\lesssim}2$ is within noise). ``$\Delta$'' is +Interact minus +Search
 accuracy: the sign of the interaction lever. Across seven models from six vendors, added
 interaction is flat-or-negative for six of seven (clearly negative for Grok $-8$,
-GPT-5.6 $-6$, Kimi/DeepSeek $-4$); only Gemini---the weakest searcher (6\%)---converts
-interaction into a clear gain. AHit@1 is undefined when no clarification is asked.
+GPT-5.6 $-6$, Kimi and DeepSeek $-4$). Only Gemini, the weakest searcher (6\%), converts
+interaction into a clear gain. AHit@1 is the human-validated touch form (\S\ref{sec:metrics})
+and is undefined when no clarification is asked.
 Two Grok +Search instances returned transient API errors and are scored incorrect,
 so its +Search accuracy is a lower bound.}
 \label{tab:crossvendor}
@@ -710,13 +746,13 @@ so its +Search accuracy is a lower bound.}
 \cmidrule(lr){2-3}\cmidrule(lr){4-6}
 Model & Ans-only & +Search & Acc & $\Delta$ & AHit@1 \\
 \midrule
-Claude-Sonnet-5   & 4.0  & \textbf{46.0} & \textbf{44.0} & $-2$  & .10 \\
-Grok-4.5          & 2.0  & 40.0 & 32.0 & $-8$  & .09 \\
-GLM-5.2           & 12.0 & 40.0 & 40.0 & $0$   & .27 \\
-Kimi-K3           & 16.0 & 38.0 & 34.0 & $-4$  & .18 \\
-GPT-5.6-sol       & 10.0 & 36.0 & 30.0 & $-6$  & \textbf{.52} \\
-DeepSeek-V4-flash & 12.0 & 28.0 & 24.0 & $-4$  & .21 \\
-Gemini-3.5-flash  & 14.0 & 6.0  & 30.0 & $+24$ & .42 \\
+Claude-Sonnet-5   & 4.0  & \textbf{46.0} & \textbf{44.0} & $-2$  & .98 \\
+Grok-4.5          & 2.0  & 40.0 & 32.0 & $-8$  & .87 \\
+GLM-5.2           & 12.0 & 40.0 & 40.0 & $0$   & .96 \\
+Kimi-K3           & 16.0 & 38.0 & 34.0 & $-4$  & .98 \\
+GPT-5.6-sol       & 10.0 & 36.0 & 30.0 & $-6$  & .98 \\
+DeepSeek-V4-flash & 12.0 & 28.0 & 24.0 & $-4$  & .96 \\
+Gemini-3.5-flash  & 14.0 & 6.0  & 30.0 & $+24$ & .96 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -894,9 +930,13 @@ artifact (only 2\% produced no answer at all).
 \textbf{Finding 5: Models are severely overconfident on ambiguous queries.}
 Expected Calibration Error ranges from 0.53 (GPT-5, interact) to 0.95 (GPT-4o,
 answer-only); models report 85--95\% confidence while answering 0--20\%
-correctly. Both models also ask imprecisely, AxisHit@1 is only 0.38 (GPT-5)
-and 0.37 (GPT-4o), so even when a model asks, it targets the correct ambiguity
-axis barely a third of the time, motivating the axis-conditioned policy of
+correctly. The remaining failure is not one of axis \emph{detection}. Under a
+human-validated classifier (agreement $0.75$, matching inter-annotator agreement $0.73$),
+both models almost always ask a question that touches the correct ambiguity axis (AxisHit@1
+$0.86$ for GPT-5 and $0.94$ for GPT-4o). What they lack is precise \emph{central} targeting,
+only $0.06$ and $0.04$ of first questions make the true axis their single central concern,
+and, above all, integration (Finding 4). The bottleneck is targeting precision and
+commitment rather than axis detection, which motivates the axis-conditioned policy of
 \S\ref{sec:error}.
 
 \textbf{Finding 6: A smaller model collapses into ill-formed clarification, 
@@ -1027,9 +1067,11 @@ Table~\ref{tab:skills} reports Targeting, the decisive component.
 \begin{table}[t]
 \centering
 \caption{Per-axis \textbf{Targeting} skill (AxisHit@1) in \texttt{+interact}.
-Recognition policy is a near-universal blind spot; temporal scope is largely
-solved; entity/metric are partial. ``--'': model never asked on that axis (IR$=0$).
-The two sparse axes ($n{\le}9$) are preliminary.}
+Recognition policy is a near-universal blind spot, temporal scope is largely
+solved, and entity/metric are partial. ``--'': model never asked on that axis (IR$=0$).
+The two sparse axes ($n{\le}9$) are preliminary. These per-axis values use the original
+classifier, whose temporal-scope bias likely inflates \texttt{temporal\_scope} and deflates
+the others (\S\ref{sec:metrics}), so recomputation with the corrected classifier is pending.}
 \label{tab:skills}
 \small
 \begin{tabular}{lrccccc}
@@ -1534,6 +1576,41 @@ guarded on held-out validation, is close to the sweet spot.
 
 
 %% ============================================================
+\section{Discussion and Research Opportunities}
+\label{sec:discussion}
+%% ============================================================
+
+\paragraph{Elicitation is a trainable skill that current models lack.} Our central result
+is that models fail to resolve ambiguity not for want of knowledge but for want of asking
+the right question (RQ2). This reframes the problem for future work. Progress will come less
+from larger backbones, which barely move interaction accuracy, and more from policies and
+objectives that reward asking on the correct axis at the right time. The Axis-Aware ReAct
+policy and axis-guided fine-tuning (RQ3) are first steps, and both leave a large gap to the
+oracle ceiling, so reward shaping on the ambiguity axis and calibrated deferral are natural
+next directions.
+
+\paragraph{Axes are different learning problems.} The per-axis dissociation shows that some
+clarification abilities are solved by scale while others, notably recognition basis, resist
+it and are only unreliably teachable. A single aggregate interaction score therefore hides
+where the real difficulty sits. Future benchmarks and training curricula should treat each
+axis as its own learning problem and budget data accordingly, which our salience estimate
+begins to quantify.
+
+\paragraph{Human and AI collaboration under ambiguity.} Because models confidently return
+the default reading, the safe behavior is often to ask rather than to answer. This motivates
+evaluation and interfaces that credit well-timed clarification and calibrated abstention
+rather than raw commitment, and it connects to mixed-initiative retrieval where the cost of
+a confident wrong answer is high.
+
+\paragraph{Self-refreshing benchmarks and broader scope.} Our co-evolution probes suggest a
+benchmark can extend itself on axes whose evidence is abundant, guarded by held-out
+validation, which offers a path to keep the instrument fresh as models improve. Natural
+extensions include more ambiguity axes, additional languages and filing regimes, and
+transfer of the paired default and intended construction to other high-stakes domains where
+a single gold answer hides genuine ambiguity.
+
+
+%% ============================================================
 \section{Related Work}
 \label{sec:related}
 %% ============================================================
@@ -1661,11 +1738,14 @@ axis-targeting are judged by GPT-4o-mini and the user is simulated by GPT-5. We 
 these against humans on a stratified, blindly double-annotated sample (five annotators).
 The correctness grader agrees with human consensus at Cohen $\kappa{=}0.85$ (raw agreement
 $0.92$), exceeding inter-annotator agreement ($0.86$), so accuracy figures hold under human
-labels. The AxisHit classifier initially agreed only weakly ($0.53$): a single-label design
+labels. The AxisHit classifier initially agreed only weakly ($0.53$). A single-label design
 over-assigned \texttt{temporal\_scope} to compound questions that also name an entity or
-metric. A corrected multi-label classifier reaches $0.75$ agreement, matching inter-annotator
-agreement ($0.73$); reported AxisHit@1 values use the original classifier and are a lower
-bound under the corrected one. Interaction results are also robust to the simulator: on a
+metric. The corrected multi-label \emph{touch} classifier reaches $0.75$ agreement, matching
+inter-annotator agreement ($0.73$), and the AxisHit@1 values reported here use it. Because
+this shows models mostly do ask on-axis, the corrected reading is that the gap lies in
+central targeting and integration rather than detection. A strict central-axis variant is
+discriminative but not yet human-validated, so we report it only as a supplementary
+decomposition. Interaction results are also robust to the simulator: on a
 $50$-instance subset, standard +Interact accuracy is $34/28/26\%$ under the LLM, deterministic,
 and $15\%$-noisy simulators. \textbf{Contamination.}
 Instances are freshly constructed from FY2022--2025 structured facts and
