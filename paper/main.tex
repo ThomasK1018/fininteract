@@ -1492,10 +1492,27 @@ $-10$: the base can often answer the entity directly, so forcing a question turn
 six correct direct answers into wrong multi-turn ones). Both drove interaction to
 $100\%$; the accuracy sign flips on whether the base could already answer, the
 training-time face of the ``interaction can hurt versus plain answering'' effect
-seen at inference (\S\ref{sec:ceiling}). The actionable step is a \emph{conditional
-when-to-ask gate}, elicit only where the model cannot already answer, plus
-multi-round curriculum and fresh-filing ingestion to lift the scarce axes above
-their availability ceiling.
+seen at inference (\S\ref{sec:ceiling}). The actionable step, which we demonstrate
+next, is a \emph{conditional when-to-ask gate}, elicit only where the model cannot
+already answer, plus multi-round curriculum and fresh-filing ingestion to lift the
+scarce axes above their availability ceiling.
+
+\textbf{Finding 12b: the over-elicitation regression is fixable at inference, but
+not by a train-time gate.} We test the when-to-ask gate directly on the frozen human
+probes ($n{=}40$ per axis). A \emph{train-time} gate that mixes no-ask demonstrations
+into the axis-guided SFT backfires: even $7$ of $164$ no-ask demonstrations tip the
+policy into a bimodal collapse in which it answers directly without retrieving, which
+is fatal because in \fininteract almost nothing is answerable from parametric memory
+(entity accuracy $32.5\to7.5$, metric $60\to2.5$). An \emph{inference-time} gate
+recovers the loss with no extra training. Routing by the base model's own ask
+decision, taking the co-evolved asker's answer when the base chose to ask and the
+base's direct answer otherwise, lifts entity back to $30.0$ from the always-ask
+$22.5$ (matching the base's own $32.5$) at a $40\%$ ask rate rather than $100\%$, and
+keeps $+20$ of metric's $+45$ gain ($35.0$ versus base $15.0$). Over-elicitation is
+thus an inference-time routing problem rather than a training one. The residual
+metric gap traces to the base's uncertainty signal under-asking where metric needs a
+question, so a confidence-calibrated gate that asks when the silent answer would be
+\emph{wrong} rather than when the base is merely unsure is the concrete next lever.
 
 \subsection{What Gates Co-Evolvability? A Falsification Test}
 \label{sec:learnability}
