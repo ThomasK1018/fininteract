@@ -686,7 +686,13 @@ AxisHit@1 here is the human-validated \emph{touch} form (the clarifying question
 a true ambiguity axis, agreement $0.75$ with human annotators, matching inter-annotator
 agreement $0.73$). A stricter central-axis form is analyzed in \S\ref{sec:skills}.
 $^{\dagger}$The human AxisHit@1 was computed with the earlier classifier and awaits
-recomputation. DisE$^+$ and the default-capture comparison are reported separately
+recomputation. $^{\ddagger}$Axis-Aware ReAct is a GPT-5-backbone pilot at $N{=}50$ run
+through the same OpenRouter harness (\S\ref{sec:axisreact}). Its accuracy is best read
+against its own matched Standard ReAct baseline in that run ($34.0$), a $+12$ point gain,
+rather than against the full $N{=}173$ GPT-5 row. AxisHit@1 is left blank for this row
+because the axis-conditioned policy deliberately sweeps multiple axes to rule them out, so
+a single-axis hit rate is not comparable (an any-axis form near saturation is discussed in
+\S\ref{sec:axisreact}). DisE$^+$ and the default-capture comparison are reported separately
 (Table~\ref{tab:illusion}). AxisHit is undefined when no question is asked.
 The OpenAI tier ladder and two open MoE models (Qwen3-30B-A3B, Qwen3.5-35B-A3B)
 are evaluated at full scale; a seven-model, six-vendor panel of current frontier
@@ -716,8 +722,8 @@ GLM-4.5         & -- & -- & -- & -- & -- & -- \\
 Qwen3-30B-A3B   & 1.2 & 28.3 & 11.6 & 72 & .90 & -- \\
 Qwen3.5-35B-A3B & 0.6 & \textbf{35.8} & 28.9 & 36 & .81 & -- \\
 \midrule
-\multicolumn{7}{l}{\textit{Proposed method baseline (GPT-5 backbone)}} \\
-Axis-Aware ReAct & -- & -- & -- & -- & -- & -- \\
+\multicolumn{7}{l}{\textit{Proposed method (GPT-5 backbone, $N{=}50$ pilot)}} \\
+Axis-Aware ReAct$^{\ddagger}$ & -- & -- & 46.0 & 100 & -- & .24 \\
 \midrule
 Human (50-inst) & -- & -- & \textbf{30.0} & 100 & \textbf{.68}$^{\dagger}$ & -- \\
 \bottomrule
@@ -1325,6 +1331,22 @@ improving AxisHit@1 and ultimately Accuracy.
 Template-oracle provides an upper bound: if Axis-Aware ReAct approaches
 template-oracle performance, it confirms that axis recognition is the dominant
 remaining bottleneck after the E1--E3 errors are addressed.
+
+\paragraph{Pilot results.}
+We evaluate the policy on a GPT-5 backbone over a stratified $N{=}50$ subset run
+through the same OpenRouter harness, alongside four matched baselines (Standard ReAct,
+Always-Ask, Axis-Oracle, Template-Oracle). Axis-Aware ReAct reaches $46.0\%$ accuracy
+against the $34.0\%$ of Standard ReAct in the same run, a $+12$ point gain, and posts the
+best calibration of any condition (ECE $0.241$ versus $0.308$ for Standard ReAct). Always-Ask
+collapses to $10.0\%$, confirming that asking indiscriminately is worse than not asking and
+that the gain comes from asking \emph{selectively} on the right axis. The single-axis
+diagnostics (AxisHit@1, WrongAxisRate) are not informative for this policy: because the
+Ambiguity Pre-Check deliberately enumerates every candidate axis to rule each in or out, an
+any-axis touch form saturates near $1.0$ while the strict central-axis form is near $0$, so
+neither cleanly credits the policy and we omit AxisHit@1 for it in Table~\ref{tab:main}. The
+accuracy and calibration gains are the load-bearing result. We report this as a pilot rather
+than a full-panel row because it is a single backbone at $N{=}50$, and we expect the effect
+size to tighten at full scale.
 
 \subsection{Training-Time Intervention: Axis-Guided SFT and GRPO}
 \label{sec:grpo}
