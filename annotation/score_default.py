@@ -64,10 +64,15 @@ def main(a):
     noticed = 0; noticed_n = 0
     grade = None
     if not a.self_graded:
-        from evaluate import grade as grade_fn
+        import evaluate as E
         from openai import OpenAI
-        oai = OpenAI()
-        grade = lambda q, gold, pred: grade_fn(q, gold, pred, oai)
+        if a.openrouter_config:
+            cfg = json.loads(Path(a.openrouter_config).read_text(encoding="utf-8"))
+            oai = OpenAI(base_url=cfg["base_url"], api_key=cfg["api_key"])
+            E.GRADER_MODEL = "openai/gpt-4o-mini"   # OpenRouter id (OpenAI key is separate)
+        else:
+            oai = OpenAI()
+        grade = lambda q, gold, pred: E.grade(q, gold, pred, oai)
 
     n_ad = n_ai = n_neither = n_total = 0
     for p in a.sheets:
@@ -115,5 +120,8 @@ if __name__ == "__main__":
     p.add_argument("--sheets", nargs="+", required=True)
     p.add_argument("--answerkey", required=True)
     p.add_argument("--self-graded", action="store_true")
+    p.add_argument("--openrouter-config", default=None,
+                   help="Route the grader through OpenRouter (openai/gpt-4o-mini) when the "
+                        "OpenAI key is unavailable.")
     p.add_argument("--out", default="annotation/default_stats.json")
     main(p.parse_args())

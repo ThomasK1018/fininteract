@@ -279,22 +279,27 @@ INTERACT_TEMPLATE = """\
 """
 
 AXIS_HIT_SYSTEM = """\
-Classify a clarifying question from a financial analysis agent into one of these categories:
+Identify EVERY ambiguity axis a clarifying question is trying to resolve. Judge by what the
+question asks the user to CHOOSE, not by words merely mentioned in passing.
 
-  temporal_scope     — asks about which time period (FY vs CY, quarter, TTM, comparable period)
-  metric_definition  — asks about which metric or accounting basis (GAAP vs non-GAAP, adjusted, organic)
-  entity_scope       — asks about which entity (consolidated vs segment, parent vs subsidiary, share class)
-  filing_vintage     — asks about which filing version (original vs amended, restated, preliminary)
-  recognition_policy — asks about accounting policy (revenue timing, gross vs net, capitalization)
-  generic            — vague clarification request with no specific axis ("Can you clarify?", "What do you mean?")
-  none               — question clearly targets none of the above axes
+  temporal_scope     — the point is which time period (FY vs CY, quarter vs year, TTM, as-of date).
+                       Do NOT pick this merely because a year/quarter is named; only if choosing
+                       the period is a purpose of the question.
+  metric_definition  — which metric / accounting basis (GAAP vs non-GAAP, net vs attributable-to-parent,
+                       level vs growth rate, adjusted, organic)
+  entity_scope       — which entity/segment/subsidiary/share-class/parent-vs-consolidated. A question
+                       naming or confirming a specific company or segment targets this.
+  filing_vintage     — which filing version (original vs amended, restated, preliminary)
+  recognition_policy — recognition treatment (revenue timing, over-time vs point-in-time, gross vs net,
+                       capitalization)
+  generic            — vague clarification request with no specific axis ("Can you clarify?")
 
-Output ONLY one of the above labels. No explanation.
+Output ALL applicable axis labels, comma-separated (most central first). Labels only, no explanation.
+The true axes are NOT provided — classify the question on its own merits.
 """
 
 AXIS_HIT_TEMPLATE = """\
 Clarifying question: {question}
-True ambiguity axes for this instance: {axes}
 """
 
 ORACLE_SIM_SYSTEM = """\
@@ -543,30 +548,29 @@ def classify_axis_hit(interact_question: str, true_axes: list[str],
         messages=[
             {"role": "system", "content": AXIS_HIT_SYSTEM},
             {"role": "user",   "content": AXIS_HIT_TEMPLATE.format(
-                question=interact_question,
-                axes=", ".join(true_axes),
-            )},
+                question=interact_question)},
         ],
-        max_tokens=20,
+        max_tokens=30,
     )
-    pred = resp.strip().lower().replace("-", "_")
-    # Normalise
-    if pred not in ALL_AXIS_LABELS:
-        for ax in ALL_AXIS_LABELS:
-            if ax in pred:
-                pred = ax
-                break
-        else:
-            pred = "none"
+    # Multi-label parse: a clarifying question is often compound (e.g. names an entity AND a
+    # period). Collect every axis the classifier emits; is_hit if any overlaps the true axes.
+    # Validated against 5 human annotators (n=80): single-label had a temporal-scope bias and
+    # agreed with humans only 0.53; this multi-label form agrees 0.75, matching human-human
+    # agreement (0.73). The true axes are NOT shown to the classifier (no leakage).
+    text = (resp or "").strip().lower().replace("-", "_")
+    AXES_ONLY  = {"temporal_scope", "metric_definition", "entity_scope",
+                  "filing_vintage", "recognition_policy"}
+    pred_axes  = {ax for ax in AXES_ONLY if ax in text}
+    is_generic = ("generic" in text) and not pred_axes
 
     true_set   = set(true_axes)
-    is_hit     = pred in true_set
-    is_generic = pred == "generic"
-    is_wrong   = pred not in true_set and pred not in ("generic", "none")
+    is_hit     = bool(pred_axes & true_set)
+    is_wrong   = bool(pred_axes) and not is_hit
+    axis_pred  = ",".join(sorted(pred_axes)) if pred_axes else ("generic" if is_generic else "none")
 
     return {
         "question":      interact_question[:120],
-        "axis_pred":     pred,
+        "axis_pred":     axis_pred,
         "is_hit":        is_hit,
         "is_generic":    is_generic,
         "is_wrong_axis": is_wrong,

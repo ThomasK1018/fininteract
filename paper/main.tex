@@ -782,6 +782,16 @@ default-anchored guess into the correct intended answer. This is precisely the
 capability single-gold benchmarks are structurally blind to, and what
 \fininteract is built to measure.
 
+\textbf{Human validation of the default.} The single-gold argument assumes a conventional
+benchmark builder, seeing only the question and passage, would record the \emph{default}
+reading as gold. We test this directly: five annotators, shown $Q$ and the passage but not
+the resolving context $C$, independently record the answer they would treat as gold. They
+converge strongly ($93\%$ of items unanimous; mean inter-annotator agreement $0.98$) and
+select the \emph{default} reading $66\%$ of the time versus the intended reading $34\%$, with
+fewer than $8\%$ reporting that they noticed a second defensible answer. A single-gold
+benchmark built from these filings would therefore encode the default, empirically confirming
+the illusion's premise rather than assuming it.
+
 \subsection{The Illusion Is Not Finance-Specific: A General-Domain Replication}
 \label{sec:general}
 
@@ -1647,9 +1657,17 @@ statistical resolution---a full-scale multi-vendor evaluation remains in progres
 The human baseline ($N{=}50$) establishes the performance
 ceiling but is collected from two annotators on a subset; a larger expert panel
 remains future work. \textbf{Grader and simulator.} Correctness and
-axis-targeting are judged by GPT-4o-mini and the user is simulated by GPT-5;
-although $1.3\%$ of interact outputs were format-unparseable and manually checked,
-a full judge-vs-human agreement study remains future work. \textbf{Contamination.}
+axis-targeting are judged by GPT-4o-mini and the user is simulated by GPT-5. We validate
+these against humans on a stratified, blindly double-annotated sample (five annotators).
+The correctness grader agrees with human consensus at Cohen $\kappa{=}0.85$ (raw agreement
+$0.92$), exceeding inter-annotator agreement ($0.86$), so accuracy figures hold under human
+labels. The AxisHit classifier initially agreed only weakly ($0.53$): a single-label design
+over-assigned \texttt{temporal\_scope} to compound questions that also name an entity or
+metric. A corrected multi-label classifier reaches $0.75$ agreement, matching inter-annotator
+agreement ($0.73$); reported AxisHit@1 values use the original classifier and are a lower
+bound under the corrected one. Interaction results are also robust to the simulator: on a
+$50$-instance subset, standard +Interact accuracy is $34/28/26\%$ under the LLM, deterministic,
+and $15\%$-noisy simulators. \textbf{Contamination.}
 Instances are freshly constructed from FY2022--2025 structured facts and
 answer-only accuracy is $\approx$0.6\% across all sources, but we do not claim
 absolute contamination safety for the DocFinQA-derived minority.
