@@ -78,6 +78,13 @@ from dise import compute_dise, aggregate_dise, DEFAULT_AXIS_OPTIONS
 USER_SIM_MODEL  = "gpt-5"    # temperature=1.0 — mirrors real user uncertainty
 GRADER_MODEL    = "gpt-4o-mini"
 AGENT_EXTRA_BODY: dict | None = None  # set from --agent-thinking; applied to AGENT calls only
+JUDGE_CLIENT: "OpenAI | None" = None  # if set (OpenRouter), simulator+grader+axis-judge route here
+TOKEN_USAGE: dict = {}         # model -> {"prompt":int,"completion":int,"calls":int}; for cost accounting
+
+
+class CreditExhausted(Exception):
+    """Raised when a provider rejects a call for lack of credit/quota, so the run
+    halts cleanly instead of writing empty (all-wrong) rows that resume would skip."""
 MAX_TURNS       = 12          # hard cap on ReAct loop turns
 MAX_INTERACT    = 6           # max interact actions per instance
 TEMPERATURE_SIM = 1.0
@@ -331,6 +338,12 @@ TEMPLATE_QUESTIONS = {
 # ---------------------------------------------------------------------------
 # Client helpers
 # ---------------------------------------------------------------------------
+def judge_client() -> OpenAI:
+    """Client for the simulator/grader/axis-judge. Routes through OpenRouter when
+    JUDGE_CLIENT is set (e.g. when the OpenAI account is unavailable), else OpenAI."""
+    return JUDGE_CLIENT if JUDGE_CLIENT is not None else OpenAI()
+
+
 def make_client(model_name: str, extra_kwargs: dict) -> OpenAI:
     """Return an OpenAI client configured for the given model family."""
     base_url = extra_kwargs.get("base_url")
@@ -346,14 +359,20 @@ def chat(client: OpenAI, model: str, messages: list[dict],
     # gpt-5 / o-series reasoning models reject temperature != 1 and use max_completion_tokens;
     # other / non-OpenAI models use temperature + max_tokens.
     ml = model.lower()
-    is_reasoning = (("/" not in model) and
-                    (ml.startswith(("gpt-5", "o1", "o3", "o4")) or "gpt-5" in ml))
+    core = ml.split("/")[-1]                 # strip any OpenRouter provider prefix (openai/, x-ai/, ...)
+    looks_reasoning = core.startswith(("gpt-5", "o1", "o3", "o4")) or "gpt-5" in core
+    is_openai_direct = "/" not in model
+    # A small max_tokens cap gets fully consumed by internal reasoning -> empty content.
+    # OpenAI-direct reasoning models want max_completion_tokens; OpenRouter (any model with
+    # a provider "/" prefix) always wants max_tokens, so reasoning models routed through
+    # OpenRouter (openai/gpt-5, x-ai/grok-4.5 with reasoning extra_body, ...) need the same
+    # headroom applied to max_tokens. In both cases temperature is omitted (defaults to 1).
+    is_router_reasoning = bool(extra_body) and "reasoning" in extra_body
     kwargs: dict = {"model": model, "messages": messages}
-    if is_reasoning:
-        # Reasoning models spend tokens on internal reasoning BEFORE producing output;
-        # a small cap (e.g. 1024) gets fully consumed by reasoning -> empty content.
-        # Add generous reasoning headroom on top of the requested output budget.
+    if is_openai_direct and looks_reasoning:
         kwargs["max_completion_tokens"] = max_tokens + 4096   # temperature omitted (defaults to 1)
+    elif (not is_openai_direct and looks_reasoning) or is_router_reasoning:
+        kwargs["max_tokens"] = max_tokens + 4096              # temperature omitted
     else:
         kwargs["temperature"] = temperature
         kwargs["max_tokens"] = max_tokens
@@ -361,8 +380,20 @@ def chat(client: OpenAI, model: str, messages: list[dict],
         kwargs["extra_body"] = extra_body
     try:
         resp = client.chat.completions.create(**kwargs)
+        u = getattr(resp, "usage", None)
+        if u is not None:
+            d = TOKEN_USAGE.setdefault(model, {"prompt": 0, "completion": 0, "calls": 0})
+            d["prompt"]     += getattr(u, "prompt_tokens", 0) or 0
+            d["completion"] += getattr(u, "completion_tokens", 0) or 0
+            d["calls"]      += 1
         return (resp.choices[0].message.content or "").strip()
     except Exception as e:
+        msg = str(e).lower()
+        # OpenRouter signals no funds with HTTP 402; OpenAI with 429 insufficient_quota.
+        if ("402" in msg or "insufficient_quota" in msg
+                or "insufficient credit" in msg or "insufficient_credits" in msg
+                or "requires more credits" in msg or "negative credit" in msg):
+            raise CreditExhausted(str(e))
         print(f"  [chat error] {model}: {e}", file=sys.stderr)
         return ""
 
@@ -399,7 +430,7 @@ def _oracle_user_answer(question: str, context: str,
     Falls back to keyword matching if the LLM call fails.
     """
     if oai is None:
-        oai = OpenAI()
+        oai = judge_client()
 
     prompt = ORACLE_SIM_TEMPLATE.format(
         question=question,
@@ -640,17 +671,22 @@ def run_agent(instance: dict, mode: str, agent_client: OpenAI,
                                        intended=intended_int, default=default_int)
         axis_info = classify_axis_hit(template_q, true_axes, sim_client)
         axis_hits.append(axis_info)
-        # Now ask the model to answer given the template clarification
+        # Now ask the model to answer given the template clarification. Inject the oracle
+        # passage so the model can GROUND the answer -- otherwise this path (which bypasses
+        # the ReAct search loop) gives a perfect on-axis question but no evidence, conflating
+        # question quality with retrieval. With evidence, template-oracle is the ceiling of
+        # question quality (perfect on-axis clarification + grounding), comparable to axis-oracle.
+        ev = passage_text[:4000]
         ans_resp = chat(agent_client, model_name, [
-            {"role": "system", "content": AGENT_SYSTEM_SEARCH},
-            {"role": "user",   "content": question},
+            {"role": "system", "content": AGENT_SYSTEM_ANSWER_ONLY},
+            {"role": "user",   "content": (f"Relevant evidence: {ev}\n\n{question}" if ev else question)},
             {"role": "assistant", "content": json.dumps({"action": "interact", "question": template_q})},
             {"role": "user",   "content": f"[User: {sim_response}]"},
             {"role": "user",   "content": "Now provide your final answer."},
         ], max_tokens=256)
         action_obj   = parse_action(ans_resp)
         final_answer = (action_obj.get("response", ans_resp) if action_obj else ans_resp)
-        correct = grade(question, correct_ans, final_answer, OpenAI())
+        correct = grade(question, correct_ans, final_answer, judge_client())
         return {
             "instance_id": instance.get("instance_id", instance.get("id")),
             "model": model_name, "mode": mode, "user_sim": user_sim_mode,
@@ -685,6 +721,13 @@ def run_agent(instance: dict, mode: str, agent_client: OpenAI,
         # no search. Drop from full context-oracle (C + spans) to here = the RECALL
         # cost; drop from here to +interact = the ELICITATION cost.
         system = AGENT_SYSTEM_ANSWER_ONLY
+    elif mode == "context-oracle":
+        # Full context-oracle: hand the agent BOTH the resolved interpretation C AND the
+        # oracle evidence (gold passage). No elicitation, no retrieval gap -> the ceiling.
+        # Forms a 2x2 with {answer-only, answer+search, interp-oracle}:
+        #   C absent/present  x  evidence absent(answer-only)/oracle(passage).
+        # Row delta (add evidence) = grounding value; column delta (add C) = elicitation value.
+        system = AGENT_SYSTEM_ANSWER_ONLY
     elif forced_n > 0:
         system = AGENT_SYSTEM_FORCED.replace("{n_forced}", str(forced_n))
     else:
@@ -693,6 +736,10 @@ def run_agent(instance: dict, mode: str, agent_client: OpenAI,
     user_content = question
     if mode == "interp-oracle":
         user_content = (f"Intended interpretation: {context}\n\n"
+                        f"Question: {question}")
+    elif mode == "context-oracle":
+        user_content = (f"Intended interpretation: {context}\n\n"
+                        f"Relevant evidence: {passage_text[:4000]}\n\n"
                         f"Question: {question}")
     messages = [
         {"role": "system", "content": system},
@@ -789,7 +836,7 @@ def run_agent(instance: dict, mode: str, agent_client: OpenAI,
             messages.append({"role": "user",
                              "content": 'Unknown action. Use {"action": "answer", "response": "..."}'})
 
-    grader_client = OpenAI()  # grader always on main OAI client
+    grader_client = judge_client()  # OpenAI, or OpenRouter when JUDGE_CLIENT is set
     # Enforce forced-n: if model answered before asking forced_n times, mark wrong
     if forced_n > 0 and n_asks < forced_n:
         correct = False
@@ -906,12 +953,32 @@ def compute_metrics(results: list[dict]) -> dict:
             any_hits.append(any(h["is_hit"] for h in hits))
     any_axis_hit = round(sum(any_hits) / len(any_hits), 4) if any_hits else None
 
+    # ECE (5-bin expected calibration error) from verbalized confidence, when present
+    # (results produced with --elicit-confidence). None when no confidences recorded.
+    conf_pairs = [(r["confidence"] / 100.0, bool(r["correct"]))
+                  for r in results if r.get("confidence") is not None]
+    ece = None
+    if conf_pairs:
+        n_conf = len(conf_pairs)
+        bins: list[list] = [[] for _ in range(5)]     # [0,.2),[.2,.4),...,[.8,1]
+        for c, ok in conf_pairs:
+            bins[min(int(c * 5), 4)].append((c, ok))
+        ece = 0.0
+        for b in bins:
+            if b:
+                avg_conf = sum(c for c, _ in b) / len(b)
+                acc_bin  = sum(ok for _, ok in b) / len(b)
+                ece += (len(b) / n_conf) * abs(avg_conf - acc_bin)
+        ece = round(ece, 4)
+
     return {
         "n":              n,
         "accuracy":       round(accuracy, 4),
         "ir_rate":        round(ir_rate, 4),
         "avg_turns":      round(avg_turns, 2),
         "avg_asks":       round(avg_asks, 2),
+        "ece":            ece,               # None unless --elicit-confidence was used
+        "n_confidence":   len(conf_pairs),
         # AxisHit breakdown
         "axis_hit_rate":    axis_hit_rate,   # fraction of all interact questions on-axis
         "axis_hit_at1":     axis_hit_at1,    # first question is on-axis
@@ -937,7 +1004,7 @@ def main():
                    default=["answer-only", "answer+search", "answer+search+interact"],
                    choices=["answer-only", "answer+search", "answer+search+interact",
                             "always-ask", "axis-oracle", "template-oracle", "enumerate",
-                            "axis-aware", "interp-oracle"])
+                            "axis-aware", "interp-oracle", "context-oracle"])
     p.add_argument("--limit",      type=int, default=None,
                    help="Max instances to evaluate (for pilot runs)")
     p.add_argument("--out",        default="data/results/eval_results.jsonl",
@@ -967,8 +1034,48 @@ def main():
     p.add_argument("--agent-thinking", choices=["on", "off"], default=None,
                    help="Toggle hybrid-reasoning models' thinking mode on the local agent "
                         "via chat_template_kwargs.enable_thinking (applies to agent calls only).")
+    p.add_argument("--openrouter-config", default=None,
+                   help="Path to a JSON file with {\"base_url\", \"api_key\"} for OpenRouter. "
+                        "Routes the AGENT-under-test through OpenRouter (model IDs like "
+                        "anthropic/claude-sonnet-5). By default the simulator+grader also route "
+                        "through OpenRouter using the identical OpenAI models (openai/gpt-5, "
+                        "openai/gpt-4o-mini) so the same key covers the whole run; pass "
+                        "--judge-on-openai to keep them on the OpenAI API instead. Keeps the API "
+                        "key out of the command line / process args.")
+    p.add_argument("--agent-reasoning", choices=["on", "off"], default="on",
+                   help="For OpenRouter agents, enable provider reasoning via "
+                        "extra_body={\"reasoning\": {\"enabled\": True}} (default on).")
+    p.add_argument("--judge-on-openai", action="store_true",
+                   help="Keep the simulator+grader on the OpenAI API even when "
+                        "--openrouter-config is set (requires OpenAI quota).")
+    p.add_argument("--resume", action="store_true",
+                   help="Append to --out and skip (model, mode, instance) tuples already "
+                        "present, so a run stopped by exhausted credit can be continued after "
+                        "a top-up without re-spending on completed work.")
     args = p.parse_args()
-    global AGENT_EXTRA_BODY
+    # UTF-8 console: instances/answers contain CJK; the default Windows cp1252 stdout
+    # raises UnicodeEncodeError on the ✓/✗ glyphs and Chinese text.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+    global AGENT_EXTRA_BODY, JUDGE_CLIENT, USER_SIM_MODEL, GRADER_MODEL
+    if args.openrouter_config:
+        cfg = json.loads(Path(args.openrouter_config).read_text(encoding="utf-8"))
+        args.agent_base_url = cfg["base_url"]
+        args.agent_api_key  = cfg["api_key"]
+        if args.agent_reasoning == "on":
+            AGENT_EXTRA_BODY = {"reasoning": {"enabled": True}}
+        if not args.judge_on_openai:
+            # Route simulator+grader+axis-judge through OpenRouter using the *same* underlying
+            # OpenAI models, so methodology matches existing rows and one key covers everything.
+            JUDGE_CLIENT   = OpenAI(base_url=cfg["base_url"], api_key=cfg["api_key"])
+            USER_SIM_MODEL = "openai/gpt-5"
+            GRADER_MODEL   = "openai/gpt-4o-mini"
+        judge_where = "OpenAI API" if args.judge_on_openai else "OpenRouter (openai/gpt-5, openai/gpt-4o-mini)"
+        print(f"Routing AGENT through OpenRouter ({args.agent_base_url}); "
+              f"simulator+grader via {judge_where}. reasoning={args.agent_reasoning}")
     if args.agent_thinking:
         AGENT_EXTRA_BODY = {"chat_template_kwargs": {"enable_thinking": args.agent_thinking == "on"}}
 
@@ -977,7 +1084,7 @@ def main():
     if not instances_path.exists():
         sys.exit(f"Instances file not found: {instances_path}")
     instances = []
-    with instances_path.open() as f:
+    with instances_path.open(encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line:
@@ -989,7 +1096,7 @@ def main():
     # Load passage texts for oracle retrieval (keyed by passage_id)
     passage_texts: dict[str, str] = {}
     if args.passage_file:
-        with open(args.passage_file) as f:
+        with open(args.passage_file, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if line:
@@ -1011,7 +1118,7 @@ def main():
               f"data/sources/passages.jsonl. ***\n", file=sys.stderr)
 
     # Build clients
-    oai = OpenAI()   # default (OpenAI)
+    oai = judge_client()   # OpenAI, or OpenRouter when JUDGE_CLIENT is set
     def get_client(model_name: str) -> OpenAI:
         # Local/self-hosted agent (vLLM, SGLang, TGI) — any OpenAI-compatible URL.
         # Routes the AGENT only; simulator/grader use OpenAI() directly above.
@@ -1041,12 +1148,36 @@ def main():
     summary_path.parent.mkdir(parents=True, exist_ok=True)
 
     all_results: list[dict] = []
+    # Resume support: skip (model, mode, instance) tuples already on disk so a run
+    # interrupted by exhausted credit can be continued after a top-up without
+    # re-spending. Prior results and token usage are reloaded so the final summary
+    # and cost sidecar stay complete.
+    done: set = set()
+    open_mode = "w"
+    if args.resume and out_path.exists():
+        with out_path.open(encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                r = json.loads(line)
+                done.add((r.get("model"), r.get("mode"), r.get("instance_id")))
+                all_results.append(r)
+        open_mode = "a"
+        usage_path = Path(args.out).with_suffix(".usage.json")
+        if usage_path.exists():
+            try:
+                TOKEN_USAGE.update(json.loads(usage_path.read_text(encoding="utf-8")))
+            except Exception:
+                pass
+        print(f"Resume: {len(done)} results already on disk; skipping those.")
+
     # Collect all (model, mode) combos to run
     combos = [(m, mo) for m in args.models for mo in args.modes]
     print(f"Running {len(combos)} model×mode combos × {len(instances)} instances "
           f"= {len(combos)*len(instances)} evaluations")
 
-    with out_path.open("w", encoding="utf-8") as f_out:
+    with out_path.open(open_mode, encoding="utf-8") as f_out:
         for model_name, mode in combos:
             client = get_client(model_name)
             label  = f"{model_name}/{mode}"
@@ -1056,7 +1187,14 @@ def main():
 
             model_results = []
             for i, inst in enumerate(instances):
-                print(f"  [{i+1}/{len(instances)}] {inst.get('instance_id', inst.get('id', '?'))} "
+                inst_id = inst.get("instance_id", inst.get("id"))
+                if (model_name, mode, inst_id) in done:
+                    model_results.append(next(
+                        (r for r in all_results
+                         if (r.get("model"), r.get("mode"), r.get("instance_id"))
+                         == (model_name, mode, inst_id)), {}))
+                    continue
+                print(f"  [{i+1}/{len(instances)}] {inst_id} "
                       f"axes={inst.get('axes',[])} ", end="", flush=True)
 
                 try:
@@ -1070,6 +1208,16 @@ def main():
                         user_sim_mode = args.user_sim,
                         elicit_conf  = args.elicit_confidence,
                     )
+                except CreditExhausted as e:
+                    try:
+                        Path(args.out).with_suffix(".usage.json").write_text(
+                            json.dumps(TOKEN_USAGE, indent=2), encoding="utf-8")
+                    except Exception:
+                        pass
+                    print(f"\n*** CREDIT EXHAUSTED: {e}\n*** Halting cleanly. "
+                          f"Top up and re-run with the SAME command + --resume to continue "
+                          f"(this instance was NOT recorded).", file=sys.stderr)
+                    raise SystemExit(3)
                 except Exception as e:
                     print(f"ERROR: {e}", file=sys.stderr)
                     result = {
@@ -1095,6 +1243,14 @@ def main():
                   f"ir={metrics['ir_rate']:.1%}  "
                   f"dise+={metrics.get('mean_dise_plus')}  "
                   f"turns={metrics['avg_turns']:.1f}")
+            # Persist cumulative token usage after every combo so an interrupted run
+            # still leaves exact cost data on disk (keyed by model: agent + openai/gpt-5
+            # simulator + openai/gpt-4o-mini grader are tracked separately).
+            try:
+                Path(args.out).with_suffix(".usage.json").write_text(
+                    json.dumps(TOKEN_USAGE, indent=2), encoding="utf-8")
+            except Exception:
+                pass
 
     # Aggregate summary per model×mode
     summary: dict[str, dict] = {}

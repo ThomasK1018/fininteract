@@ -654,7 +654,8 @@ reports the secondary interaction diagnostics IR (\% asked), AxisHit@1, and ECE.
 DisE$^+$ and the default-capture comparison are reported separately
 (Table~\ref{tab:illusion}). AxisHit is undefined when no question is asked.
 The OpenAI tier ladder and two open MoE models (Qwen3-30B-A3B, Qwen3.5-35B-A3B)
-are evaluated; remaining other-vendor rows in progress.
+are evaluated at full scale; a seven-model, six-vendor panel of current frontier
+models is additionally evaluated in a preliminary pilot (Table~\ref{tab:crossvendor}).
 The human baseline is the single interaction condition (passage + one yes/no
 clarification + answer) on a stratified 50-instance subset; see \S\ref{sec:humanbaseline}.
 Open-MoE +Search/+Interact accuracy is measured over the full retrieval corpus;
@@ -687,6 +688,38 @@ Human (50-inst) & -- & -- & \textbf{30.0} & 100 & \textbf{.68} & -- \\
 \bottomrule
 \end{tabular}
 \end{table*}
+
+\begin{table}[t]
+\centering
+\caption{\textbf{Preliminary cross-vendor evaluation} on \fininteract via a unified
+OpenRouter harness (identical simulator/grader pipeline to Table~\ref{tab:main}).
+\emph{Numbers are a pilot at $N{=}50$ instances per mode} and will be updated to the
+full evaluation; they are directional, not final (at $N{=}50$ one instance ${=}2$
+points, so $|\Delta|{\lesssim}2$ is within noise). ``$\Delta$'' is +Interact minus +Search
+accuracy: the sign of the interaction lever. Across seven models from six vendors, added
+interaction is flat-or-negative for six of seven (clearly negative for Grok $-8$,
+GPT-5.6 $-6$, Kimi/DeepSeek $-4$); only Gemini---the weakest searcher (6\%)---converts
+interaction into a clear gain. AHit@1 is undefined when no clarification is asked.
+Two Grok +Search instances returned transient API errors and are scored incorrect,
+so its +Search accuracy is a lower bound.}
+\label{tab:crossvendor}
+\small
+\begin{tabular}{lccccc}
+\toprule
+& \multicolumn{2}{c}{Acc (\%)} & \multicolumn{3}{c}{+Interact} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-6}
+Model & Ans-only & +Search & Acc & $\Delta$ & AHit@1 \\
+\midrule
+Claude-Sonnet-5   & 4.0  & \textbf{46.0} & \textbf{44.0} & $-2$  & .10 \\
+Grok-4.5          & 2.0  & 40.0 & 32.0 & $-8$  & .09 \\
+GLM-5.2           & 12.0 & 40.0 & 40.0 & $0$   & .27 \\
+Kimi-K3           & 16.0 & 38.0 & 34.0 & $-4$  & .18 \\
+GPT-5.6-sol       & 10.0 & 36.0 & 30.0 & $-6$  & \textbf{.52} \\
+DeepSeek-V4-flash & 12.0 & 28.0 & 24.0 & $-4$  & .21 \\
+Gemini-3.5-flash  & 14.0 & 6.0  & 30.0 & $+24$ & .42 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Why Existing Benchmarks Miss This: The Single-Gold Illusion}
 \label{sec:illusion}
@@ -807,8 +840,15 @@ grading, not of finance.
 \subsection{Findings}
 
 We report results for the full OpenAI tier ladder, GPT-5, GPT-4o, and
-GPT-5-mini, across all three modes (Table~\ref{tab:main}); other-vendor models
-are in progress. All headline accuracy comparisons below are reported with
+GPT-5-mini, across all three modes (Table~\ref{tab:main}). To probe whether the
+effect is an OpenAI-specific artifact, we additionally evaluate a preliminary
+seven-model, six-vendor panel of current frontier models (Claude-Sonnet-5,
+Gemini-3.5-flash, Grok-4.5, DeepSeek-V4, GLM-5.2, Kimi-K3, GPT-5.6) through a
+unified OpenRouter harness with an identical simulator/grader pipeline
+($N{=}50$/mode, Table~\ref{tab:crossvendor}); it reproduces the headline pattern:
+added interaction is flat-or-negative for six of seven vendors and yields a clear
+gain only for Gemini, the weakest autonomous searcher. All headline accuracy
+comparisons below are reported with
 bootstrap $95\%$ CIs over instances, and we test each within-model mode
 transition with a two-sided paired bootstrap ($n{=}173$). Six findings emerge
 here, with a seventh (the latent-capacity ceiling) in \S\ref{sec:ceiling}.
@@ -1599,8 +1639,12 @@ read with this asymmetry in mind, and the EN portion is a target for growth.
 \texttt{filing\_vintage} is unrepresented and \texttt{temporal\_scope}/%
 \texttt{recognition\_policy} are sparse (Table~\ref{tab:stats}): viable
 structured ambiguity for these axes is rare in public filings (Appendix~\ref{app:cost}).
-\textbf{Model coverage.} We report the OpenAI tier ladder (3 models); other-vendor
-models are in progress. The human baseline ($N{=}50$) establishes the performance
+\textbf{Model coverage.} We report the OpenAI tier ladder (3 models) and two open
+MoE models at full scale ($n{=}173$); a seven-model, six-vendor panel of current
+frontier models is additionally evaluated in a preliminary pilot ($N{=}50$/mode,
+Table~\ref{tab:crossvendor}), which reproduces the central finding but at reduced
+statistical resolution---a full-scale multi-vendor evaluation remains in progress.
+The human baseline ($N{=}50$) establishes the performance
 ceiling but is collected from two annotators on a subset; a larger expert panel
 remains future work. \textbf{Grader and simulator.} Correctness and
 axis-targeting are judged by GPT-4o-mini and the user is simulated by GPT-5;

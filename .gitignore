@@ -31,6 +31,8 @@ compass_artifact_wf-1e7a4e8b-8d00-4ead-b048-70c4ee806f83_text_markdown (1).md
 .env
 *.key
 *credentials*
+configs/openrouter.json
+configs/*.secret.json
 
 # Python
 __pycache__/
@@ -56,6 +58,8 @@ data/results/
 # transfer artifacts
 fininteract_flow_results.zip
 fininteract-*-main.zip
+AuthorKit*.zip
+*.zip
 
 # AI reviewer chat dumps (local reference only, large HTML)
 ai_reviewer/
