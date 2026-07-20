@@ -1066,72 +1066,80 @@ Table~\ref{tab:skills} reports Targeting, the decisive component.
 
 \begin{table}[t]
 \centering
-\caption{Per-axis \textbf{Targeting} skill (AxisHit@1) in \texttt{+interact}.
-Recognition policy is a near-universal blind spot, temporal scope is largely
-solved, and entity/metric are partial. ``--'': model never asked on that axis (IR$=0$).
-The two sparse axes ($n{\le}9$) are preliminary. These per-axis values use the original
-classifier, whose temporal-scope bias likely inflates \texttt{temporal\_scope} and deflates
-the others (\S\ref{sec:metrics}), so recomputation with the corrected classifier is pending.}
+\caption{Per-axis \textbf{Targeting} skill (AxisHit@1, \emph{touch} form) in \texttt{+interact},
+recomputed with the corrected classifier (\S\ref{sec:metrics}). Recognition policy is a robust
+blind spot (no model ever asks), temporal scope is fully solved, and entity and metric are
+touched almost always but rarely made the \emph{central} concern (central-form AxisHit@1
+$\leq0.16$, see text). The two sparse axes ($n{\le}9$) are preliminary.}
 \label{tab:skills}
 \small
 \begin{tabular}{lrccccc}
 \toprule
 Axis & $n$ & GPT-5 & GPT-4o & {\footnotesize GPT-5-m} & {\footnotesize Q3-30B} & {\footnotesize Q3.5-35B} \\
 \midrule
-entity\_scope       & 94 & .41 & .29 & .37 & .28 & .39 \\
-metric\_definition  & 63 & .32 & .13 & .27 & .18 & .36 \\
-recognition\_policy &  9 & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} & .17 \\
-temporal\_scope     &  7 & .95 & 1.0 & .95 & -- & 1.0 \\
+entity\_scope       & 94 & .89 & 1.00 & .99 & .93 & .85 \\
+metric\_definition  & 63 & .92 & .97 & 1.00 & .96 & .87 \\
+recognition\_policy &  9 & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} \\
+temporal\_scope     &  7 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Finding 9: Ambiguity clarification is a per-axis skill, and models lack
-specific ones.} Targeting is sharply differentiated: every OpenAI model scores
-AxisHit $=0$ on \texttt{recognition\_policy} (they essentially never ask whether a
-figure is recognized point-in-time vs.\ over time), yet all reach $\geq0.95$ on
-\texttt{temporal\_scope}; entity and metric sit in between ($0.13$--$0.41$).
-Resolution follows the same shape (e.g.\ GPT-5 resolves $57\%$ of temporal but
-$\leq23\%$ of entity/metric). The gap is therefore not uniform incompetence but
-\emph{missing specific skills}, which is precisely the target an intervention
-should aim at (\S\ref{sec:grpo}). We also tested whether failures cluster by axis
-in per-instance behavior space (PCA over per-model correct/ask/AxisHit/default);
-they do not (k-means ARI $\approx0.01$, $p\approx0.15$), a floor effect of the
-near-zero accuracies, the axis structure lives in the aggregate targeting
-profile, not in coarse per-instance behavior. Clustering the \emph{text of the
-asked clarifying questions} is the sharper test and is left to future work.
+\textbf{Finding 9: Ambiguity clarification is a per-axis skill with a sharp touch
+versus central-targeting dissociation.} Under the corrected classifier the pattern is
+precise. \texttt{recognition\_policy} is a robust blind spot. No model ever asks about it,
+in either the touch or the central form (AxisHit@1 $=0$), so models essentially never
+question whether a figure is recognized point-in-time or over time. \texttt{temporal\_scope}
+is fully solved. Models both touch it and make it the central concern (central AxisHit@1
+$=1.0$). Entity and metric occupy a revealing middle. Models almost always \emph{touch} them
+(touch AxisHit@1 $0.85$--$1.0$) yet rarely make them the \emph{central} point of the question
+(central AxisHit@1 $\leq0.16$), defaulting instead to period confirmation. For these two axes
+the failure is not neglect but imprecision, the model names the entity or metric in passing
+while centering the question elsewhere. Resolution follows the same shape (GPT-5 resolves
+$57\%$ of temporal but $\leq23\%$ of entity and metric). The gap is not uniform incompetence
+but missing specific targeting, which is precisely the intervention target
+(\S\ref{sec:grpo}). We also tested whether failures cluster by axis in per-instance behavior
+space (PCA over per-model correct, ask, AxisHit, default) and they do not (k-means ARI
+$\approx0.01$, $p\approx0.15$), a floor effect of the near-zero accuracies, so the axis
+structure lives in the aggregate targeting profile rather than in coarse per-instance
+behavior.
 
 \begin{table}[t]
 \centering
-\caption{Zero-shot Targeting (AxisHit@1) by base-model scale (Qwen3,
-\texttt{+interact}; denominator = instances where the model asked). Entity and
-metric scale steeply, entity is nearly solved at 32B, while recognition policy
-stays $0$ at \emph{every} scale, including the same 32B that targets entity well.
-The rare axis is underpowered ($n{\le}9$ asked-on) but flat throughout.}
+\caption{Zero-shot \emph{central}-targeting (central-form AxisHit@1) by base-model scale
+(Qwen3, \texttt{+interact}, denominator = instances where the model asked). Under the
+validated touch form every scale already reaches $\approx0.9$ on entity and metric, so scale
+buys the precision to \emph{center} the question on the right axis rather than detection.
+Entity central-targeting scales steeply and is largely solved at 32B, while recognition policy
+stays $0$ at every scale, including the same 32B that targets entity well. Recognition is
+underpowered ($n{\le}9$ asked-on) but flat throughout.}
 \label{tab:scaledissoc}
 \small
 \begin{tabular}{lccc}
 \toprule
 Axis & 4B & 14B & 32B \\
 \midrule
-entity\_scope       & .12 & .30 & \textbf{.89} \\
-metric\_definition  & .05 & .10 & .45 \\
+entity\_scope       & .00 & .00 & \textbf{.68} \\
+metric\_definition  & .05 & .00 & .17 \\
 recognition\_policy & \textbf{.00} & \textbf{.00} & \textbf{.00} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \textbf{Finding 11: the axes are different \emph{kinds} of skill, some
-scale-solvable, one a scale-invariant blind spot.} Zero-shot targeting across a
-controlled scale ladder (Qwen3 $4\text{B}\!\to\!32\text{B}$;
-Table~\ref{tab:scaledissoc}) separates the axes sharply. \texttt{entity\_scope}
-and \texttt{metric\_definition} rise steeply with scale, entity is nearly
-\emph{solved} at 32B ($0.89$), so there capability is largely a matter of scale.
-\texttt{recognition\_policy}, by contrast, is $0.00$ at every scale, including the
-same 32B model that has clearly learned to target entity: more parameters buy no
-recognition-basis targeting at all. The dissociation confirms the taxonomy carves
-genuine capability boundaries rather than arbitrary strata, and it pinpoints where
-scale stops helping, the axis a targeted intervention must address
+scale-solvable, one a scale-invariant blind spot.} A controlled scale ladder
+(Qwen3 $4\text{B}\!\to\!32\text{B}$, Table~\ref{tab:scaledissoc}) separates the axes
+sharply, once we look at \emph{central} targeting. \texttt{recognition\_policy} is a
+scale-invariant blind spot. It is never targeted at any scale, in either the touch or the
+central form ($0.00$ at 4B, 14B, and 32B, including the same 32B that targets entity well),
+so more parameters buy no recognition-basis targeting at all. \texttt{entity\_scope} and
+\texttt{metric\_definition} tell a subtler story. Every scale already \emph{touches} them
+(touch AxisHit@1 $\approx0.9$), but the ability to make them the \emph{central} point of the
+question emerges only with scale, entity central-targeting rising from $0.00$ at 4B and 14B to
+$0.68$ at 32B. Scale therefore does not buy ambiguity detection for these axes, which is
+already present, but the precision to center the question on the right axis. The dissociation
+confirms the taxonomy carves genuine capability boundaries rather than arbitrary strata, and
+it pinpoints recognition basis as the axis a targeted intervention must address
 (\S\ref{sec:coevolve}).
 
 \subsection{Mechanistic Case Study: Where Ambiguity Lives in the Network}
