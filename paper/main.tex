@@ -707,14 +707,17 @@ because the axis-conditioned policy deliberately sweeps multiple axes to rule th
 a single-axis hit rate is not comparable (an any-axis form near saturation is discussed in
 \S\ref{sec:axisreact}). DisE$^+$ and the default-capture comparison are reported separately
 (Table~\ref{tab:illusion}). AxisHit is undefined when no question is asked.
-The OpenAI tier ladder and two open MoE models (Qwen3-30B-A3B, Qwen3.5-35B-A3B)
-are evaluated at full scale; a seven-model, six-vendor panel of current frontier
-models is additionally evaluated in a preliminary pilot (Table~\ref{tab:crossvendor}).
+The OpenAI tier ladder and a Qwen open-model ladder (dense 4B to 32B plus two MoE
+models, Qwen3-30B-A3B and Qwen3.5-35B-A3B) are evaluated at full scale; a
+seven-model, six-vendor panel of current frontier models is additionally evaluated
+in a preliminary pilot (Table~\ref{tab:crossvendor}).
 The human baseline is the single interaction condition (passage + one yes/no
 clarification + answer) on a stratified 50-instance subset; see \S\ref{sec:humanbaseline}.
-Open-MoE +Search/+Interact accuracy is measured over the full retrieval corpus;
-for both MoE models, as for GPT-4o, added interaction \emph{underperforms} plain
-search, while only GPT-5 converts interaction into a gain.}
+Open-model +Search/+Interact accuracy is measured over the full retrieval corpus.
+For both MoE models and the largest dense model, as for GPT-4o, added interaction
+\emph{underperforms} plain search, while GPT-5 converts it into a clear gain. The
+smaller dense models (4B to 14B) show apparent gains on the small subset where they
+ask, which we read cautiously under the open-model caveat (\S\ref{sec:mechanistic}).}
 \label{tab:main}
 \small
 \begin{tabular}{lccccccc}
@@ -727,11 +730,10 @@ Model & Ans-only & +Search & Acc & IR & AHit@1 & ECE \\
 GPT-5           & 0.6 & 6.4  & \textbf{20.2} & 98.8 & .86 & .53 \\
 GPT-4o          & 0.6 & 12.1 & 4.6 & 99.4 & .94 & .82 \\
 GPT-5-mini      & 0.6 & 0.0 & 0.0 & 96.0 & .94 & .00 \\
-Claude-Sonnet-4 & -- & -- & -- & -- & -- & -- \\
-Claude-Opus-4   & -- & -- & -- & -- & -- & -- \\
-DeepSeek-V3.1   & -- & -- & -- & -- & -- & -- \\
-Qwen3-235B      & -- & -- & -- & -- & -- & -- \\
-GLM-4.5         & -- & -- & -- & -- & -- & -- \\
+Qwen3-4B        & 0.0 & 8.1  & 12.1 & 28 & .85 & -- \\
+Qwen3-8B        & 0.6 & 14.4 & 24.9 & 15 & .88 & -- \\
+Qwen3-14B       & 0.0 & 18.5 & 22.5 & 36 & .74 & -- \\
+Qwen3-32B       & 1.2 & 27.2 & 8.4  & 61 & .96 & -- \\
 Qwen3-30B-A3B   & 1.2 & 28.3 & 11.6 & 72 & .90 & -- \\
 Qwen3.5-35B-A3B & 0.6 & \textbf{35.8} & 28.9 & 36 & .81 & -- \\
 \midrule
