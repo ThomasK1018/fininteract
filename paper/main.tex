@@ -1407,6 +1407,28 @@ failure attribution without additional annotation:
   \item \textbf{Template-oracle still low} $\to$ E6 residual; evidence extraction still fails
 \end{itemize}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_errordist.png}
+\caption{\textbf{Error-type distribution} in \texttt{+interact}, attributing every
+instance to the taxonomy of Table~\ref{tab:errors} with the corrected axis classifier.
+\emph{E5 misintegration} (the agent asks, touches the correct axis, yet answers wrong)
+dominates for every model, while ambiguity blindness (E1), wrong-axis (E2), and generic
+(E3) asks stay comparatively rare.}
+\label{fig:errordist}
+\end{figure}
+
+\textbf{Misintegration, not misdirection, dominates the error budget.} Attributing each
+interact-mode outcome to the taxonomy (Figure~\ref{fig:errordist}) shows that \emph{E5}
+(right axis touched, wrong answer) accounts for the large majority of failures, $67\%$ for
+GPT-5, $89\%$ for GPT-4o, $90\%$ for GPT-5-mini, and $75\%$ for Qwen3-30B, while not-asking
+(E1) and off-axis asks (E2 and E3) together stay below $15\%$ for the closed models. The
+bottleneck is converting a correctly targeted clarification into the intended answer, not
+deciding whether or what to ask. Qwen3.5-35B-A3B is the informative exception, asking less
+(E1 $21\%$) but resolving more of what it attempts (Correct $35\%$), so its failures lean
+toward under-asking rather than misintegration. This corroborates Findings~4 and~9 across
+the full error budget and motivates the state-gated answering of \S\ref{sec:axisreact}.
+
 \subsection{Inference-Time Intervention: Axis-Aware Clarification ReAct}
 \label{sec:axisreact}
 

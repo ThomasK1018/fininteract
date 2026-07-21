@@ -1,0 +1,37 @@
+{
+  "gpt-5": {
+    "Correct": 0.2023,
+    "E1 blindness": 0.0116,
+    "E2 wrong-axis": 0.1156,
+    "E3 generic": 0.0,
+    "E5 misintegration": 0.6705
+  },
+  "gpt-4o": {
+    "Correct": 0.0462,
+    "E1 blindness": 0.0058,
+    "E2 wrong-axis": 0.0578,
+    "E3 generic": 0.0,
+    "E5 misintegration": 0.8902
+  },
+  "gpt-5-mini": {
+    "Correct": 0.0,
+    "E1 blindness": 0.0405,
+    "E2 wrong-axis": 0.0578,
+    "E3 generic": 0.0,
+    "E5 misintegration": 0.9017
+  },
+  "qwen3-30b-a3b": {
+    "Correct": 0.1098,
+    "E1 blindness": 0.0636,
+    "E2 wrong-axis": 0.0751,
+    "E3 generic": 0.0,
+    "E5 misintegration": 0.7514
+  },
+  "qwen3p5-35b-a3b": {
+    "Correct": 0.3526,
+    "E1 blindness": 0.2139,
+    "E2 wrong-axis": 0.0809,
+    "E3 generic": 0.0,
+    "E5 misintegration": 0.3526
+  }
+}
