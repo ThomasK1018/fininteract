@@ -312,6 +312,15 @@ noun; Chinese: CJK company name).
 \textbf{Context must not contain the answer.}
 $C$ specifies scope constraints but not the numeric value $A$ itself.
 
+\textbf{What we evaluate, and what we do not.} \fininteract measures whether an agent
+recognizes financial-report ambiguity and resolves it through targeted clarification,
+graded against the intended interpretation. It deliberately does not test raw
+numerical reasoning over a supplied table, long-document reading comprehension, or
+open-ended financial analysis, which existing benchmarks such as FinQA and DocFinQA
+already cover. Every question is anchored to a single named issuer and a
+programmatically verifiable value, so open-ended forecasting, multi-company
+aggregation, and subjective judgment fall outside its scope.
+
 \subsection{Agent Interaction Model}
 
 We follow \interactcomp's ReAct framework~\citep{yao2023react}.
@@ -580,7 +589,7 @@ no reported finding depends on it.
 \label{sec:stats}
 
 The frozen evaluation snapshot (\texttt{v1.0}) contains 173 instances
-(Table~\ref{tab:stats}; the public \texttt{v1.1} release is $N{=}172$, \S\ref{sec:humanval}), drawn from
+(Table~\ref{tab:stats} and Figure~\ref{fig:datastats}; the public \texttt{v1.1} release is $N{=}172$, \S\ref{sec:humanval}), drawn from
 61 unique companies and SEC/CSRC filings dated 2022--2025. Every instance passes
 all 14 pre-verifier rules and the 10-trial adversarial verifier (mean blind-solve
 rate $0.7\%$), and is R14-discriminating (intended $\neq$ default answer beyond
@@ -616,6 +625,18 @@ Mean blind-solve rate (verifier) & 0.7\% \\
 \end{tabular}
 \end{table}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_dataset_stats.png}
+\caption{\textbf{\fininteract distributions.} \emph{(a)}~Primary ambiguity axis: the
+corpus is entity/metric-dominant ($54\%$ / $36\%$), with the three subordinate axes
+sparse, mirroring how often each axis is the \emph{primary} ambiguity in public
+filings (\S\ref{sec:taxonomy}). \emph{(b)}~Difficulty by disambiguation entropy
+$H_0=\log_2 k$: instances span one to $3.58$ bits, most at one or two bits with a
+substantial multi-axis tail at $3.58$ bits (45 instances).}
+\label{fig:datastats}
+\end{figure}
+
 
 %% ============================================================
 \section{Evaluation Framework}
@@ -636,10 +657,13 @@ To test robustness, we evaluate under three simulator variants:
 
 \subsection{Models}
 
-Eight models are evaluated across all three primary modes:
-GPT-5, GPT-5-mini, GPT-4o (OpenAI);
-Claude-Sonnet-4, Claude-Opus-4 (Anthropic);
-DeepSeek-V3.1, Qwen3-235B, GLM-4.5 (open-weight).
+We evaluate three OpenAI models (GPT-5, GPT-4o, GPT-5-mini) and a Qwen open-weight
+ladder (dense 4B, 8B, 14B, and 32B plus two mixture-of-experts models, Qwen3-30B-A3B
+and Qwen3.5-35B-A3B) at full scale ($N{=}173$) across all three primary modes
+(Table~\ref{tab:main}). To test cross-vendor generality we additionally run a
+seven-model, six-vendor frontier panel (Claude-Sonnet-5, Gemini-3.5-flash, Grok-4.5,
+DeepSeek-V4-flash, GLM-5.2, Kimi-K3, and GPT-5.6-sol) through a unified OpenRouter
+harness at a preliminary $N{=}50$ per mode (Table~\ref{tab:crossvendor}).
 
 \subsection{Metrics}
 \label{sec:metrics}
