@@ -1225,25 +1225,30 @@ behavior.
 \centering
 \includegraphics[width=\linewidth]{fig_axisperf.png}
 \caption{\textbf{Per-model, per-axis performance.} \emph{(a)}~Targeting (AxisHit@1
-touch, Table~\ref{tab:skills}) versus \emph{(b)}~Resolution (\texttt{+interact}
-accuracy) for every model and ambiguity axis. Cells are shaded by value and annotated.
-\texttt{filing\_vintage} has no corpus instances ($n{=}0$), and the two sparse axes carry
-their $n$. Models target entity, metric, and temporal almost perfectly yet resolve them
-poorly, and the resolution ranking reorders across axes.}
+touch) versus \emph{(b)}~Resolution (\texttt{+interact} accuracy) for every model and
+ambiguity axis. The top five rows are the full-scale panel ($n{=}173$, all axes) and
+the bottom seven are the proprietary pilot ($n{=}50$), for which only entity and metric
+carry enough instances ($n{=}29$ and $19$), with recognition, temporal, and filing at
+$n\leq1$ and shown n/a. \texttt{filing\_vintage} is empty at full scale too ($n{=}0$).
+Every model targets entity and metric almost perfectly, the proprietary models resolve
+them better than the older OpenAI ladder, and no model targets recognition policy.}
 \label{fig:axisperf}
 \end{figure}
 
 \textbf{Per-model, per-axis case analysis.} Placing targeting and resolution side by
-side for every model and axis (Figure~\ref{fig:axisperf}) surfaces two patterns.
+side for every model and axis (Figure~\ref{fig:axisperf}) surfaces three patterns.
 First, resolution does \emph{not} track targeting: GPT-4o and GPT-5-mini touch the
 correct axis on entity and metric almost as often as any model (AxisHit $0.94$--$1.0$)
 yet resolve those axes at $0$--$5\%$, so a high AxisHit is no guarantee of a correct
-answer. Second, the model ranking \emph{reorders} across axes. Qwen3.5-35B-A3B leads on
-the two abundant axes (entity $40\%$, metric $32\%$), GPT-5 leads on temporal ($57\%$),
-and every model floors on recognition, whose targeting is $0$ and whose resolution sits
-at chance on the nine available instances. \texttt{filing\_vintage} is untestable
-($n{=}0$). A single aggregate interaction score therefore conceals which axis a given
-model can actually resolve, which is the case for per-axis reporting.
+answer. Second, the model ranking \emph{reorders} across axes. Among the full-scale
+models Qwen3.5-35B-A3B leads on the two abundant axes (entity $40\%$, metric $32\%$)
+while GPT-5 leads on temporal ($57\%$). Third, the seven proprietary models resolve
+entity and metric substantially better than the older OpenAI ladder (entity
+$21$--$48\%$, metric $26$--$42\%$, versus GPT-5's $23$ and $13\%$), yet they inherit the
+\emph{same} recognition blind spot, with touch AxisHit $0$ on every recognition instance
+they saw. \texttt{filing\_vintage} is untestable everywhere ($n{=}0$). A single
+aggregate interaction score therefore conceals which axis a given model can actually
+resolve, which is why we report per axis.
 
 \begin{table}[t]
 \centering
