@@ -973,7 +973,20 @@ GPT-5 from 6.4\% to 20.2\% (95\% CI $[14.5,26.6]$; paired bootstrap $p{<}0.001$)
 but \emph{lowers} GPT-4o from 12.1\% to 4.6\% ($p{=}0.002$). Forcing the weaker
 model to interact makes it significantly worse than not interacting at all. This
 extends \interactcomp's ``interaction stagnation'' into a sharper claim: for
-models that cannot use it, interaction is actively harmful.
+models that cannot use it, interaction is actively harmful. Across all twelve
+evaluated models the interaction lever (added-interaction minus plain-search
+accuracy) is positive for only GPT-5 and Gemini and flat-or-negative for the other
+ten (Figure~\ref{fig:lever}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\linewidth]{fig_lever.png}
+\caption{\textbf{Interaction is a capability, not a free lever.} Added-interaction
+minus plain-search accuracy across the twelve full-scale and cross-vendor models.
+Interaction improves accuracy for only GPT-5 and Gemini and is flat or negative for
+the other ten, so the ability to convert clarification into a correct answer is rare.}
+\label{fig:lever}
+\end{figure}
 
 \textbf{Finding 2: Model rankings flip with the interaction axis.} GPT-4o
 \emph{outperforms} GPT-5 under pure retrieval (12.1 vs.\ 6.4) yet is
@@ -1045,7 +1058,7 @@ but does so with fewer wasted asks.
 \label{sec:ceiling}
 
 To locate the bottleneck we bracket interactive accuracy with two ablations
-(Table~\ref{tab:ceiling}). \textbf{Forced interaction} requires the agent to ask
+(Table~\ref{tab:ceiling} and Figure~\ref{fig:bottleneck}). \textbf{Forced interaction} requires the agent to ask
 $n{=}4$ clarifying questions before answering. \textbf{Context-oracle} hands the
 model the disambiguating context $C$ (which fixes the intended interpretation)
 together with a passage containing \emph{both} the intended and the default
@@ -1074,6 +1087,16 @@ Qwen3.5-35B-A3B & 0.6 & 28.9 & -- & \textbf{91.9} \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_bottleneck.png}
+\caption{\textbf{The elicitation gap.} Free-interaction accuracy (orange) versus the
+context-oracle ceiling (teal) per model. Once the ambiguity is resolved every model
+answers $90$--$95\%$ correctly, so the $63$--$95$ point gap is the cost of the model
+failing to \emph{elicit} the disambiguation itself, not missing knowledge.}
+\label{fig:bottleneck}
+\end{figure}
 
 \textbf{Finding 7: Models can answer once the ambiguity is resolved, they
 cannot resolve it themselves.} The context-oracle ceiling is $93$--$95\%$ for all
@@ -1110,13 +1133,27 @@ human baseline is the cost of \emph{elicitation}: knowing the resolved answer is
 near-trivial, but extracting the right bit through a single clarification is hard
 even for experts. Humans ask far more on-target questions than any model
 (AxisHit $0.68$ vs.\ $0.34$--$0.38$) yet still capture the default reading $50\%$
-of the time. The asymmetry is sharpest in Chinese: ZH annotators ask the
+of the time. Across models and the human baseline, targeting and resolution
+\emph{dissociate}: the models with the highest AxisHit@1 (GPT-4o and GPT-5-mini at
+$0.94$) post the lowest accuracy, while the human, with the lowest AxisHit ($0.68$),
+posts the highest (Figure~\ref{fig:humanllm}). The asymmetry is sharpest in Chinese: ZH annotators ask the
 \emph{best}-targeted questions ($0.72$ AxisHit) but post the \emph{lowest}
 accuracy ($22.2\%$) and highest default-capture ($72.2\%$). Chinese instances are
 therefore harder to \emph{resolve}, not harder to \emph{recognize}, the
 \emph{gui-mu}/\emph{kou-fei} (parent-attributable vs.\ deduction-of-nonrecurring) net-income
 distinction is sticky even once correctly surfaced, corroborating the
 language-asymmetry caveat in \S\ref{sec:limitations} with a mechanism.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.82\linewidth]{fig_humanllm.png}
+\caption{\textbf{Targeting does not imply resolution.} Accuracy against AxisHit@1
+(touch) in the interact regime, for the five full-scale models and the human baseline
+(star). The relationship is inverted: models that ask on the correct axis most often
+resolve the ambiguity least often, whereas the human asks less precisely yet resolves
+more. Asking the right question and answering it are separate abilities.}
+\label{fig:humanllm}
+\end{figure}
 
 \subsection{Per-Axis Skills: Which Clarification Abilities Do Models Lack?}
 \label{sec:skills}
