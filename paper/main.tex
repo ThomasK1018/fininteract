@@ -112,6 +112,7 @@ Without the disambiguating context $C$, a model's default interpretation
 leads to the wrong answer.}
 \label{tab:example}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{p{1.8cm}p{5.7cm}}
 \toprule
 Field & Value \\
@@ -134,7 +135,7 @@ Intended span &
 Default span &
   ``Family of Apps\ldots Income from operations \$62,871\ldots'' \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \paragraph{Limitations of Existing Benchmarks.}
@@ -337,6 +338,7 @@ ablation modes.
 \caption{Evaluation modes.}
 \label{tab:modes}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lll}
 \toprule
 Mode & Actions & Description \\
@@ -351,14 +353,17 @@ Axis-oracle & \multicolumn{2}{l}{Told the primary axis, not the value} \\
 Template-oracle & \multicolumn{2}{l}{Fixed human-written question per axis} \\
 Enumerate & \multicolumn{2}{l}{Lists all interpretations and answers} \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 
 %% ============================================================
-\section{Financial Ambiguity Taxonomy}
-\label{sec:taxonomy}
+\section{Methodology}
+\label{sec:methodology}
 %% ============================================================
+
+\subsection{Financial Ambiguity Taxonomy}
+\label{sec:taxonomy}
 
 We define five axes of financial ambiguity, each grounded in standard
 accounting and disclosure practice (Table~\ref{tab:axes}).
@@ -368,6 +373,7 @@ accounting and disclosure practice (Table~\ref{tab:axes}).
 \caption{Five-axis financial ambiguity taxonomy.}
 \label{tab:axes}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{p{2.0cm}p{5.5cm}}
 \toprule
 Axis & Definition \\
@@ -394,7 +400,7 @@ Axis & Definition \\
   Ambiguity over accounting policy: revenue recognized point-in-time
   vs. over time; gross vs. net revenue; capitalized vs. expensed R\&D. \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 Each instance exercises one primary axis (mandatory) and optionally one or
@@ -422,10 +428,8 @@ This quantity anchors our supplementary efficiency metric \disep (\S\ref{sec:met
 and serves as a per-instance difficulty proxy.
 
 
-%% ============================================================
-\section{Dataset Construction}
+\subsection{Dataset Construction}
 \label{sec:construction}
-%% ============================================================
 
 \fininteract is built and evaluated in four stages (Figure~\ref{fig:framework}):
 we \textbf{(1)~construct} ambiguous instances from public filings,
@@ -481,12 +485,11 @@ nomenclature (e.g., A/H-share distinctions, \emph{jituan} (group) vs.\ \emph{zi-
 
 \subsection{Three-Role Construction Pipeline}
 
-Instance construction follows a three-role pipeline.
-Each passage attempt costs approximately 10--14 minutes of wall time,
-dominated by two sequential GPT-5 calls.
+Instance construction follows a three-role pipeline (per-passage cost and
+timing in Appendix~\ref{app:cost}).
 
-\paragraph{Step 1: Constructor (GPT-5, $\sim$2--5 min).}
-A single GPT-5 call with a 4,096-token budget generates the full
+\paragraph{Step 1: Constructor (GPT-5).}
+A single GPT-5 call generates the full
 $(Q, C, A)$ triple given a filing passage, verified candidate answer, and
 mandatory primary ambiguity axis.
 The output JSON includes \texttt{question}, \texttt{context}, \texttt{answer},
@@ -501,9 +504,8 @@ Thirteen automated code-level rules are applied without any API calls
 (Table~\ref{tab:qc}).
 Any failure immediately rejects the passage, avoiding wasted verifier budget.
 
-\paragraph{Step 3: Adversarial Verifier (10 trials, parallelized, $\sim$5--10 min).}
-Ten verifier calls fire simultaneously via a thread pool: five GPT-5-mini
-trials and five GPT-5 trials.
+\paragraph{Step 3: Adversarial Verifier (10 trials).}
+Ten verifier calls run in parallel (five GPT-5-mini and five GPT-5).
 Each trial asks the model to answer $Q$ \emph{without} context $C$ and
 to state the interpretation it assumed (period, entity, metric, basis).
 An instance is \textbf{rejected} if $\geq 2$ of the 10 trials both
@@ -512,35 +514,8 @@ that aligns with the intended interpretation.
 This two-condition criterion prevents false rejections from lucky guesses:
 if a model produces the right number while assuming a different interpretation
 (e.g., the default), the coincidence is not counted against the instance.
-Because all ten calls run concurrently, wall time equals the latency of the
-slowest single GPT-5 call.
 
-\begin{table}[h]
-\centering
-\caption{Pre-verifier sanity checks (14 rules).}
-\label{tab:qc}
-\small
-\begin{tabular}{cl}
-\toprule
-Rule & Description \\
-\midrule
-R1  & $Q$ must not be answerable yes/no \\
-R2  & $Q$ must not contain disambiguating terms or inline dates \\
-R3  & $A$ taken verbatim from the source candidate value (not invented) \\
-R4  & $Q$ must name the company \\
-R5  & $Q$ must ask about a substantive financial metric \\
-R6  & Answer type consistent with question type \\
-R7  & Context $C$ must not contain the answer value \\
-R8  & Intended and default interpretations must differ \\
-R9  & All axis labels must be valid vocabulary items \\
-R10 & Answer must be non-trivial (not empty or ``0'') \\
-R11 & \texttt{default\_answer} present and differs from \texttt{answer} \\
-R12 & Both evidence spans non-empty \\
-R13 & Evidence spans must be meaningfully distinct ($\leq$85\% overlap) \\
-R14 & Intended and default \emph{answers} differ beyond grader tolerance \\
-\bottomrule
-\end{tabular}
-\end{table}
+
 
 \subsection{Axis Diversity Enforcement}
 
@@ -601,6 +576,7 @@ grader tolerance).
 $H_0=\log_2 k$ over $k$ plausible interpretations.}
 \label{tab:stats}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lr}
 \toprule
 Property & Value \\
@@ -622,7 +598,7 @@ Primary axis: entity\_scope     & 94 \\
 $H_0$ (mean / median / range)   & 2.20 / 2.00 / 1.0--3.6 \\
 Mean blind-solve rate (verifier) & 0.7\% \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \begin{figure}[t]
@@ -639,11 +615,14 @@ substantial multi-axis tail at $3.58$ bits (45 instances).}
 
 
 %% ============================================================
-\section{Evaluation Framework}
+\section{Experiments}
+\label{sec:exp}
 \label{sec:eval}
 %% ============================================================
 
-\subsection{Agent Architecture}
+\subsection{Evaluation Setup}
+
+\subsubsection{Agent Architecture}
 
 We evaluate agents under the ReAct framework in seven configurations
 (Table~\ref{tab:modes}).
@@ -662,7 +641,7 @@ prompt format. All models run under the same fixed ReAct system prompt, so class
 prompt-format ablations such as few-shot or chain-of-thought prompting are orthogonal
 to the interaction capability this benchmark is built to isolate.
 
-\subsection{Models}
+\subsubsection{Models}
 
 We evaluate three OpenAI models (GPT-5, GPT-4o, GPT-5-mini) and a Qwen open-weight
 ladder (dense 4B, 8B, 14B, and 32B plus two mixture-of-experts models, Qwen3-30B-A3B
@@ -672,7 +651,7 @@ seven-model, six-vendor frontier panel (Claude-Sonnet-5, Gemini-3.5-flash, Grok-
 DeepSeek-V4-flash, GLM-5.2, Kimi-K3, and GPT-5.6-sol) through a unified OpenRouter
 harness at a preliminary $N{=}50$ per mode (Table~\ref{tab:crossvendor}).
 
-\subsection{Metrics}
+\subsubsection{Metrics}
 \label{sec:metrics}
 
 We deliberately lead with metrics that are standard in the ambiguous-QA and
@@ -721,10 +700,7 @@ all-instances variant, which would award its maximum to a confident
 DisE$^+$ is a diagnostic of clarification efficiency, never the ranking metric.
 
 
-%% ============================================================
-\section{Experiments}
-\label{sec:exp}
-%% ============================================================
+\subsection{Overall Performance}
 
 The analyses are organized around the three research questions. We first quantify
 the single-gold illusion that motivates the benchmark (\S\ref{sec:illusion},
@@ -767,6 +743,7 @@ $+2/+1/-3$ conversions on their $48/26/62$ asks), so they reflect answer varianc
 rather than a benefit from interaction (open-model caveat, \S\ref{sec:mechanistic}).}
 \label{tab:main}
 \small
+\resizebox{0.9\textwidth}{!}{%
 \begin{tabular}{lccccccc}
 \toprule
 & \multicolumn{2}{c}{Acc (\%)} &
@@ -789,7 +766,7 @@ Axis-Aware ReAct$^{\ddagger}$ & -- & -- & 46.0 & 100 & -- & .24 \\
 \midrule
 Human (50-inst) & -- & -- & \textbf{30.0} & 100 & \textbf{.68}$^{\dagger}$ & -- \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table*}
 
 \begin{table}[t]
@@ -808,6 +785,7 @@ Two Grok +Search instances returned transient API errors and are scored incorrec
 so its +Search accuracy is a lower bound.}
 \label{tab:crossvendor}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lccccc}
 \toprule
 & \multicolumn{2}{c}{Acc (\%)} & \multicolumn{3}{c}{+Interact} \\
@@ -822,7 +800,7 @@ GPT-5.6-sol       & 10.0 & 36.0 & 30.0 & $-6$  & .98 \\
 DeepSeek-V4-flash & 12.0 & 28.0 & 24.0 & $-4$  & .96 \\
 Gemini-3.5-flash  & 14.0 & 6.0  & 30.0 & $+24$ & .96 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \subsection{Why Existing Benchmarks Miss This: The Single-Gold Illusion}
@@ -848,6 +826,7 @@ where prior benchmarks operate, models capture the default far more than the
 intended answer; only interaction reverses this.}
 \label{tab:illusion}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{llccc}
 \toprule
 Model & Mode & Intended & Default & $\Delta$ \\
@@ -865,7 +844,7 @@ GPT-5-mini & Answer-only   & 0.6 & 0.0 & $-0.6$ \\
            & Answer+Search & 0.0 & 0.0 & 0.0 \\
            & +Interact     & 0.0 & 0.0 & 0.0 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \textbf{Finding 0: A single-gold convention over-states competence by up to
@@ -910,6 +889,7 @@ producing a valid but non-target reading. \emph{Ask}: fraction that asks when
 permitted. gpt-5-mini interact omitted (it asks ${<}1\%$).}
 \label{tab:general}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{llcccc}
 \toprule
 Model & Mode & Intended & Any-valid & Def.-cap & Ask \\
@@ -928,7 +908,7 @@ Model & Mode & Intended & Any-valid & Def.-cap & Ask \\
  & Answer-only & 36.0 & 77.0 & 62.5 & 0 \\
  & Oracle      & 62.0 & 73.5 & 27.5 & 0 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \textbf{Finding 0b: the single-gold illusion is domain-general.} Running the
@@ -1075,6 +1055,7 @@ to missing knowledge or grounding. ($^\dagger$GPT-5 forced capped at $n{=}65$.
 Open-MoE interact accuracy is now measured over the full retrieval corpus.)}
 \label{tab:ceiling}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
 Model & Answer-only & Interact & Forced(4) & \textbf{Oracle ceiling} \\
@@ -1085,7 +1066,7 @@ GPT-5-mini & 0.6 & 0.0  & 0.6 & \textbf{95.4} \\
 Qwen3-30B-A3B   & 1.2 & 11.6 & -- & \textbf{90.2} \\
 Qwen3.5-35B-A3B & 0.6 & 28.9 & -- & \textbf{91.9} \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \begin{figure}[t]
@@ -1179,6 +1160,7 @@ touched almost always but rarely made the \emph{central} concern (central-form A
 $\leq0.16$, see text). The two sparse axes ($n{\le}9$) are preliminary.}
 \label{tab:skills}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lrccccc}
 \toprule
 Axis & $n$ & GPT-5 & GPT-4o & {\footnotesize GPT-5-m} & {\footnotesize Q3-30B} & {\footnotesize Q3.5-35B} \\
@@ -1188,7 +1170,7 @@ metric\_definition  & 63 & .92 & .97 & 1.00 & .96 & .87 \\
 recognition\_policy &  9 & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} \\
 temporal\_scope     &  7 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \begin{figure}[t]
@@ -1215,11 +1197,7 @@ while centering the question elsewhere. Resolution follows the same shape across
 (GPT-5 resolves $57\%$ of temporal but $\leq23\%$ of entity and metric,
 Figure~\ref{fig:axisperf}). The gap is not uniform incompetence
 but missing specific targeting, which is precisely the intervention target
-(\S\ref{sec:grpo}). We also tested whether failures cluster by axis in per-instance behavior
-space (PCA over per-model correct, ask, AxisHit, default) and they do not (k-means ARI
-$\approx0.01$, $p\approx0.15$), a floor effect of the near-zero accuracies, so the axis
-structure lives in the aggregate targeting profile rather than in coarse per-instance
-behavior.
+(\S\ref{sec:grpo}).
 
 \begin{figure}[t]
 \centering
@@ -1261,6 +1239,7 @@ stays $0$ at every scale, including the same 32B that targets entity well. Recog
 underpowered ($n{\le}9$ asked-on) but flat throughout.}
 \label{tab:scaledissoc}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lccc}
 \toprule
 Axis & 4B & 14B & 32B \\
@@ -1269,7 +1248,7 @@ entity\_scope       & .00 & .00 & \textbf{.68} \\
 metric\_definition  & .05 & .00 & .17 \\
 recognition\_policy & \textbf{.00} & \textbf{.00} & \textbf{.00} \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \textbf{Finding 11: the axes are different \emph{kinds} of skill, some
@@ -1405,10 +1384,8 @@ problem on an available signal, and motivates the axis-conditioned interventions
 \S\ref{sec:error}, which target exactly that signal.
 
 
-%% ============================================================
-\section{Diagnosis and Intervention: Acting on the Ambiguity Axis}
+\subsection{Diagnosis and Intervention: Acting on the Ambiguity Axis}
 \label{sec:error}
-%% ============================================================
 
 Our results converge on a single diagnosis. The benchmark localizes the
 bottleneck to \emph{eliciting} the disambiguation: agents answer $93$--$95\%$
@@ -1417,13 +1394,13 @@ correctly once the intended interpretation is supplied
 mechanistic probe shows why, open models \emph{linearly represent} the ambiguity
 \emph{axis} yet do not act on it (\S\ref{sec:mechanistic}). The remaining gap is
 thus an \emph{action} problem on an already-available signal, and the
-\emph{axis} is its natural unit. This section turns that diagnosis into
+\emph{axis} is its natural unit. We now turn that diagnosis into
 intervention: we first catalog how acting fails (a seven-type error taxonomy),
 then present two interventions that share one idea, \textbf{condition on the
 axis}, instantiated at inference time (Axis-Aware ReAct, \S\ref{sec:axisreact})
 and at training time (axis-guided SFT/GRPO, \S\ref{sec:grpo}).
 
-\subsection{Error Taxonomy}
+\subsubsection{Error Taxonomy}
 
 Beyond aggregate accuracy, we characterize model failures using a
 seven-type error taxonomy (Table~\ref{tab:errors}) derived from
@@ -1435,6 +1412,7 @@ Each type is diagnosable from existing metrics without additional annotation.
 \caption{Error taxonomy E1--E7 with diagnostic signals and improvement directions.}
 \label{tab:errors}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{p{0.8cm}p{3.2cm}p{3.5cm}}
 \toprule
 Type & Description & Improvement direction \\
@@ -1454,10 +1432,10 @@ E6 & \textbf{Evidence grounding}: template-oracle correct, agent wrong
 E7 & \textbf{Over-interaction}: correct but low DisE$^+$
    & Penalize via DisE$^+$/AxisHit efficiency signal \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
-\subsection{Diagnostic Mapping from Evaluation Signals}
+\subsubsection{Diagnostic Mapping from Evaluation Signals}
 
 The existing evaluation metrics map directly onto error types, enabling
 failure attribution without additional annotation:
@@ -1496,7 +1474,7 @@ deciding whether or what to ask. Qwen3.5-35B-A3B is the informative exception, a
 toward under-asking rather than misintegration. This corroborates Findings~4 and~9 across
 the full error budget and motivates the state-gated answering of \S\ref{sec:axisreact}.
 
-\subsection{Inference-Time Intervention: Axis-Aware Clarification ReAct}
+\subsubsection{Inference-Time Intervention: Axis-Aware Clarification ReAct}
 \label{sec:axisreact}
 
 The first intervention conditions on the axis \emph{without changing the model
@@ -1547,7 +1525,7 @@ accuracy and calibration gains are the load-bearing result. We report this as a 
 than a full-panel row because it is a single backbone at $N{=}50$, and we expect the effect
 size to tighten at full scale.
 
-\subsection{Training-Time Intervention: Axis-Guided SFT and GRPO}
+\subsubsection{Training-Time Intervention: Axis-Guided SFT and GRPO}
 \label{sec:grpo}
 
 The per-axis skill analysis (\S\ref{sec:skills}) gives this intervention a precise
@@ -1581,6 +1559,7 @@ interaction are leak-proof signals of learned clarification; accuracy ($^{*}$) i
 partly leaked by oracle retrieval and should not be read as a learning signal.}
 \label{tab:grpo}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
 Stage & AxisHit@1 & Interaction & Accuracy$^{*}$ & Reward \\
@@ -1590,7 +1569,7 @@ Base (Qwen3-4B)          & 25.0 & 54.9 & 84.3 & 0.96 \\
 \;\;+\,KTO               & \textbf{70.6} & \textbf{100} & 84.3 & 1.27 \\
 \;\;+\,GRPO              & 66.7 & \textbf{100} & 88.2 & \textbf{1.30} \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \textbf{SFT does the heavy lifting.} The leak-proof signals jump almost entirely
@@ -1627,7 +1606,7 @@ together over training.}
 \label{fig:grpo}
 \end{figure}
 
-\subsection{When Can the Benchmark Refresh Itself? Three Co-Evolution Probes}
+\subsubsection{When Can the Benchmark Refresh Itself? Three Co-Evolution Probes}
 \label{sec:coevolve}
 
 A benchmark that models eventually memorize stops measuring. Because \fininteract
@@ -1650,6 +1629,7 @@ closes on both \emph{abundant} axes and fails only on the \emph{scarce} one; whe
 asking \emph{helps accuracy} flips on whether the base could already answer.}
 \label{tab:coevolve}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lccc}
 \toprule
  & \texttt{entity} & \texttt{metric} & \texttt{recognition} \\
@@ -1661,7 +1641,7 @@ Targeting, base $\to$ evolved        & $.00\to\textbf{.68}$ & $.00\to\textbf{.58
 Interaction rate                     & $40\to100$ & $50\to100$ & $67\to100$ \\
 De-leaked accuracy                   & $32.5\to22.5$ & $15\to\textbf{60}$ & $11\to11$ \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 All three rounds run end-to-end: the Constructor$\to$Verifier pipeline yields hard
@@ -1713,7 +1693,7 @@ metric gap traces to the base's uncertainty signal under-asking where metric nee
 question, so a confidence-calibrated gate that asks when the silent answer would be
 \emph{wrong} rather than when the base is merely unsure is the concrete next lever.
 
-\subsection{What Gates Co-Evolvability? A Falsification Test}
+\subsubsection{What Gates Co-Evolvability? A Falsification Test}
 \label{sec:learnability}
 
 The three rounds let us isolate \emph{which} axis property predicts whether the loop
@@ -1757,6 +1737,7 @@ $^\ddagger$recognition is \emph{unreliable} rather than a clean fail: held-out h
 AxisHit ranges $0$--$0.44$ across training runs on the scarce $n{=}9$ probe.}
 \label{tab:learnability}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lrrccc}
 \toprule
 Axis & Primary & Salience & Slope & Decode & Co-evolve \\
@@ -1767,7 +1748,7 @@ temporal\_scope     & 150 & 0.15 & sat.    & 0.92 & solved \\
 filing\_vintage     & 264 & 0.33 & --      & --   & untestable \\
 recognition\_policy &  30 & \textbf{0.04} & $+0.00$ & \textbf{0.93} & weak$^{\ddagger}$ \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \textbf{Finding 13: co-evolvability is gated by source \emph{abundance}, driven by
@@ -1891,6 +1872,7 @@ domain.
 \checkmark = supported; -- = not applicable or not evaluated.}
 \label{tab:comparison}
 \small
+\resizebox{0.9\textwidth}{!}{%
 \begin{tabular}{lccccccc}
 \toprule
 Benchmark & Scale & Ambiguity & Interaction & Multi-turn & Bilingual
@@ -1918,7 +1900,7 @@ FinEval~\citep{guo2023fineval}
 \fininteract (ours)
   & 173 & \checkmark & \checkmark & \checkmark & EN+ZH & LLM+human & EDGAR+CNINFO \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table*}
 
 \paragraph{Ambiguous QA.}
@@ -2056,6 +2038,7 @@ is one GPT-5 constructor call plus ten verifier trials (five GPT-5, five
 GPT-5-mini) with GPT-4o-mini grading.}
 \label{tab:cost}
 \small
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lr}
 \toprule
 Quantity & Value \\
@@ -2069,7 +2052,7 @@ Cost per viable passage (full pipeline)         & \$0.155 \\
 Blended cost per candidate passage              & \$0.035 \\
 \textbf{Cost per accepted instance}             & \textbf{\$0.31} \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \paragraph{Projected cost to scale.} At the measured blended rate, producing $N$
@@ -2083,6 +2066,42 @@ candidate passages that contain structured, verifiable ambiguity. This favors
 brute-force compute, and explains why the rare axes (e.g.\ filing\_vintage),
 whose candidate passages almost never survive the constructor, are the expensive
 ones to grow.
+
+%% ============================================================
+\section{Construction Quality-Control Rules}
+\label{app:qc}
+%% ============================================================
+
+The pre-verifier applies fourteen automated code-level rules before any API call (Table~\ref{tab:qc}), rejecting a candidate the moment any rule fails.
+
+\begin{table}[h]
+\centering
+\caption{Pre-verifier sanity checks (14 rules).}
+\label{tab:qc}
+\small
+\resizebox{0.9\columnwidth}{!}{%
+\begin{tabular}{cl}
+\toprule
+Rule & Description \\
+\midrule
+R1  & $Q$ must not be answerable yes/no \\
+R2  & $Q$ must not contain disambiguating terms or inline dates \\
+R3  & $A$ taken verbatim from the source candidate value (not invented) \\
+R4  & $Q$ must name the company \\
+R5  & $Q$ must ask about a substantive financial metric \\
+R6  & Answer type consistent with question type \\
+R7  & Context $C$ must not contain the answer value \\
+R8  & Intended and default interpretations must differ \\
+R9  & All axis labels must be valid vocabulary items \\
+R10 & Answer must be non-trivial (not empty or ``0'') \\
+R11 & \texttt{default\_answer} present and differs from \texttt{answer} \\
+R12 & Both evidence spans non-empty \\
+R13 & Evidence spans must be meaningfully distinct ($\leq$85\% overlap) \\
+R14 & Intended and default \emph{answers} differ beyond grader tolerance \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
 
 %% ============================================================
 \section{Reproducibility}
