@@ -655,6 +655,13 @@ To test robustness, we evaluate under three simulator variants:
 \textbf{Oracle} (deterministic keyword matching against $\mathcal{I}_\text{int}$), and
 \textbf{Noisy} (15\% random answer corruption).
 
+\textbf{On prompting strategy.} Because \fininteract evaluates interactive agents, the
+strategy axis we vary is the \emph{interaction protocol} (answer-only, +search,
++interact, and the axis-conditioned policies of \S\ref{sec:error}) rather than the
+prompt format. All models run under the same fixed ReAct system prompt, so classic
+prompt-format ablations such as few-shot or chain-of-thought prompting are orthogonal
+to the interaction capability this benchmark is built to isolate.
+
 \subsection{Models}
 
 We evaluate three OpenAI models (GPT-5, GPT-4o, GPT-5-mini) and a Qwen open-weight
@@ -1123,7 +1130,8 @@ model's per-axis \texttt{+interact} competence into three components:
 \textbf{Resolution} (accuracy, does asking yield the intended answer?). A model
 ``has'' an axis skill only when all three are high; a low value localizes the
 failure to not-asking, asking-wrong, or asking-right-but-still-wrong.
-Table~\ref{tab:skills} reports Targeting, the decisive component.
+Table~\ref{tab:skills} reports Targeting, the decisive component, and
+Figure~\ref{fig:radar} shows the same profile as a capability radar.
 
 \begin{table}[t]
 \centering
@@ -1145,6 +1153,16 @@ temporal\_scope     &  7 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.72\linewidth]{fig_radar.png}
+\caption{\textbf{Per-axis clarification-capability profile} (touch AxisHit@1 from
+Table~\ref{tab:skills}). Every model saturates entity, metric, and temporal targeting
+but collapses to zero on \texttt{recognition\_policy}, a blind spot shared across the
+closed frontier and the strongest open model.}
+\label{fig:radar}
+\end{figure}
 
 \textbf{Finding 9: Ambiguity clarification is a per-axis skill with a sharp touch
 versus central-targeting dissociation.} Under the corrected classifier the pattern is
