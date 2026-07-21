@@ -184,6 +184,20 @@ We hypothesize that this stagnation is more severe in finance, where
 a model that does not know what ``non-GAAP'' means cannot recognize that
 ``adjusted net income'' is under-specified.
 
+\paragraph{Design Considerations.}
+Measuring the single-gold illusion cleanly demands more than a set of hard questions.
+A benchmark that exposes it must satisfy four requirements. It must draw
+\emph{representative} ambiguity from real filings rather than synthetic templates, so
+the phenomenon it measures is the one models face in deployment. It must support
+\emph{fine-grained} diagnosis, pairing every instance with a default and an intended
+reading and labeling its ambiguity axis, so evaluation localizes \emph{which}
+clarification ability fails rather than returning one aggregate score. It must be
+\emph{low-cost and leak-safe} to construct, keeping the answer out of the
+disambiguating context so that retrieval alone cannot resolve the question. And it
+must be \emph{high-quality and verifiable}, with programmatically checkable ground
+truth and automatic judges validated against human annotators. These four goals,
+developed in \S\ref{sec:task}, shape the design choices that follow.
+
 \paragraph{Our Proposal.}
 We operationalize the single-gold illusion and measure its consequences. We
 release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances
