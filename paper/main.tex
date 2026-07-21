@@ -1211,14 +1211,39 @@ $=1.0$). Entity and metric occupy a revealing middle. Models almost always \emph
 (touch AxisHit@1 $0.85$--$1.0$) yet rarely make them the \emph{central} point of the question
 (central AxisHit@1 $\leq0.16$), defaulting instead to period confirmation. For these two axes
 the failure is not neglect but imprecision, the model names the entity or metric in passing
-while centering the question elsewhere. Resolution follows the same shape (GPT-5 resolves
-$57\%$ of temporal but $\leq23\%$ of entity and metric). The gap is not uniform incompetence
+while centering the question elsewhere. Resolution follows the same shape across all five models
+(GPT-5 resolves $57\%$ of temporal but $\leq23\%$ of entity and metric,
+Figure~\ref{fig:axisperf}). The gap is not uniform incompetence
 but missing specific targeting, which is precisely the intervention target
 (\S\ref{sec:grpo}). We also tested whether failures cluster by axis in per-instance behavior
 space (PCA over per-model correct, ask, AxisHit, default) and they do not (k-means ARI
 $\approx0.01$, $p\approx0.15$), a floor effect of the near-zero accuracies, so the axis
 structure lives in the aggregate targeting profile rather than in coarse per-instance
 behavior.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_axisperf.png}
+\caption{\textbf{Per-model, per-axis performance.} \emph{(a)}~Targeting (AxisHit@1
+touch, Table~\ref{tab:skills}) versus \emph{(b)}~Resolution (\texttt{+interact}
+accuracy) for every model and ambiguity axis. Cells are shaded by value and annotated.
+\texttt{filing\_vintage} has no corpus instances ($n{=}0$), and the two sparse axes carry
+their $n$. Models target entity, metric, and temporal almost perfectly yet resolve them
+poorly, and the resolution ranking reorders across axes.}
+\label{fig:axisperf}
+\end{figure}
+
+\textbf{Per-model, per-axis case analysis.} Placing targeting and resolution side by
+side for every model and axis (Figure~\ref{fig:axisperf}) surfaces two patterns.
+First, resolution does \emph{not} track targeting: GPT-4o and GPT-5-mini touch the
+correct axis on entity and metric almost as often as any model (AxisHit $0.94$--$1.0$)
+yet resolve those axes at $0$--$5\%$, so a high AxisHit is no guarantee of a correct
+answer. Second, the model ranking \emph{reorders} across axes. Qwen3.5-35B-A3B leads on
+the two abundant axes (entity $40\%$, metric $32\%$), GPT-5 leads on temporal ($57\%$),
+and every model floors on recognition, whose targeting is $0$ and whose resolution sits
+at chance on the nine available instances. \texttt{filing\_vintage} is untestable
+($n{=}0$). A single aggregate interaction score therefore conceals which axis a given
+model can actually resolve, which is the case for per-axis reporting.
 
 \begin{table}[t]
 \centering
