@@ -149,7 +149,9 @@ aggregate multiple financial tasks but treat QA as closed-book or
 retrieval-augmented reading comprehension.
 None of these benchmarks ask whether a model \emph{recognizes} that a
 question is ambiguous, nor whether it can \emph{resolve} that ambiguity
-through strategic interaction with a user.
+through strategic interaction with a user. Table~\ref{tab:comparison}
+summarizes how \fininteract differs from these benchmarks along ambiguity
+pairing, interaction, per-axis diagnosis, and verifiable ground truth.
 
 \paragraph{The Ambiguous-QA Gap in Finance.}
 The ambiguous-QA literature has matured in the general domain:
@@ -233,7 +235,9 @@ time and through training, measurably improve resolution?
   \item \textbf{\fininteract, the instrument.} A bilingual benchmark of 173
     verifiable, ambiguity-paired instances with a five-axis taxonomy, construction
     pipeline, and evaluation harness that make the above measurable and
-    reproducible (\S\ref{sec:construction}).
+    reproducible (\S\ref{sec:construction}). The benchmark and all construction,
+    evaluation, and training code are released for reproducible follow-on work at
+    \url{https://anonymous.4open.science/r/FinInteract}.% TODO: replace with the live anonymized repository URL before submission
 \end{enumerate}
 
 
@@ -676,6 +680,15 @@ DisE$^+$ is a diagnostic of clarification efficiency, never the ranking metric.
 \section{Experiments}
 \label{sec:exp}
 %% ============================================================
+
+The analyses are organized around the three research questions. We first quantify
+the single-gold illusion that motivates the benchmark (\S\ref{sec:illusion},
+\S\ref{sec:general}), then take up \textbf{RQ1} (detection and resolution) in the
+main findings and the per-axis skill decomposition (\S\ref{sec:skills}),
+\textbf{RQ2} (where the bottleneck lies) in the latent-capacity ceiling and oracle
+controls (\S\ref{sec:ceiling}), and \textbf{RQ3} (intervention) in the diagnosis and
+intervention section (\S\ref{sec:error}). Qualitative case studies
+(\S\ref{sec:casestudies}) make the per-axis failure modes concrete.
 
 \begin{table*}[t]
 \centering
@@ -1147,6 +1160,43 @@ already present, but the precision to center the question on the right axis. The
 confirms the taxonomy carves genuine capability boundaries rather than arbitrary strata, and
 it pinpoints recognition basis as the axis a targeted intervention must address
 (\S\ref{sec:coevolve}).
+
+\subsection{Qualitative Case Studies}
+\label{sec:casestudies}
+
+Three instances make the failure modes concrete, one for each axis where the pattern
+is sharpest. Every case pairs a natural analyst question with two defensible readings
+whose ground truth is exact and machine-verifiable.
+
+\textbf{Entity scope (resolvable, yet over-elicited).} \emph{``What was Meta
+Platforms' operating income?''} is \$46.75B for the total consolidated company and
+\$62.87B for the Family of Apps segment, a $34\%$ gap on the same GAAP metric and
+fiscal year. A search-only agent retrieves a passage containing both figures and
+commits to one, and single-gold grading credits it whenever that figure happens to
+match the key. This is the axis models handle best, and the base policy often
+resolves it directly (\S\ref{sec:coevolve}), which is precisely why forcing a
+clarifying question on entity scope can \emph{lower} accuracy rather than raise it.
+
+\textbf{Recognition policy (the blind spot).} \emph{``What were Tesla's revenues?''}
+is \$97.69B under GAAP accrual revenue recognized on the income statement, but only
+\$14.92B under a cash-basis proxy taken from operating cash flows, a $6.5\times$
+difference driven entirely by the recognition basis. This is the axis models almost
+never surface: instead of asking which recognition basis is meant, the typical
+clarification reverts to the more salient period or entity question
+(\S\ref{sec:skills}), so the $6.5\times$ ambiguity is never raised and the default is
+reported as fact. The axis is represented in the network yet not acted on
+(\S\ref{sec:mechanistic}).
+
+\textbf{Metric definition (clarification supplies the answer).} \emph{``What was
+Workday's operating income growth rate?''} is $126.8\%$ on a GAAP basis and $26\%$ on
+a non-GAAP basis for the same year-over-year comparison. Here the base model cannot
+answer correctly without knowing which definition is intended, so a single on-axis
+question converts a wrong answer into a right one, the mechanism behind the $+45$
+point training-time gain on this axis (\S\ref{sec:coevolve}).
+
+Together the three cases trace the arc of the paper: an axis that is resolvable but
+over-elicited (entity), an axis that is represented yet never acted on (recognition),
+and an axis where eliciting the definition is the whole battle (metric).
 
 \subsection{Mechanistic Case Study: Where Ambiguity Lives in the Network}
 \label{sec:mechanistic}
