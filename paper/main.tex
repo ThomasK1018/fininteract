@@ -185,18 +185,17 @@ untargeted counterparts, so the benchmark is not only diagnostic but actionable
 
 \noindent\textbf{Contributions.}
 \begin{enumerate}[leftmargin=*,itemsep=1pt]
-  \item \textbf{The single-gold illusion}, a measurement-validity failure we identify and
-    quantify: single-gold grading overstates competence by up to $3\times$ on ambiguous
-    financial queries (\S\ref{sec:illusion}).
-  \item \textbf{\fininteract}, a bilingual benchmark of 173 verifiable, ambiguity-paired
-    instances across a five-axis taxonomy, with a per-axis AxisHit skill metric that
-    localizes \emph{which} clarification ability a model lacks (\S\ref{sec:task},
-    \S\ref{sec:construction}).
-  \item \textbf{Axis-conditioned interventions} at inference and training time that raise
-    resolution over untargeted counterparts, showing the benchmark is actionable
-    (Appendix~\ref{app:findings}).
-  \item \textbf{An open release} of the benchmark and all construction, evaluation, and
-    training code at \url{https://anonymous.4open.science/r/FinInteract}.% TODO: replace with the live anonymized repository URL before submission
+  \item \textbf{A five-category formulation of financial ambiguity.} We formalize the ways a
+    financial question can be under-specified into five categories, entity scope, metric
+    definition, temporal scope, filing vintage, and recognition policy (\S\ref{sec:task}).
+  \item \textbf{\fininteract, a fine-grained financial ambiguity benchmark.} We build a
+    bilingual benchmark of 173 instances extracted directly from source filings, each paired
+    with a default and an intended interpretation and a per-axis label, verified by an
+    adversarial constructor and careful human annotation. The benchmark and all code are
+    released at \url{https://anonymous.4open.science/r/FinInteract} (\S\ref{sec:methodology}).% TODO: replace with the live anonymized repository URL before submission
+  \item \textbf{A broad empirical study.} We evaluate a range of proprietary and open-source
+    models and localize where they fail, most sharply an elicitation bottleneck and a
+    recognition-policy blind spot that no current model resolves (\S\ref{sec:exp}).
 \end{enumerate}
 
 
