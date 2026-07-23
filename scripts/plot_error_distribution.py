@@ -6,7 +6,7 @@ consistent with the AxisHit@1 reported elsewhere:
 
   Correct            answer matches the intended interpretation
   E1 blindness       wrong, and the agent never asked (n_asks == 0)
-  E2 wrong-axis      wrong, asked, first question targets no true axis
+  E2 wrong-category      wrong, asked, first question targets no true category
   E3 generic         wrong, asked, first question is generic (no axis)
   E5 misintegration  wrong, asked, first question touches a true axis (right ask, wrong answer)
 
@@ -27,8 +27,8 @@ import matplotlib.pyplot as plt
 MODELS = ["gpt-5", "gpt-4o", "gpt-5-mini", "qwen3-30b-a3b", "qwen3p5-35b-a3b"]
 LABEL = {"gpt-5": "GPT-5", "gpt-4o": "GPT-4o", "gpt-5-mini": "GPT-5-mini",
          "qwen3-30b-a3b": "Qwen3-30B", "qwen3p5-35b-a3b": "Qwen3.5-35B"}
-CATS = ["Correct", "E1 blindness", "E2 wrong-axis", "E3 generic", "E5 misintegration"]
-CCOL = {"Correct": "#2a9d8f", "E1 blindness": "#264653", "E2 wrong-axis": "#e76f51",
+CATS = ["Correct", "E1 blindness", "E2 wrong-category", "E3 generic", "E5 misintegration"]
+CCOL = {"Correct": "#2a9d8f", "E1 blindness": "#264653", "E2 wrong-category": "#e76f51",
         "E3 generic": "#f4a261", "E5 misintegration": "#8a5a83"}
 AXSET = {"temporal_scope", "metric_definition", "entity_scope", "filing_vintage", "recognition_policy"}
 
@@ -82,7 +82,7 @@ def main(a):
         elif preds & true:
             dist[m]["E5 misintegration"] += 1
         else:
-            dist[m]["E2 wrong-axis"] += 1
+            dist[m]["E2 wrong-category"] += 1
 
     # normalize + save
     out = {}

@@ -44,7 +44,7 @@ def main(a):
     ax1.set_xticklabels(labels, fontsize=8.5)
     ax1.set_ylabel("Instances")
     ax1.set_ylim(0, max(counts) * 1.28)
-    ax1.set_title("(a) Primary ambiguity axis", fontsize=11)
+    ax1.set_title("(a) Primary ambiguity category", fontsize=11)
 
     # (b) H0 distribution
     xs = sorted(h0c)

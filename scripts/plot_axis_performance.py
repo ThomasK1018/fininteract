@@ -1,7 +1,7 @@
 """Per-axis performance matrix (paper/fig_axisperf.png).
 
 Two heatmaps over model x ambiguity-axis:
-  (a) Targeting  = AxisHit@1 (touch form).
+  (a) Targeting  = CategoryHit@1 (touch form).
   (b) Resolution = +interact accuracy.
 
 Two model blocks, separated in the figure:
@@ -32,7 +32,7 @@ CV = ["anthropic/claude-sonnet-5", "google/gemini-3.5-flash", "x-ai/grok-4.5",
 CV_L = ["Claude-Sonnet-5", "Gemini-3.5", "Grok-4.5", "DeepSeek-V4", "GLM-5.2", "Kimi-K3", "GPT-5.6"]
 MODELS = FULL + CV
 MLABEL = FULL_L + CV_L
-# full-scale targeting (touch AxisHit@1) from Table tab:skills
+# full-scale targeting (touch CategoryHit@1) from Table tab:skills
 TARGET_FULL = {
     "entity_scope":       [0.89, 1.00, 0.99, 0.93, 0.85],
     "metric_definition":  [0.92, 0.97, 1.00, 0.96, 0.87],
@@ -126,7 +126,7 @@ def main(a):
         print(f"  {ax_:20s}", ["--" if v is None else f"{v:.0f}" for v in res[ax_]])
 
     fig, (axL, axR) = plt.subplots(1, 2, figsize=(9.6, 4.3))
-    draw(axL, tgt, "(a) Targeting: AxisHit@1 (touch)", 1.0, lambda v: f"{v:.2f}")
+    draw(axL, tgt, "(a) Targeting: CategoryHit@1 (touch)", 1.0, lambda v: f"{v:.2f}")
     draw(axR, res, "(b) Resolution: +interact accuracy", 100.0, lambda v: f"{v:.0f}")
     axR.set_yticklabels([])
     fig.text(0.5, 0.965, "Full scale (n=173, top)   |   Proprietary pilot (n=50, bottom)",

@@ -48,13 +48,13 @@ benchmarks attach one gold answer per question and cannot tell an agent that res
 ambiguity from one that guesses the common reading, a blind spot we call the
 \emph{single-gold illusion}. We release \fininteract, a bilingual (English/Chinese)
 benchmark of 173 instances that pairs each question with a \emph{default} and an
-\emph{intended} interpretation (fixed by a disambiguating context) across a five-axis
+\emph{intended} interpretation (fixed by a disambiguating context) across a five-category
 ambiguity taxonomy, and grades whether an agent elicits the right clarification.
 Re-grading the \emph{same} outputs against the intended rather than the default
 interpretation cuts apparent accuracy by up to $3\times$. The failure is elicitation, not
 knowledge: given the resolved interpretation models answer $93$--$95\%$ correctly, yet the
 best model resolves only $20\%$ under free interaction, and \emph{adding} clarification
-lowers accuracy below plain search for all but the strongest model. A per-axis skill
+lowers accuracy below plain search for all but the strongest model. A per-category skill
 metric localizes \emph{which} clarification ability fails and reveals recognition basis as
 a blind spot no current model targets.
 \end{abstract}
@@ -98,7 +98,7 @@ programmatically verifiable against SEC XBRL facts.
 \textbf{(1)}~A real analyst query (``What was Meta Platforms' operating income?'') looks
 fully specified, but neglects that companies report differently across entities, metrics,
 periods, filings, and accounting policies. \textbf{(2)}~The query hides ambiguity along five
-axes (entity scope, metric definition, temporal scope, filing vintage, recognition policy),
+categories (entity scope, metric definition, temporal scope, filing vintage, recognition policy),
 here yielding two defensible answers, a default reading of \$62.87B (Family of Apps segment)
 and the intended \$46.75B (consolidated GAAP), both plausible without clarification.
 \textbf{(3)}~A search-only agent retrieves evidence and returns the plausible default, which
@@ -133,7 +133,7 @@ $A$ (intended) &
 $A_d$ (default) &
   \$62.87B \emph{[Family of Apps segment]} \\
 \midrule
-Ambiguity axis & Entity scope \\
+Ambiguity category & Entity scope \\
 $H_0$ & 1.58 bits \\
 \midrule
 Intended span &
@@ -149,13 +149,13 @@ We organize the study around three questions.
 \textbf{RQ1 (Detection and resolution).} Do frontier models recognize financial-report
 ambiguity, and does interactive clarification improve resolution over autonomous search?
 \textbf{RQ2 (Where the bottleneck lies).} Is the binding constraint knowing \emph{when}
-and on \emph{which} axis to ask (elicitation) rather than access to evidence (grounding)?
-\textbf{RQ3 (Intervention).} Can targeted interventions on the ambiguity axis, at inference
+and on \emph{which} category to ask (elicitation) rather than access to evidence (grounding)?
+\textbf{RQ3 (Intervention).} Can targeted interventions on the ambiguity category, at inference
 time and through training, measurably improve resolution?
 
 \paragraph{Design considerations.}
 A benchmark that answers these questions must draw \emph{representative} ambiguity from real
-filings, support \emph{fine-grained} per-axis diagnosis through paired default and intended
+filings, support \emph{fine-grained} per-category diagnosis through paired default and intended
 readings, admit \emph{low-cost, leak-safe} construction that keeps the answer out of the
 disambiguating context, and provide \emph{verifiable}, human-validated ground truth
 (\S\ref{sec:task}).
@@ -164,9 +164,9 @@ disambiguating context, and provide \emph{verifiable}, human-validated ground tr
 We release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances
 (53 English / 120 Chinese). Each question $Q$ is paired with a \emph{default}
 interpretation (the reading a non-expert assumes) and an \emph{intended}
-interpretation fixed by a disambiguating context $C$, across a five-axis taxonomy
+interpretation fixed by a disambiguating context $C$, across a five-category taxonomy
 of financial ambiguity. Grading the \emph{same} model outputs against the default
-versus the intended interpretation exposes the illusion directly, and a per-axis
+versus the intended interpretation exposes the illusion directly, and a per-category
 skill metric then localizes \emph{which} clarification ability a model lacks.
 We evaluate agents under a ReAct protocol where a user simulator answers only from
 the disambiguating context, so the benchmark measures whether an agent elicits the
@@ -174,13 +174,13 @@ clarification it needs rather than whether it can be handed the answer.
 
 \paragraph{Findings.}
 Our study answers the three questions. \textbf{(RQ1)} Frontier models detect ambiguity but
-rarely resolve it, asking about the correct axis almost always yet converting the
-clarification into the right answer only occasionally, and the recognition-basis axis is a
+rarely resolve it, asking about the correct category almost always yet converting the
+clarification into the right answer only occasionally, and the recognition-basis category is a
 blind spot no current model targets (\S\ref{sec:skills}). \textbf{(RQ2)} The bottleneck is
 elicitation, not knowledge: given the resolved interpretation models answer $93$--$95\%$
 correctly, yet the best resolves only $20\%$ under free interaction and adding clarification
 lowers accuracy for all but the strongest model (\S\ref{sec:ceiling}). \textbf{(RQ3)}
-Axis-conditioned interventions at inference and in training raise resolution over their
+Category-conditioned interventions at inference and in training raise resolution over their
 untargeted counterparts, so the benchmark is not only diagnostic but actionable
 (Appendix~\ref{app:findings}).
 
@@ -191,7 +191,7 @@ untargeted counterparts, so the benchmark is not only diagnostic but actionable
     definition, temporal scope, filing vintage, and recognition policy (\S\ref{sec:task}).
   \item \textbf{\fininteract, a fine-grained financial ambiguity benchmark.} We build a
     bilingual benchmark of 173 instances extracted directly from source filings, each paired
-    with a default and an intended interpretation and a per-axis label, verified by an
+    with a default and an intended interpretation and a per-category label, verified by an
     adversarial constructor and careful human annotation. The benchmark and all code are
     released at \url{https://anonymous.4open.science/r/FinInteract} (\S\ref{sec:methodology}).% TODO: replace with the live anonymized repository URL before submission
   \item \textbf{A broad empirical study.} We evaluate a range of proprietary and open-source
@@ -231,9 +231,9 @@ target-distractor design to the financial domain.
 
 \textbf{Design goals.} \fininteract targets four goals.
 \textbf{(G1) Representative coverage.} Real ambiguity drawn from public filings across a
-five-axis taxonomy and two languages, so the benchmark reflects how the ambiguity actually
+five-category taxonomy and two languages, so the benchmark reflects how the ambiguity actually
 arises rather than a synthetic proxy.
-\textbf{(G2) Fine-grained diagnosis.} Every instance is labeled with its ambiguity axis and
+\textbf{(G2) Fine-grained diagnosis.} Every instance is labeled with its ambiguity category and
 paired with a default and an intended reading, so evaluation localizes \emph{which}
 clarification ability a model lacks instead of reporting one aggregate score.
 \textbf{(G3) Low-cost, leak-safe construction.} A semi-automated three-role pipeline builds
@@ -290,11 +290,11 @@ Mode & Actions & Description \\
 Answer-only & answer & Pure parametric recall \\
 Answer+Search & search, answer & Oracle retrieval augmented \\
 Answer+Search+Interact & search, interact, answer & Standard full interaction \\
-\textbf{Axis-Aware ReAct} & state, search, interact, answer & \textbf{Proposed: axis-conditioned + state-gated} \\
+\textbf{Category-Aware ReAct} & state, search, interact, answer & \textbf{Proposed: category-conditioned + state-gated} \\
 \midrule
 Always-ask & \multicolumn{2}{l}{Must ask $\geq 1$ question before answering} \\
-Axis-oracle & \multicolumn{2}{l}{Told the primary axis, not the value} \\
-Template-oracle & \multicolumn{2}{l}{Fixed human-written question per axis} \\
+Category-oracle & \multicolumn{2}{l}{Told the primary category, not the value} \\
+Template-oracle & \multicolumn{2}{l}{Fixed human-written question per category} \\
 Enumerate & \multicolumn{2}{l}{Lists all interpretations and answers} \\
 \bottomrule
 \end{tabular}}
@@ -309,18 +309,18 @@ Enumerate & \multicolumn{2}{l}{Lists all interpretations and answers} \\
 \subsection{Financial Ambiguity Taxonomy}
 \label{sec:taxonomy}
 
-We define five axes of financial ambiguity, each grounded in standard
+We define five categories of financial ambiguity, each grounded in standard
 accounting and disclosure practice (Table~\ref{tab:axes}).
 
 \begin{table}[h]
 \centering
-\caption{Five-axis financial ambiguity taxonomy.}
+\caption{Five-category financial ambiguity taxonomy.}
 \label{tab:axes}
 \small
 \resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{p{2.0cm}p{5.5cm}}
 \toprule
-Axis & Definition \\
+Category & Definition \\
 \midrule
 \textbf{Temporal scope} &
   Ambiguity over which time period is intended: fiscal year ending
@@ -347,17 +347,17 @@ Axis & Definition \\
 \end{tabular}}
 \end{table}
 
-Each instance exercises one primary axis (mandatory) and optionally one or
-two secondary axes where the passage genuinely supports additional ambiguity.
-Viable structured ambiguity is far more available for some axes than others:
+Each instance exercises one primary category (mandatory) and optionally one or
+two secondary categories where the passage genuinely supports additional ambiguity.
+Viable structured ambiguity is far more available for some categories than others:
 cleanly paired, independently verifiable ambiguity is abundant for entity scope
 and metric definition but rare for the other three in public filings
 (Appendix~\ref{app:cost}). The released corpus reflects this, entity scope
 (54\%) and metric definition (37\%) dominate, with recognition policy (5\%),
 temporal scope (4\%), and filing vintage ($0\%$) sparse. We therefore position
 \fininteract as an \textbf{entity/metric-dominant} financial-ambiguity benchmark
-with exploratory coverage of three sparser axes, confine quantitative per-axis
-claims to the two well-powered axes, and report the sparser axes with their
+with exploratory coverage of three sparser categories, confine quantitative per-category
+claims to the two well-powered categories, and report the sparser categories with their
 sample sizes as preliminary signal.
 
 \paragraph{Disambiguation Entropy.}
@@ -365,8 +365,8 @@ For each instance we compute the prior disambiguation entropy:
 $H_0 = \log_2 k$,
 where $k$ is the number of plausible interpretations before any clarifying
 interaction.
-For a single-axis instance with two interpretations, $H_0 = 1$ bit.
-For a two-axis instance with three and four plausible values respectively,
+For a single-category instance with two interpretations, $H_0 = 1$ bit.
+For a two-category instance with three and four plausible values respectively,
 $H_0 = \log_2(3 \times 4) \approx 3.58$ bits.
 This quantity anchors our supplementary efficiency metric \disep (\S\ref{sec:metrics})
 and serves as a per-instance difficulty proxy.
@@ -390,15 +390,15 @@ calibration, and efficiency metrics. This section covers stages~1--2;
 \caption{\textbf{The \fininteract framework.} \textbf{(1)~Construct:} from SEC/EDGAR
 and A-share annual reports we build instances, each pairing an ambiguous question
 $Q$, disambiguating context $C$, intended answer $A$, and default answer $D$, across
-five financial ambiguity axes (173 bilingual instances). \textbf{(2)~Verify:} a
+five financial ambiguity categories (173 bilingual instances). \textbf{(2)~Verify:} a
 constructor generates $(Q,C,A,D)$; sanity checks, an adversarial verifier (must
 \emph{fail} to answer $Q$ without $C$), and expert validation retain only hard,
 valid, non-trivial instances. \textbf{(3)~Evaluate:} agents run a ReAct loop
 (search/interact/answer) where a user simulator answers only from $C$, under
-answer-only, +search, +interact, and Axis-Aware ReAct modes. \textbf{(4)~Score and
+answer-only, +search, +interact, and Category-Aware ReAct modes. \textbf{(4)~Score and
 diagnose:} accuracy on the intended interpretation is primary; the intended-vs-default
-comparison exposes the single-gold illusion, and interaction-quality (IR, AxisHit@1,
-wrong-axis / generic-ask rates), calibration (ECE), and efficiency ($\text{DisE}^+$)
+comparison exposes the single-gold illusion, and interaction-quality (IR, CategoryHit@1,
+wrong-category / generic-ask rates), calibration (ECE), and efficiency ($\text{DisE}^+$)
 localize the core bottleneck, issuing the correct follow-up clarification.}
 \label{fig:framework}
 \end{figure*}
@@ -435,13 +435,13 @@ timing in Appendix~\ref{app:cost}).
 \paragraph{Step 1: Constructor (GPT-5).}
 A single GPT-5 call generates the full
 $(Q, C, A)$ triple given a filing passage, verified candidate answer, and
-mandatory primary ambiguity axis.
+mandatory primary ambiguity category.
 The output JSON includes \texttt{question}, \texttt{context}, \texttt{answer},
 \texttt{default\_answer}, \texttt{intended\_evidence\_span},
 \texttt{default\_evidence\_span}, \texttt{intended\_interpretation},
 \texttt{default\_interpretation}, and \texttt{axes\_exercised}.
-Axis-specific instructions are injected per primary axis to prevent the
-constructor from drifting toward whichever axis is easiest to generate.
+Category-specific instructions are injected per primary category to prevent the
+constructor from drifting toward whichever category is easiest to generate.
 
 \paragraph{Step 2: Pre-verifier sanity checks ($\sim$instant).}
 Thirteen automated code-level rules are applied without any API calls
@@ -461,14 +461,14 @@ if a model produces the right number while assuming a different interpretation
 
 
 
-\subsection{Axis Diversity Enforcement}
+\subsection{Category Diversity Enforcement}
 
-A naive construction loop over-represents axes common in the passage pool.
-We enforce target axis shares through four mechanisms:
-(1) a priority function with a 3$\times$ penalty on over-quota axes;
+A naive construction loop over-represents categories common in the passage pool.
+We enforce target category shares through four mechanisms:
+(1) a priority function with a 3$\times$ penalty on over-quota categories;
 (2) hard exclusion at 2$\times$ quota;
 (3) rarity-adjusted initial sort (passages sorted by
-$\sum_\text{axes}(\text{target\_share}/\text{pool\_frequency})$); and
+$\sum_\text{categories}(\text{target\_share}/\text{pool\_frequency})$); and
 (4) dynamic re-sort every 10 instances.
 
 \subsection{Human Validation Protocol}
@@ -482,19 +482,19 @@ H3 \emph{Does $C$ uniquely identify the intended interpretation?}
 H4 \emph{Does $C$ avoid directly stating the answer?}
 H5 \emph{Is $A$ correct under the intended interpretation?}
 H6 \emph{Is $A_d$ correct under the default interpretation?}
-H7 \emph{Is the primary axis label correct?}
+H7 \emph{Is the primary category label correct?}
 H8 \emph{What yes/no question would a financial analyst naturally ask to
-resolve the ambiguity?} (free text, used to compute human AxisHit).
+resolve the ambiguity?} (free text, used to compute human CategoryHit).
 Acceptance requires H1--H6 to hold after adjudication by the primary author.
 
-\paragraph{Agreement.} On a stratified 60-instance sample (by language and axis),
+\paragraph{Agreement.} On a stratified 60-instance sample (by language and category),
 per-item raw agreement is $0.82$--$0.97$. Because the labels are heavily skewed
 toward ``yes'' ($>85\%$ per item), Cohen's $\kappa$ is degenerate under the
 Feinstein--Cicchetti prevalence paradox; we therefore report the prevalence-robust
 Gwet's AC1, which is \textbf{$0.85$ on average} (range $0.78$--$0.97$) and
-$1.00$ for the axis label (H7), substantial-to-near-perfect agreement. Only one
+$1.00$ for the category label (H7), substantial-to-near-perfect agreement. Only one
 instance was rejected by \emph{both} annotators on the same item (consensus
-rejection $1.7\%$); adjudication confirmed it as an axis over-reach (a
+rejection $1.7\%$); adjudication confirmed it as a category over-reach (a
 revenue-recognition-timing pairing whose plausible default is the firm's total
 revenue, not a disaggregation component). We quarantine it from the public
 release (\texttt{v1.1}, $N{=}172$); all experiments below are computed on the
@@ -532,12 +532,12 @@ Filing type (10-K / annual report) & 53 / 120 \\
 Unique companies       & 61 \\
 Filing years (2022/23/24/25) & 40 / 53 / 58 / 19 \\
 \midrule
-Primary axis: entity\_scope     & 94 \\
+Primary category: entity\_scope     & 94 \\
 \quad metric\_definition        & 63 \\
 \quad recognition\_policy       & 9 \\
 \quad temporal\_scope           & 7 \\
 \quad filing\_vintage           & 0 \\
-\# axes (single / two)          & 128 / 45 \\
+\# categories (single / two)          & 128 / 45 \\
 \midrule
 $H_0$ (mean / median / range)   & 2.20 / 2.00 / 1.0--3.6 \\
 Mean blind-solve rate (verifier) & 0.7\% \\
@@ -548,12 +548,12 @@ Mean blind-solve rate (verifier) & 0.7\% \\
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{fig_dataset_stats.png}
-\caption{\textbf{\fininteract distributions.} \emph{(a)}~Primary ambiguity axis: the
-corpus is entity/metric-dominant ($54\%$ / $36\%$), with the three subordinate axes
-sparse, mirroring how often each axis is the \emph{primary} ambiguity in public
+\caption{\textbf{\fininteract distributions.} \emph{(a)}~Primary ambiguity category: the
+corpus is entity/metric-dominant ($54\%$ / $36\%$), with the three subordinate categories
+sparse, mirroring how often each category is the \emph{primary} ambiguity in public
 filings (\S\ref{sec:taxonomy}). \emph{(b)}~Difficulty by disambiguation entropy
 $H_0=\log_2 k$: instances span one to $3.58$ bits, most at one or two bits with a
-substantial multi-axis tail at $3.58$ bits (45 instances).}
+substantial multi-category tail at $3.58$ bits (45 instances).}
 \label{fig:datastats}
 \end{figure}
 
@@ -579,8 +579,8 @@ To test robustness, we evaluate under three simulator variants:
 \textbf{Noisy} (15\% random answer corruption).
 
 \textbf{On prompting strategy.} Because \fininteract evaluates interactive agents, the
-strategy axis we vary is the \emph{interaction protocol} (answer-only, +search,
-+interact, and the axis-conditioned policies of \S\ref{sec:error}) rather than the
+strategy category we vary is the \emph{interaction protocol} (answer-only, +search,
++interact, and the category-conditioned policies of \S\ref{sec:error}) rather than the
 prompt format. All models run under the same fixed ReAct system prompt, so classic
 prompt-format ablations such as few-shot or chain-of-thought prompting are orthogonal
 to the interaction capability this benchmark is built to isolate.
@@ -617,13 +617,13 @@ conventional single-gold benchmark would have scored (\S\ref{sec:illusion}).
 
 \textbf{Interaction diagnostics} (secondary, descriptive): \emph{IR}
 (interaction rate, \% of instances with $\geq 1$ ask), \emph{Round} (mean
-turns), and \emph{AxisHit}, for each interact action GPT-4o-mini classifies
-whether the clarifying question targets a true ambiguity axis for that instance;
-we report AxisHit@1, AnyAxisHit, WrongAxisRate, and GenericAskRate. Because
+turns), and \emph{CategoryHit}, for each interact action GPT-4o-mini classifies
+whether the clarifying question targets a true ambiguity category for that instance;
+we report CategoryHit@1, AnyCategoryHit, WrongCategoryRate, and GenericAskRate. Because
 clarifications are often compound (one question can name an entity, a period, and a metric
-at once), we report AxisHit@1 in two forms: a lenient \emph{touch} form (the question names
-any true axis) and a strict \emph{central} form (the single most-central axis is a true
-axis). The touch form is validated against human annotators (\S\ref{sec:humanval}). These
+at once), we report CategoryHit@1 in two forms: a lenient \emph{touch} form (the question names
+any true category) and a strict \emph{central} form (the single most-central category is a true
+category). The touch form is validated against human annotators (\S\ref{sec:humanval}). These
 metrics characterize \emph{how} a model interacts and do not rank models.
 
 \textbf{Calibration}: 5-bin Expected Calibration Error (ECE) between stated
@@ -649,29 +649,29 @@ DisE$^+$ is a diagnostic of clarification efficiency, never the ranking metric.
 The main text highlights three headline results, one per research question. The
 \emph{single-gold illusion} that motivates the benchmark (\S\ref{sec:illusion}), the
 \emph{elicitation ceiling} that localizes the bottleneck to asking rather than knowing
-(\textbf{RQ2}, \S\ref{sec:ceiling}), and the \emph{per-axis skill dissociation} that
+(\textbf{RQ2}, \S\ref{sec:ceiling}), and the \emph{per-category skill dissociation} that
 shows which clarification abilities models lack (\textbf{RQ1}, \S\ref{sec:skills}). The
 full set of per-model findings, the general-domain replication, the human baseline, the
-case studies, the mechanistic probe, and the axis-conditioned interventions
+case studies, the mechanistic probe, and the category-conditioned interventions
 (\textbf{RQ3}) are collected in Appendix~\ref{app:findings}.
 
 \begin{table*}[t]
 \centering
 \caption{Main results. \textbf{Accuracy (\%)} graded against the intended
 interpretation is the primary metric (per mode); the interact mode additionally
-reports the secondary interaction diagnostics IR (\% asked), AxisHit@1, and ECE.
-AxisHit@1 here is the human-validated \emph{touch} form (the clarifying question names
-a true ambiguity axis, agreement $0.75$ with human annotators, matching inter-annotator
-agreement $0.73$). A stricter central-axis form is analyzed in \S\ref{sec:skills}.
-$^{\dagger}$The human AxisHit@1 was computed with the earlier classifier and awaits
-recomputation. $^{\ddagger}$Axis-Aware ReAct is a GPT-5-backbone pilot at $N{=}50$ run
+reports the secondary interaction diagnostics IR (\% asked), CategoryHit@1, and ECE.
+CategoryHit@1 here is the human-validated \emph{touch} form (the clarifying question names
+a true ambiguity category, agreement $0.75$ with human annotators, matching inter-annotator
+agreement $0.73$). A stricter central-category form is analyzed in \S\ref{sec:skills}.
+$^{\dagger}$The human CategoryHit@1 was computed with the earlier classifier and awaits
+recomputation. $^{\ddagger}$Category-Aware ReAct is a GPT-5-backbone pilot at $N{=}50$ run
 through the same OpenRouter harness (\S\ref{sec:axisreact}). Its accuracy is best read
 against its own matched Standard ReAct baseline in that run ($34.0$), a $+12$ point gain,
-rather than against the full $N{=}173$ GPT-5 row. AxisHit@1 is left blank for this row
-because the axis-conditioned policy deliberately sweeps multiple axes to rule them out, so
-a single-axis hit rate is not comparable (an any-axis form near saturation is discussed in
+rather than against the full $N{=}173$ GPT-5 row. CategoryHit@1 is left blank for this row
+because the category-conditioned policy deliberately sweeps multiple categories to rule them out, so
+a single-category hit rate is not comparable (an any-category form near saturation is discussed in
 \S\ref{sec:axisreact}). DisE$^+$ and the default-capture comparison are reported separately
-(Table~\ref{tab:illusion}). AxisHit is undefined when no question is asked.
+(Table~\ref{tab:illusion}). CategoryHit is undefined when no question is asked.
 The OpenAI tier ladder and a Qwen open-model ladder (dense 4B to 32B plus two MoE
 models, Qwen3-30B-A3B and Qwen3.5-35B-A3B) are evaluated at full scale; a
 seven-model, six-vendor panel of current frontier models is additionally evaluated
@@ -693,7 +693,7 @@ rather than a benefit from interaction (open-model caveat, \S\ref{sec:mechanisti
 & \multicolumn{2}{c}{Acc (\%)} &
   \multicolumn{4}{c}{Answer+Search+Interact} \\
 \cmidrule(lr){2-3}\cmidrule(lr){4-7}
-Model & Ans-only & +Search & Acc & IR & AHit@1 & ECE \\
+Model & Ans-only & +Search & Acc & IR & CHit@1 & ECE \\
 \midrule
 GPT-5           & 0.6 & 6.4  & \textbf{20.2} & 98.8 & .86 & .53 \\
 GPT-4o          & 0.6 & 12.1 & 4.6 & 99.4 & .94 & .82 \\
@@ -706,7 +706,7 @@ Qwen3-30B-A3B   & 1.2 & 28.3 & 11.6 & 72 & .90 & -- \\
 Qwen3.5-35B-A3B & 0.6 & \textbf{35.8} & 28.9 & 36 & .81 & -- \\
 \midrule
 \multicolumn{7}{l}{\textit{Proposed method (GPT-5 backbone, $N{=}50$ pilot)}} \\
-Axis-Aware ReAct$^{\ddagger}$ & -- & -- & 46.0 & 100 & -- & .24 \\
+Category-Aware ReAct$^{\ddagger}$ & -- & -- & 46.0 & 100 & -- & .24 \\
 \midrule
 Human (50-inst) & -- & -- & \textbf{30.0} & 100 & \textbf{.68}$^{\dagger}$ & -- \\
 \bottomrule
@@ -723,7 +723,7 @@ points, so $|\Delta|{\lesssim}2$ is within noise). ``$\Delta$'' is +Interact min
 accuracy: the sign of the interaction lever. Across seven models from six vendors, added
 interaction is flat-or-negative for six of seven (clearly negative for Grok $-8$,
 GPT-5.6 $-6$, Kimi and DeepSeek $-4$). Only Gemini, the weakest searcher (6\%), converts
-interaction into a clear gain. AHit@1 is the human-validated touch form (\S\ref{sec:metrics})
+interaction into a clear gain. CHit@1 is the human-validated touch form (\S\ref{sec:metrics})
 and is undefined when no clarification is asked.
 Two Grok +Search instances returned transient API errors and are scored incorrect,
 so its +Search accuracy is a lower bound.}
@@ -734,7 +734,7 @@ so its +Search accuracy is a lower bound.}
 \toprule
 & \multicolumn{2}{c}{Acc (\%)} & \multicolumn{3}{c}{+Interact} \\
 \cmidrule(lr){2-3}\cmidrule(lr){4-6}
-Model & Ans-only & +Search & Acc & $\Delta$ & AHit@1 \\
+Model & Ans-only & +Search & Acc & $\Delta$ & CHit@1 \\
 \midrule
 Claude-Sonnet-5   & 4.0  & \textbf{46.0} & \textbf{44.0} & $-2$  & .98 \\
 Grok-4.5          & 2.0  & 40.0 & 32.0 & $-8$  & .87 \\
@@ -876,34 +876,34 @@ consume the round budget on low-value questions without converging on a committe
 answer. The bottleneck is targeted, self-initiated disambiguation, which neither
 scale nor brute-force asking supplies.
 
-\subsection{Per-Axis Skills: Which Clarification Abilities Do Models Lack?}
+\subsection{Per-Category Skills: Which Clarification Abilities Do Models Lack?}
 \label{sec:skills}
 
-The five axes are not just data strata; each names a distinct \emph{skill}, the
-ability to recognize that a question is under-specified \emph{along that axis} and
+The five categories are not just data strata; each names a distinct \emph{skill}, the
+ability to recognize that a question is under-specified \emph{along that category} and
 ask the question that resolves it. We make this measurable by decomposing each
-model's per-axis \texttt{+interact} competence into three components:
+model's per-category \texttt{+interact} competence into three components:
 \textbf{Recognition} (interaction rate, does it ask when it should?),
-\textbf{Targeting} (AxisHit@1, does it ask about the \emph{right} axis?), and
+\textbf{Targeting} (CategoryHit@1, does it ask about the \emph{right} category?), and
 \textbf{Resolution} (accuracy, does asking yield the intended answer?). A model
-``has'' an axis skill only when all three are high; a low value localizes the
+``has'' a category skill only when all three are high; a low value localizes the
 failure to not-asking, asking-wrong, or asking-right-but-still-wrong.
 Table~\ref{tab:skills} reports Targeting, the decisive component, and
 Figure~\ref{fig:radar} shows the same profile as a capability radar.
 
 \begin{table}[t]
 \centering
-\caption{Per-axis \textbf{Targeting} skill (AxisHit@1, \emph{touch} form) in \texttt{+interact},
+\caption{Per-category \textbf{Targeting} skill (CategoryHit@1, \emph{touch} form) in \texttt{+interact},
 recomputed with the corrected classifier (\S\ref{sec:metrics}). Recognition policy is a robust
 blind spot (no model ever asks), temporal scope is fully solved, and entity and metric are
-touched almost always but rarely made the \emph{central} concern (central-form AxisHit@1
-$\leq0.16$, see text). The two sparse axes ($n{\le}9$) are preliminary.}
+touched almost always but rarely made the \emph{central} concern (central-form CategoryHit@1
+$\leq0.16$, see text). The two sparse categories ($n{\le}9$) are preliminary.}
 \label{tab:skills}
 \small
 \resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lrccccc}
 \toprule
-Axis & $n$ & GPT-5 & GPT-4o & {\footnotesize GPT-5-m} & {\footnotesize Q3-30B} & {\footnotesize Q3.5-35B} \\
+Category & $n$ & GPT-5 & GPT-4o & {\footnotesize GPT-5-m} & {\footnotesize Q3-30B} & {\footnotesize Q3.5-35B} \\
 \midrule
 entity\_scope       & 94 & .89 & 1.00 & .99 & .93 & .85 \\
 metric\_definition  & 63 & .92 & .97 & 1.00 & .96 & .87 \\
@@ -916,22 +916,22 @@ temporal\_scope     &  7 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.72\linewidth]{fig_radar.png}
-\caption{\textbf{Per-axis clarification-capability profile} (touch AxisHit@1 from
+\caption{\textbf{Per-category clarification-capability profile} (touch CategoryHit@1 from
 Table~\ref{tab:skills}). Every model saturates entity, metric, and temporal targeting
 but collapses to zero on \texttt{recognition\_policy}, a blind spot shared across the
 closed frontier and the strongest open model.}
 \label{fig:radar}
 \end{figure}
 
-\textbf{Finding 9: Ambiguity clarification is a per-axis skill with a sharp touch
+\textbf{Finding 9: Ambiguity clarification is a per-category skill with a sharp touch
 versus central-targeting dissociation.} Under the corrected classifier the pattern is
 precise. \texttt{recognition\_policy} is a robust blind spot. No model ever asks about it,
-in either the touch or the central form (AxisHit@1 $=0$), so models essentially never
+in either the touch or the central form (CategoryHit@1 $=0$), so models essentially never
 question whether a figure is recognized point-in-time or over time. \texttt{temporal\_scope}
-is fully solved. Models both touch it and make it the central concern (central AxisHit@1
+is fully solved. Models both touch it and make it the central concern (central CategoryHit@1
 $=1.0$). Entity and metric occupy a revealing middle. Models almost always \emph{touch} them
-(touch AxisHit@1 $0.85$--$1.0$) yet rarely make them the \emph{central} point of the question
-(central AxisHit@1 $\leq0.16$), defaulting instead to period confirmation. For these two axes
+(touch CategoryHit@1 $0.85$--$1.0$) yet rarely make them the \emph{central} point of the question
+(central CategoryHit@1 $\leq0.16$), defaulting instead to period confirmation. For these two categories
 the failure is not neglect but imprecision, the model names the entity or metric in passing
 while centering the question elsewhere. Resolution follows the same shape across all five models
 (GPT-5 resolves $57\%$ of temporal but $\leq23\%$ of entity and metric,
@@ -942,9 +942,9 @@ but missing specific targeting, which is precisely the intervention target
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{fig_axisperf.png}
-\caption{\textbf{Per-model, per-axis performance.} \emph{(a)}~Targeting (AxisHit@1
+\caption{\textbf{Per-model, per-category performance.} \emph{(a)}~Targeting (CategoryHit@1
 touch) versus \emph{(b)}~Resolution (\texttt{+interact} accuracy) for every model and
-ambiguity axis. The top five rows are the full-scale panel ($n{=}173$, all axes) and
+ambiguity category. The top five rows are the full-scale panel ($n{=}173$, all categories) and
 the bottom seven are the proprietary pilot ($n{=}50$), for which only entity and metric
 carry enough instances ($n{=}29$ and $19$), with recognition, temporal, and filing at
 $n\leq1$ and shown n/a. \texttt{filing\_vintage} is empty at full scale too ($n{=}0$).
@@ -953,20 +953,20 @@ them better than the older OpenAI ladder, and no model targets recognition polic
 \label{fig:axisperf}
 \end{figure}
 
-\textbf{Per-model, per-axis case analysis.} Placing targeting and resolution side by
-side for every model and axis (Figure~\ref{fig:axisperf}) surfaces three patterns.
+\textbf{Per-model, per-category case analysis.} Placing targeting and resolution side by
+side for every model and category (Figure~\ref{fig:axisperf}) surfaces three patterns.
 First, resolution does \emph{not} track targeting: GPT-4o and GPT-5-mini touch the
-correct axis on entity and metric almost as often as any model (AxisHit $0.94$--$1.0$)
-yet resolve those axes at $0$--$5\%$, so a high AxisHit is no guarantee of a correct
-answer. Second, the model ranking \emph{reorders} across axes. Among the full-scale
-models Qwen3.5-35B-A3B leads on the two abundant axes (entity $40\%$, metric $32\%$)
+correct category on entity and metric almost as often as any model (CategoryHit $0.94$--$1.0$)
+yet resolve those categories at $0$--$5\%$, so a high CategoryHit is no guarantee of a correct
+answer. Second, the model ranking \emph{reorders} across categories. Among the full-scale
+models Qwen3.5-35B-A3B leads on the two abundant categories (entity $40\%$, metric $32\%$)
 while GPT-5 leads on temporal ($57\%$). Third, the seven proprietary models resolve
 entity and metric substantially better than the older OpenAI ladder (entity
 $21$--$48\%$, metric $26$--$42\%$, versus GPT-5's $23$ and $13\%$), yet they inherit the
-\emph{same} recognition blind spot, with touch AxisHit $0$ on every recognition instance
+\emph{same} recognition blind spot, with touch CategoryHit $0$ on every recognition instance
 they saw. \texttt{filing\_vintage} is untestable everywhere ($n{=}0$). A single
-aggregate interaction score therefore conceals which axis a given model can actually
-resolve, which is why we report per axis.
+aggregate interaction score therefore conceals which category a given model can actually
+resolve, which is why we report per category.
 
 %% ============================================================
 \section{Discussion and Research Opportunities}
@@ -977,16 +977,16 @@ resolve, which is why we report per axis.
 is that models fail to resolve ambiguity not for want of knowledge but for want of asking
 the right question (RQ2). This reframes the problem for future work. Progress will come less
 from larger backbones, which barely move interaction accuracy, and more from policies and
-objectives that reward asking on the correct axis at the right time. The Axis-Aware ReAct
-policy and axis-guided fine-tuning (RQ3) are first steps, and both leave a large gap to the
-oracle ceiling, so reward shaping on the ambiguity axis and calibrated deferral are natural
+objectives that reward asking on the correct category at the right time. The Category-Aware ReAct
+policy and category-guided fine-tuning (RQ3) are first steps, and both leave a large gap to the
+oracle ceiling, so reward shaping on the ambiguity category and calibrated deferral are natural
 next directions.
 
-\paragraph{Axes are different learning problems.} The per-axis dissociation shows that some
+\paragraph{Categories are different learning problems.} The per-category dissociation shows that some
 clarification abilities are solved by scale while others, notably recognition basis, resist
 it and are only unreliably teachable. A single aggregate interaction score therefore hides
 where the real difficulty sits. Future benchmarks and training curricula should treat each
-axis as its own learning problem and budget data accordingly, which our salience estimate
+category as its own learning problem and budget data accordingly, which our salience estimate
 begins to quantify.
 
 \paragraph{Human and AI collaboration under ambiguity.} Because models confidently return
@@ -996,9 +996,9 @@ rather than raw commitment, and it connects to mixed-initiative retrieval where 
 a confident wrong answer is high.
 
 \paragraph{Self-refreshing benchmarks and broader scope.} Our co-evolution probes suggest a
-benchmark can extend itself on axes whose evidence is abundant, guarded by held-out
+benchmark can extend itself on categories whose evidence is abundant, guarded by held-out
 validation, which offers a path to keep the instrument fresh as models improve. Natural
-extensions include more ambiguity axes, additional languages and filing regimes, and
+extensions include more ambiguity categories, additional languages and filing regimes, and
 transfer of the paired default and intended construction to other high-stakes domains where
 a single gold answer hides genuine ambiguity.
 
@@ -1079,8 +1079,8 @@ More recent benchmarks target the agent's \emph{own} ability to ask:
 CLAMBER~\citep{zhang2024clamber} evaluates whether models identify and clarify
 ambiguous information needs, and QuestBench~\citep{li2025questbench} tests whether
 they can ask the minimal necessary question in reasoning tasks. Both are
-general-domain and judge a single clarifying step; \fininteract adds \emph{per-axis}
-targeting (AxisHit), programmatically verifiable financial grounding, and, via the
+general-domain and judge a single clarifying step; \fininteract adds \emph{per-category}
+targeting (CategoryHit), programmatically verifiable financial grounding, and, via the
 co-evolution rounds (\S\ref{sec:coevolve}), an analysis of \emph{when} asking helps
 versus hurts. We adapt this line's formalism to finance, replacing human-judged
 ambiguity labels with programmatically verifiable XBRL-grounded evidence pairs.
@@ -1092,7 +1092,7 @@ questions by expected value of perfect information; ClariQ~\citep{aliannejadi202
 established a shared task for generating clarifying questions in open-domain dialogue;
 and the mixed-initiative paradigm is surveyed in Conversational Information
 Seeking~\citep{zamani2023cis}. \fininteract instantiates this lineage with a
-leak-proof, per-axis measure of \emph{which} clarification an agent should issue and a
+leak-proof, per-category measure of \emph{which} clarification an agent should issue and a
 verifiable outcome for whether issuing it resolves the query.
 
 \paragraph{Interactive Search Agents.}
@@ -1116,10 +1116,10 @@ over raw size, and Appendix~\ref{app:cost} shows the pipeline scales at
 \$0.31/instance. \textbf{Language balance.} The English split (53) is smaller
 than the Chinese split (120); per-language results (\S\ref{sec:exp}) should be
 read with this asymmetry in mind, and the EN portion is a target for growth.
-\textbf{Axis coverage.} The taxonomy is intentionally five-axis, but
+\textbf{Category coverage.} The taxonomy is intentionally five-category, but
 \texttt{filing\_vintage} is unrepresented and \texttt{temporal\_scope}/%
 \texttt{recognition\_policy} are sparse (Table~\ref{tab:stats}): viable
-structured ambiguity for these axes is rare in public filings (Appendix~\ref{app:cost}).
+structured ambiguity for these categories is rare in public filings (Appendix~\ref{app:cost}).
 \textbf{Model coverage.} We report the OpenAI tier ladder (3 models) and two open
 MoE models at full scale ($n{=}173$); a seven-model, six-vendor panel of current
 frontier models is additionally evaluated in a preliminary pilot ($N{=}50$/mode,
@@ -1128,16 +1128,16 @@ statistical resolution---a full-scale multi-vendor evaluation remains in progres
 The human baseline ($N{=}50$) establishes the performance
 ceiling but is collected from two annotators on a subset; a larger expert panel
 remains future work. \textbf{Grader and simulator.} Correctness and
-axis-targeting are judged by GPT-4o-mini and the user is simulated by GPT-5. We validate
+category-targeting are judged by GPT-4o-mini and the user is simulated by GPT-5. We validate
 these against humans on a stratified, blindly double-annotated sample (five annotators).
 The correctness grader agrees with human consensus at Cohen $\kappa{=}0.85$ (raw agreement
 $0.92$), exceeding inter-annotator agreement ($0.86$), so accuracy figures hold under human
-labels. The AxisHit classifier initially agreed only weakly ($0.53$). A single-label design
+labels. The CategoryHit classifier initially agreed only weakly ($0.53$). A single-label design
 over-assigned \texttt{temporal\_scope} to compound questions that also name an entity or
 metric. The corrected multi-label \emph{touch} classifier reaches $0.75$ agreement, matching
-inter-annotator agreement ($0.73$), and the AxisHit@1 values reported here use it. Because
-this shows models mostly do ask on-axis, the corrected reading is that the gap lies in
-central targeting and integration rather than detection. A strict central-axis variant is
+inter-annotator agreement ($0.73$), and the CategoryHit@1 values reported here use it. Because
+this shows models mostly do ask on-category, the corrected reading is that the gap lies in
+central targeting and integration rather than detection. A strict central-category variant is
 discriminative but not yet human-validated, so we report it only as a supplementary
 decomposition. Interaction results are also robust to the simulator: on a
 $50$-instance subset, standard +Interact accuracy is $34/28/26\%$ under the LLM, deterministic,
@@ -1153,19 +1153,19 @@ absolute contamination safety for the DocFinQA-derived minority.
 
 We introduced \fininteract, the first bilingual benchmark for evaluating
 financial search agents on genuinely ambiguous queries.
-The five-axis financial ambiguity taxonomy, paired default/intended
+The five-category financial ambiguity taxonomy, paired default/intended
 interpretation design, and adversarial verifier-based construction pipeline
 yield 173 high-quality instances that resist trivial disambiguation.
-One unit organizes the whole story, the ambiguity \emph{axis}: it structures the
+One unit organizes the whole story, the ambiguity \emph{category}: it structures the
 taxonomy, is what an agent must elicit (single-gold grading overstates competence
-up to $3\times$ when models commit to the wrong axis-reading), is
+up to $3\times$ when models commit to the wrong category-reading), is
 \emph{linearly represented} inside open models yet left unacted-on, and is the
 lever for intervention. Our central finding is that interaction capability, not
 financial knowledge, is the bottleneck: agents answer $93$--$95\%$ correctly once
-the axis is resolved but $\sim$8\% on their own, amplifying the stagnation
+the category is resolved but $\sim$8\% on their own, amplifying the stagnation
 \interactcomp identified in the general domain. We turn this diagnosis into
-intervention with two axis-conditioned methods, at inference (Axis-Aware ReAct)
-and at training (axis-guided SFT/GRPO), and release \fininteract with full
+intervention with two category-conditioned methods, at inference (Category-Aware ReAct)
+and at training (category-guided SFT/GRPO), and release \fininteract with full
 construction, evaluation, and training code for reproducible follow-on work.
 
 
@@ -1179,7 +1179,7 @@ construction, evaluation, and training code for reproducible follow-on work.
 \label{app:findings}
 %% ============================================================
 
-The main text reports the three headline findings (the single-gold illusion, the elicitation ceiling, and the per-axis skill dissociation). This appendix collects the remaining empirical findings and the axis-conditioned interventions.
+The main text reports the three headline findings (the single-gold illusion, the elicitation ceiling, and the per-category skill dissociation). This appendix collects the remaining empirical findings and the category-conditioned interventions.
 
 \subsection{The Illusion Is Not Finance-Specific: A General-Domain Replication}
 \label{sec:general}
@@ -1274,10 +1274,10 @@ the other ten, so the ability to convert clarification into a correct answer is 
 \label{fig:lever}
 \end{figure}
 
-\textbf{Finding 2: Model rankings flip with the interaction axis.} GPT-4o
+\textbf{Finding 2: Model rankings flip with the interaction category.} GPT-4o
 \emph{outperforms} GPT-5 under pure retrieval (12.1 vs.\ 6.4) yet is
 \emph{dominated} by it under interaction (4.6 vs.\ 20.2). A single-mode benchmark
-would mis-rank these models; the interaction axis is what separates them, which
+would mis-rank these models; the interaction category is what separates them, which
 is precisely the dimension FinInteract is designed to measure.
 
 \textbf{Finding 3: Retrieval cannot substitute for interaction.} Oracle retrieval
@@ -1297,13 +1297,13 @@ artifact (only 2\% produced no answer at all).
 \textbf{Finding 5: Models are severely overconfident on ambiguous queries.}
 Expected Calibration Error ranges from 0.53 (GPT-5, interact) to 0.95 (GPT-4o,
 answer-only); models report 85--95\% confidence while answering 0--20\%
-correctly. The remaining failure is not one of axis \emph{detection}. Under a
+correctly. The remaining failure is not one of category \emph{detection}. Under a
 human-validated classifier (agreement $0.75$, matching inter-annotator agreement $0.73$),
-both models almost always ask a question that touches the correct ambiguity axis (AxisHit@1
+both models almost always ask a question that touches the correct ambiguity category (CategoryHit@1
 $0.86$ for GPT-5 and $0.94$ for GPT-4o). What they lack is precise \emph{central} targeting,
-only $0.06$ and $0.04$ of first questions make the true axis their single central concern,
+only $0.06$ and $0.04$ of first questions make the true category their single central concern,
 and, above all, integration (Finding 4). The bottleneck is targeting precision and
-commitment rather than axis detection, which motivates the axis-conditioned policy of
+commitment rather tha category detection, which motivates the category-conditioned policy of
 \S\ref{sec:error}.
 
 \textbf{Finding 6: A smaller model collapses into ill-formed clarification, 
@@ -1320,12 +1320,12 @@ answering, capturing \emph{neither} the intended nor the default reading
 ($0.0/0.0\%$). This is an extreme form of Finding~4's integration gap and a
 distinct failure mode: clarification without commitment.
 
-\paragraph{Language and axis breakdown.} Splitting by language confirms the
+\paragraph{Language and category breakdown.} Splitting by language confirms the
 benchmark's bilingual-difficulty hypothesis: Chinese instances are consistently
 harder than English in the interact mode (GPT-5 $18.3\%$ ZH vs.\ $24.5\%$ EN;
 GPT-4o $0.8\%$ vs.\ $13.2\%$), reflecting more complex corporate-structure naming
-and metric conventions in A-share filings. Stratifying by primary axis (interact
-mode), \texttt{metric\_definition} is the hardest well-populated axis (GPT-5
+and metric conventions in A-share filings. Stratifying by primary category (interact
+mode), \texttt{metric\_definition} is the hardest well-populated category (GPT-5
 $12.7\%$, $n{=}63$) and \texttt{entity\_scope} the next ($23.4\%$, $n{=}94$),
 while \texttt{temporal\_scope} is comparatively easy ($57.1\%$, $n{=}7$). This
 inverts the general-domain pattern where entity disambiguation dominates, and
@@ -1346,7 +1346,7 @@ but does so with fewer wasted asks.
 To bound the task from above under \emph{realistic} interaction, where the
 disambiguating context must be \emph{elicited}, not handed over, we collect a
 human baseline on a stratified 50-instance subset (32 EN / 18 ZH, balanced by
-axis). Two finance-literate annotators (one bilingual) face the same input a
+category). Two finance-literate annotators (one bilingual) face the same input a
 model does in the search regime: the ambiguous question and a retrieved passage
 containing both candidate values, position-shuffled and unlabeled. Each may ask
 \emph{one} yes/no question, which the experimenter answers truthfully from the
@@ -1362,12 +1362,12 @@ $93$--$95\%$ context-oracle ceiling. The gap between the oracle ceiling and the
 human baseline is the cost of \emph{elicitation}: knowing the resolved answer is
 near-trivial, but extracting the right bit through a single clarification is hard
 even for experts. Humans ask far more on-target questions than any model
-(AxisHit $0.68$ vs.\ $0.34$--$0.38$) yet still capture the default reading $50\%$
+(CategoryHit $0.68$ vs.\ $0.34$--$0.38$) yet still capture the default reading $50\%$
 of the time. Across models and the human baseline, targeting and resolution
-\emph{dissociate}: the models with the highest AxisHit@1 (GPT-4o and GPT-5-mini at
-$0.94$) post the lowest accuracy, while the human, with the lowest AxisHit ($0.68$),
+\emph{dissociate}: the models with the highest CategoryHit@1 (GPT-4o and GPT-5-mini at
+$0.94$) post the lowest accuracy, while the human, with the lowest CategoryHit ($0.68$),
 posts the highest (Figure~\ref{fig:humanllm}). The asymmetry is sharpest in Chinese: ZH annotators ask the
-\emph{best}-targeted questions ($0.72$ AxisHit) but post the \emph{lowest}
+\emph{best}-targeted questions ($0.72$ CategoryHit) but post the \emph{lowest}
 accuracy ($22.2\%$) and highest default-capture ($72.2\%$). Chinese instances are
 therefore harder to \emph{resolve}, not harder to \emph{recognize}, the
 \emph{gui-mu}/\emph{kou-fei} (parent-attributable vs.\ deduction-of-nonrecurring) net-income
@@ -1377,9 +1377,9 @@ language-asymmetry caveat in \S\ref{sec:limitations} with a mechanism.
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.82\linewidth]{fig_humanllm.png}
-\caption{\textbf{Targeting does not imply resolution.} Accuracy against AxisHit@1
+\caption{\textbf{Targeting does not imply resolution.} Accuracy against CategoryHit@1
 (touch) in the interact regime, for the five full-scale models and the human baseline
-(star). The relationship is inverted: models that ask on the correct axis most often
+(star). The relationship is inverted: models that ask on the correct category most often
 resolve the ambiguity least often, whereas the human asks less precisely yet resolves
 more. Asking the right question and answering it are separate abilities.}
 \label{fig:humanllm}
@@ -1389,10 +1389,10 @@ more. Asking the right question and answering it are separate abilities.}
 
 \begin{table}[t]
 \centering
-\caption{Zero-shot \emph{central}-targeting (central-form AxisHit@1) by base-model scale
+\caption{Zero-shot \emph{central}-targeting (central-form CategoryHit@1) by base-model scale
 (Qwen3, \texttt{+interact}, denominator = instances where the model asked). Under the
 validated touch form every scale already reaches $\approx0.9$ on entity and metric, so scale
-buys the precision to \emph{center} the question on the right axis rather than detection.
+buys the precision to \emph{center} the question on the right category rather than detection.
 Entity central-targeting scales steeply and is largely solved at 32B, while recognition policy
 stays $0$ at every scale, including the same 32B that targets entity well. Recognition is
 underpowered ($n{\le}9$ asked-on) but flat throughout.}
@@ -1401,7 +1401,7 @@ underpowered ($n{\le}9$ asked-on) but flat throughout.}
 \resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lccc}
 \toprule
-Axis & 4B & 14B & 32B \\
+Category & 4B & 14B & 32B \\
 \midrule
 entity\_scope       & .00 & .00 & \textbf{.68} \\
 metric\_definition  & .05 & .00 & .17 \\
@@ -1410,26 +1410,26 @@ recognition\_policy & \textbf{.00} & \textbf{.00} & \textbf{.00} \\
 \end{tabular}}
 \end{table}
 
-\textbf{Finding 11: the axes are different \emph{kinds} of skill, some
+\textbf{Finding 11: the categories are different \emph{kinds} of skill, some
 scale-solvable, one a scale-invariant blind spot.} A controlled scale ladder
-(Qwen3 $4\text{B}\!\to\!32\text{B}$, Table~\ref{tab:scaledissoc}) separates the axes
+(Qwen3 $4\text{B}\!\to\!32\text{B}$, Table~\ref{tab:scaledissoc}) separates the categories
 sharply, once we look at \emph{central} targeting. \texttt{recognition\_policy} is a
 scale-invariant blind spot. It is never targeted at any scale, in either the touch or the
 central form ($0.00$ at 4B, 14B, and 32B, including the same 32B that targets entity well),
 so more parameters buy no recognition-basis targeting at all. \texttt{entity\_scope} and
 \texttt{metric\_definition} tell a subtler story. Every scale already \emph{touches} them
-(touch AxisHit@1 $\approx0.9$), but the ability to make them the \emph{central} point of the
+(touch CategoryHit@1 $\approx0.9$), but the ability to make them the \emph{central} point of the
 question emerges only with scale, entity central-targeting rising from $0.00$ at 4B and 14B to
-$0.68$ at 32B. Scale therefore does not buy ambiguity detection for these axes, which is
-already present, but the precision to center the question on the right axis. The dissociation
+$0.68$ at 32B. Scale therefore does not buy ambiguity detection for these categories, which is
+already present, but the precision to center the question on the right category. The dissociation
 confirms the taxonomy carves genuine capability boundaries rather than arbitrary strata, and
-it pinpoints recognition basis as the axis a targeted intervention must address
+it pinpoints recognition basis as the category a targeted intervention must address
 (\S\ref{sec:coevolve}).
 
 \subsection{Qualitative Case Studies}
 \label{sec:casestudies}
 
-Three instances make the failure modes concrete, one for each axis where the pattern
+Three instances make the failure modes concrete, one for each category where the pattern
 is sharpest. Every case pairs a natural analyst question with two defensible readings
 whose ground truth is exact and machine-verifiable.
 
@@ -1438,30 +1438,30 @@ Platforms' operating income?''} is \$46.75B for the total consolidated company a
 \$62.87B for the Family of Apps segment, a $34\%$ gap on the same GAAP metric and
 fiscal year. A search-only agent retrieves a passage containing both figures and
 commits to one, and single-gold grading credits it whenever that figure happens to
-match the key. This is the axis models handle best, and the base policy often
+match the key. This is the category models handle best, and the base policy often
 resolves it directly (\S\ref{sec:coevolve}), which is precisely why forcing a
 clarifying question on entity scope can \emph{lower} accuracy rather than raise it.
 
 \textbf{Recognition policy (the blind spot).} \emph{``What were Tesla's revenues?''}
 is \$97.69B under GAAP accrual revenue recognized on the income statement, but only
 \$14.92B under a cash-basis proxy taken from operating cash flows, a $6.5\times$
-difference driven entirely by the recognition basis. This is the axis models almost
+difference driven entirely by the recognition basis. This is the category models almost
 never surface: instead of asking which recognition basis is meant, the typical
 clarification reverts to the more salient period or entity question
 (\S\ref{sec:skills}), so the $6.5\times$ ambiguity is never raised and the default is
-reported as fact. The axis is represented in the network yet not acted on
+reported as fact. The category is represented in the network yet not acted on
 (\S\ref{sec:mechanistic}).
 
 \textbf{Metric definition (clarification supplies the answer).} \emph{``What was
 Workday's operating income growth rate?''} is $126.8\%$ on a GAAP basis and $26\%$ on
 a non-GAAP basis for the same year-over-year comparison. Here the base model cannot
-answer correctly without knowing which definition is intended, so a single on-axis
+answer correctly without knowing which definition is intended, so a single on-category
 question converts a wrong answer into a right one, the mechanism behind the $+45$
-point training-time gain on this axis (\S\ref{sec:coevolve}).
+point training-time gain on this category (\S\ref{sec:coevolve}).
 
-Together the three cases trace the arc of the paper: an axis that is resolvable but
-over-elicited (entity), an axis that is represented yet never acted on (recognition),
-and an axis where eliciting the definition is the whole battle (metric).
+Together the three cases trace the arc of the paper: a category that is resolvable but
+over-elicited (entity), a category that is represented yet never acted on (recognition),
+and a category where eliciting the definition is the whole battle (metric).
 
 \subsection{Mechanistic Case Study: Where Ambiguity Lives in the Network}
 \label{sec:mechanistic}
@@ -1490,16 +1490,16 @@ layers 35/37, 32/33, 48/49, 40/41). Figure~\ref{fig:crossmodel}(b) shows that th
 \emph{type} is linearly decodable at $0.80$ accuracy (majority baseline $0.60$) on both larger
 models, though it becomes available at different depths, early ($\approx$27\%) in Qwen3-30B and
 late ($\approx$85\%) in Qwen3.5-35B. Across four models, two scales, and three architecture
-families, the representation is consistent: financial-query ambiguity, and its axis, is linearly
+families, the representation is consistent: financial-query ambiguity, and its category, is linearly
 encoded, emerging toward the top of the network.
 
 \paragraph{Representation, elicitation, and the cost of interacting.} The two MoE
 models we probe are also \emph{evaluated} (Table~\ref{tab:main}): beyond linearly
-encoding the axis, both \emph{elicit}, and they differ in \emph{how} they ask.
+encoding the category, both \emph{elicit}, and they differ in \emph{how} they ask.
 Qwen3-30B interacts on $72\%$ of instances but loops without committing in Chinese
 ($76\%$ of its interactive transcripts never produce a final answer), whereas
 Qwen3.5-35B interacts less ($36\%$) but commits in $95\%$ of cases and targets the
-gold axis more often (AxisHit $0.40$ vs.\ $0.16$). With the full retrieval corpus in
+gold category more often (CategoryHit $0.40$ vs.\ $0.16$). With the full retrieval corpus in
 place their accuracy is now measured, and it exposes a sharper pattern: plain search
 reaches $28.3\%$/$35.8\%$, but \emph{adding} interaction \emph{lowers} accuracy to
 $11.6\%$/$28.9\%$ ($-16.8$/$-6.9$ points). Interaction is thus net-negative relative
@@ -1508,7 +1508,7 @@ strongest model, GPT-5, converts clarification into a gain ($6.4\to20.2$). An
 interpretation-oracle control (the resolved interpretation supplied but no evidence)
 scores $\approx0\%$ for both MoE models, so the residual gap to the oracle ceiling is
 an evidence-grounding cost, not a parametric-recall one. The representational and
-behavioural evidence shows the axis is both registered and acted on at the level of
+behavioural evidence shows the category is both registered and acted on at the level of
 asking. A linear-probe replication on the
 \emph{base} (non-instruct) checkpoints reproduces the decodability and the early-vs-late depth
 split (peaks $0.71$/$0.74$ vs.\ baseline $0.60$).
@@ -1524,7 +1524,7 @@ split (peaks $0.71$/$0.74$ vs.\ baseline $0.60$).
   \label{fig:crossmodel}
 \end{figure}
 
-\paragraph{Finding 10: Open models linearly represent both ambiguity and its axis, replicating
+\paragraph{Finding 10: Open models linearly represent both ambiguity and its category, replicating
 from 4B to 35B and across dense and MoE architectures.} The representation is type-specific
 (entity vs.\ metric decodable at $0.80$) and robust to scale and architecture, yet behaviorally
 these same models still default rather than clarify. The behavioral gap is thus better read as a
@@ -1533,17 +1533,17 @@ establishing this causally (e.g.\ via activation steering) remains future work.
 
 \paragraph{Scope and caveats.} This is mechanistic evidence on open proxies, not the closed
 frontier models benchmarked in \S\ref{sec:exp}; diff-in-means probing and linear decoding
-establish \emph{availability}, not causal use; and axis-type decoding is supported only for the
-two well-populated axes (entity\_scope, metric\_definition). We deliberately do \emph{not} draw
+establish \emph{availability}, not causal use; and category-type decoding is supported only for the
+two well-populated categories (entity\_scope, metric\_definition). We deliberately do \emph{not} draw
 behavioral conclusions from these open models' free-form generations, where surface cues (chain-of-thought
 markers, retrieval that surfaces the evidence span) confound naive clarification counts; the
 asking-behavior claims come solely from the graded closed-model evaluation in \S\ref{sec:exp}.
-That the axis is \emph{represented but not acted on} frames the bottleneck as an action
-problem on an available signal, and motivates the axis-conditioned interventions of
+That the category is \emph{represented but not acted on} frames the bottleneck as an action
+problem on an available signal, and motivates the category-conditioned interventions of
 \S\ref{sec:error}, which target exactly that signal.
 
 
-\subsection{Diagnosis and Intervention: Acting on the Ambiguity Axis}
+\subsection{Diagnosis and Intervention: Acting on the Ambiguity Category}
 \label{sec:error}
 
 Our results converge on a single diagnosis. The benchmark localizes the
@@ -1551,13 +1551,13 @@ bottleneck to \emph{eliciting} the disambiguation: agents answer $93$--$95\%$
 correctly once the intended interpretation is supplied
 (\S\ref{sec:ceiling}) but resolve only $\sim$8\% on their own, and the
 mechanistic probe shows why, open models \emph{linearly represent} the ambiguity
-\emph{axis} yet do not act on it (\S\ref{sec:mechanistic}). The remaining gap is
+\emph{category} yet do not act on it (\S\ref{sec:mechanistic}). The remaining gap is
 thus an \emph{action} problem on an already-available signal, and the
-\emph{axis} is its natural unit. We now turn that diagnosis into
+\emph{category} is its natural unit. We now turn that diagnosis into
 intervention: we first catalog how acting fails (a seven-type error taxonomy),
 then present two interventions that share one idea, \textbf{condition on the
-axis}, instantiated at inference time (Axis-Aware ReAct, \S\ref{sec:axisreact})
-and at training time (axis-guided SFT/GRPO, \S\ref{sec:grpo}).
+category}, instantiated at inference time (Category-Aware ReAct, \S\ref{sec:axisreact})
+and at training time (category-guided SFT/GRPO, \S\ref{sec:grpo}).
 
 \subsubsection{Error Taxonomy}
 
@@ -1578,10 +1578,10 @@ Type & Description & Improvement direction \\
 \midrule
 E1 & \textbf{Ambiguity blindness}: no interaction, wrong answer
    & Ambiguity pre-check; train on detection \\
-E2 & \textbf{Wrong-axis clarification}: asked wrong dimension
-   & Axis classifier; financial taxonomy grounding \\
-E3 & \textbf{Generic clarification}: vague ask, no axis target
-   & Axis-conditioned clarification templates \\
+E2 & \textbf{Wrong-category clarification}: asked wrong dimension
+   & Category classifier; financial taxonomy grounding \\
+E3 & \textbf{Generic clarification}: vague ask, no category target
+   & Category-conditioned clarification templates \\
 E4 & \textbf{Retrieval dominance}: searched but skipped interaction
    & Force interpretation check after retrieval \\
 E5 & \textbf{Clarification misuse}: right question, wrong answer
@@ -1589,7 +1589,7 @@ E5 & \textbf{Clarification misuse}: right question, wrong answer
 E6 & \textbf{Evidence grounding}: template-oracle correct, agent wrong
    & Improved source-grounded extraction \\
 E7 & \textbf{Over-interaction}: correct but low DisE$^+$
-   & Penalize via DisE$^+$/AxisHit efficiency signal \\
+   & Penalize via DisE$^+$/CategoryHit efficiency signal \\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -1601,13 +1601,13 @@ failure attribution without additional annotation:
 
 \begin{itemize}[leftmargin=*,noitemsep]
   \item \textbf{Low IR + low Acc} $\to$ E1 (ambiguity blindness dominant)
-  \item \textbf{High IR + low AxisHit@1} $\to$ E2/E3 (interacts but misdirected)
-  \item \textbf{High AxisHit@1 + low Acc} $\to$ E5/E6 (right axis, wrong grounding)
+  \item \textbf{High IR + low CategoryHit@1} $\to$ E2/E3 (interacts but misdirected)
+  \item \textbf{High CategoryHit@1 + low Acc} $\to$ E5/E6 (right category, wrong grounding)
   \item \textbf{High GenericAskRate} $\to$ E3 (lacks financial clarification structure)
-  \item \textbf{High WrongAxisRate} $\to$ E2 (confidently misdirected)
+  \item \textbf{High WrongCategoryRate} $\to$ E2 (confidently misdirected)
   \item \textbf{Always-ask $\gg$ Standard ReAct} $\to$ E1 dominant; latent capacity exists
   \item \textbf{Template-oracle $\gg$ Agent-interact} $\to$ ``what to ask'' is the bottleneck
-  \item \textbf{Axis-oracle $\gg$ Agent-interact} $\to$ axis recognition is the bottleneck
+  \item \textbf{Category-oracle $\gg$ Agent-interact} $\to$ category recognition is the bottleneck
   \item \textbf{Template-oracle still low} $\to$ E6 residual; evidence extraction still fails
 \end{itemize}
 
@@ -1615,41 +1615,41 @@ failure attribution without additional annotation:
 \centering
 \includegraphics[width=\linewidth]{fig_errordist.png}
 \caption{\textbf{Error-type distribution} in \texttt{+interact}, attributing every
-instance to the taxonomy of Table~\ref{tab:errors} with the corrected axis classifier.
-\emph{E5 misintegration} (the agent asks, touches the correct axis, yet answers wrong)
-dominates for every model, while ambiguity blindness (E1), wrong-axis (E2), and generic
+instance to the taxonomy of Table~\ref{tab:errors} with the corrected category classifier.
+\emph{E5 misintegration} (the agent asks, touches the correct category, yet answers wrong)
+dominates for every model, while ambiguity blindness (E1), wrong-category (E2), and generic
 (E3) asks stay comparatively rare.}
 \label{fig:errordist}
 \end{figure}
 
 \textbf{Misintegration, not misdirection, dominates the error budget.} Attributing each
 interact-mode outcome to the taxonomy (Figure~\ref{fig:errordist}) shows that \emph{E5}
-(right axis touched, wrong answer) accounts for the large majority of failures, $67\%$ for
+(right category touched, wrong answer) accounts for the large majority of failures, $67\%$ for
 GPT-5, $89\%$ for GPT-4o, $90\%$ for GPT-5-mini, and $75\%$ for Qwen3-30B, while not-asking
-(E1) and off-axis asks (E2 and E3) together stay below $15\%$ for the closed models. The
+(E1) and off-category asks (E2 and E3) together stay below $15\%$ for the closed models. The
 bottleneck is converting a correctly targeted clarification into the intended answer, not
 deciding whether or what to ask. Qwen3.5-35B-A3B is the informative exception, asking less
 (E1 $21\%$) but resolving more of what it attempts (Correct $35\%$), so its failures lean
 toward under-asking rather than misintegration. This corroborates Findings~4 and~9 across
 the full error budget and motivates the state-gated answering of \S\ref{sec:axisreact}.
 
-\subsubsection{Inference-Time Intervention: Axis-Aware Clarification ReAct}
+\subsubsection{Inference-Time Intervention: Category-Aware Clarification ReAct}
 \label{sec:axisreact}
 
-The first intervention conditions on the axis \emph{without changing the model
+The first intervention conditions on the category \emph{without changing the model
 weights}. Standard ReAct leaves the agent free to decide whether and what to ask.
-We propose \textbf{Axis-Aware Clarification ReAct}, a three-component
+We propose \textbf{Category-Aware Clarification ReAct}, a three-component
 structured interaction policy that directly addresses E1--E3.
 
 \paragraph{Component 1: Ambiguity Pre-Check.}
 Before any action, the agent explicitly decides which of the five ambiguity
-axes are underspecified in the question and initializes an interpretation
+categories are underspecified in the question and initializes an interpretation
 state $\mathcal{S} = \{$entity, period, metric, basis, vintage$\}$, marking
 each field as \emph{resolved} or \emph{unknown}.
 
-\paragraph{Component 2: Axis-Conditioned Clarification.}
+\paragraph{Component 2: Category-Conditioned Clarification.}
 For each \emph{unknown} field, the agent generates a targeted yes/no question
-using axis-conditioned templates (one per axis) rather than free-form
+using category-conditioned templates (one per category) rather than free-form
 clarification.
 The agent emits at most one clarification per turn, prioritizing the most
 information-theoretically valuable unknown field.
@@ -1661,59 +1661,59 @@ This prevents the \emph{retrieval dominance} pattern (E4) where the agent
 answers immediately after finding a plausible number in a search result.
 
 \paragraph{Expected outcomes.}
-Relative to standard Answer+Search+Interact, Axis-Aware ReAct should reduce
-GenericAskRate (E3), WrongAxisRate (E2), and IR=0 failures (E1), while
-improving AxisHit@1 and ultimately Accuracy.
-Template-oracle provides an upper bound: if Axis-Aware ReAct approaches
-template-oracle performance, it confirms that axis recognition is the dominant
+Relative to standard Answer+Search+Interact, Category-Aware ReAct should reduce
+GenericAskRate (E3), WrongCategoryRate (E2), and IR=0 failures (E1), while
+improving CategoryHit@1 and ultimately Accuracy.
+Template-oracle provides an upper bound: if Category-Aware ReAct approaches
+template-oracle performance, it confirms that category recognition is the dominant
 remaining bottleneck after the E1--E3 errors are addressed.
 
 \paragraph{Pilot results.}
 We evaluate the policy on a GPT-5 backbone over a stratified $N{=}50$ subset run
 through the same OpenRouter harness, alongside four matched baselines (Standard ReAct,
-Always-Ask, Axis-Oracle, Template-Oracle). Axis-Aware ReAct reaches $46.0\%$ accuracy
+Always-Ask, Category-Oracle, Template-Oracle). Category-Aware ReAct reaches $46.0\%$ accuracy
 against the $34.0\%$ of Standard ReAct in the same run, a $+12$ point gain, and posts the
 best calibration of any condition (ECE $0.241$ versus $0.308$ for Standard ReAct). Always-Ask
 collapses to $10.0\%$, confirming that asking indiscriminately is worse than not asking and
-that the gain comes from asking \emph{selectively} on the right axis. The single-axis
-diagnostics (AxisHit@1, WrongAxisRate) are not informative for this policy: because the
-Ambiguity Pre-Check deliberately enumerates every candidate axis to rule each in or out, an
-any-axis touch form saturates near $1.0$ while the strict central-axis form is near $0$, so
-neither cleanly credits the policy and we omit AxisHit@1 for it in Table~\ref{tab:main}. The
+that the gain comes from asking \emph{selectively} on the right category. The single-category
+diagnostics (CategoryHit@1, WrongCategoryRate) are not informative for this policy: because the
+Ambiguity Pre-Check deliberately enumerates every candidate category to rule each in or out, an
+any-category touch form saturates near $1.0$ while the strict central-category form is near $0$, so
+neither cleanly credits the policy and we omit CategoryHit@1 for it in Table~\ref{tab:main}. The
 accuracy and calibration gains are the load-bearing result. We report this as a pilot rather
 than a full-panel row because it is a single backbone at $N{=}50$, and we expect the effect
 size to tighten at full scale.
 
-\subsubsection{Training-Time Intervention: Axis-Guided SFT and GRPO}
+\subsubsection{Training-Time Intervention: Category-Guided SFT and GRPO}
 \label{sec:grpo}
 
-The per-axis skill analysis (\S\ref{sec:skills}) gives this intervention a precise
+The per-category skill analysis (\S\ref{sec:skills}) gives this intervention a precise
 target: models do not lack clarification ability uniformly, they lack \emph{specific}
-axis skills (AxisHit $=0$ on recognition policy, partial on metric). The question is
+category skills (CategoryHit $=0$ on recognition policy, partial on metric). The question is
 whether those missing skills can be installed by training rather than prompting.
 The second intervention applies the \emph{same} idea, condition on the
-axis, but in the weights rather than the prompt, showing the benchmark is not
+category, but in the weights rather than the prompt, showing the benchmark is not
 only diagnosable but \emph{trainable}. Starting from Qwen3-4B-Instruct (4-bit
 QLoRA), we run an RLVR ladder, supervised fine-tuning (SFT), KTO, then GRPO, on
-the \fininteract training split, with all user simulators, graders, and axis
+the \fininteract training split, with all user simulators, graders, and category
 judges served locally (zero API cost). We score each stage with the two
-\emph{leak-proof} metrics, AxisHit@1 and interaction rate (Table~\ref{tab:grpo});
+\emph{leak-proof} metrics, CategoryHit@1 and interaction rate (Table~\ref{tab:grpo});
 accuracy is reported only with the caveat that the training environment's
 retrieval returns the disambiguated evidence span, so it is partly leaked and is
 \emph{not} a reliable learning signal.
 
-\textbf{The axis-guided teacher.} The decisive ingredient is how SFT
+\textbf{The category-guided teacher.} The decisive ingredient is how SFT
 demonstrations are generated. An uninformed teacher, even a 72B model, almost
 always asks the \emph{obvious} ambiguity (typically the reporting period) and
-rarely the subtle gold axis (entity scope, recognition policy), yielding
-$\sim$0\% on-axis demonstrations. Privately revealing the gold axis to the teacher
+rarely the subtle gold category (entity scope, recognition policy), yielding
+$\sim$0\% on-category demonstrations. Privately revealing the gold category to the teacher
 while generating demonstrations (the hint is \emph{not} stored in the trajectory)
-lifts the on-axis yield to $\sim$79\%, a reusable recipe for any axis-structured
+lifts the on-category yield to $\sim$79\%, a reusable recipe for any category-structured
 clarification task.
 
 \begin{table}[t]
 \centering
-\caption{RLVR ladder on \fininteract (Qwen3-4B, held-out $n{=}51$). AxisHit@1 and
+\caption{RLVR ladder on \fininteract (Qwen3-4B, held-out $n{=}51$). CategoryHit@1 and
 interaction are leak-proof signals of learned clarification; accuracy ($^{*}$) is
 partly leaked by oracle retrieval and should not be read as a learning signal.}
 \label{tab:grpo}
@@ -1721,10 +1721,10 @@ partly leaked by oracle retrieval and should not be read as a learning signal.}
 \resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
-Stage & AxisHit@1 & Interaction & Accuracy$^{*}$ & Reward \\
+Stage & CategoryHit@1 & Interaction & Accuracy$^{*}$ & Reward \\
 \midrule
 Base (Qwen3-4B)          & 25.0 & 54.9 & 84.3 & 0.96 \\
-\;\;+\,SFT (axis-guided) & 68.6 & \textbf{100} & 88.2 & 1.28 \\
+\;\;+\,SFT (category-guided) & 68.6 & \textbf{100} & 88.2 & 1.28 \\
 \;\;+\,KTO               & \textbf{70.6} & \textbf{100} & 84.3 & 1.27 \\
 \;\;+\,GRPO              & 66.7 & \textbf{100} & 88.2 & \textbf{1.30} \\
 \bottomrule
@@ -1732,11 +1732,11 @@ Base (Qwen3-4B)          & 25.0 & 54.9 & 84.3 & 0.96 \\
 \end{table}
 
 \textbf{SFT does the heavy lifting.} The leak-proof signals jump almost entirely
-at the supervised stage, AxisHit@1 rises $25\to69$ and interaction $55\to100$
+at the supervised stage, CategoryHit@1 rises $25\to69$ and interaction $55\to100$
 (Figure~\ref{fig:grpo}a), while KTO and GRPO move within run-to-run noise at
 $n{=}51$. Training teaches the model to \emph{always interact and target the
-correct axis}, the behavior \fininteract is built to elicit. Whether this gain
-reflects a sharpened internal \emph{representation} of the axis or only a rewired
+correct category}, the behavior \fininteract is built to elicit. Whether this gain
+reflects a sharpened internal \emph{representation} of the category or only a rewired
 output \emph{policy}, probing the trained model as in \S\ref{sec:mechanistic}, is
 a direct test of the diagnosis and a target for future work.
 
@@ -1744,7 +1744,7 @@ a direct test of the diagnosis and a target for future work.
 approximation. We additionally confirm the full multi-turn episode is trainable
 end-to-end: optimizing the 4B policy over entire ReAct episodes (loss masked on
 simulator and retrieval tokens) for 15 steps raises mean reward $0.55\to1.08$
-while clarifying turns rise $5.7\to8.6$ (Figure~\ref{fig:grpo}b), the axis-aware
+while clarifying turns rise $5.7\to8.6$ (Figure~\ref{fig:grpo}b), the category-aware
 reward is teaching the policy to ask more. We report this as a learning-signal
 demonstration, not a converged model.
 
@@ -1752,13 +1752,13 @@ demonstration, not a converged model.
 teacher are local Qwen2.5-32B/72B models (weaker than GPT-4o, and siblings of the
 policy); the terminal reward is partly leaked; and GRPO is run for tens of steps,
 not to convergence. We therefore frame this as evidence that \fininteract is
-\emph{trainable}, an axis-guided SFT seed instills axis-targeted
+\emph{trainable}, a category-guided SFT seed instills category-targeted
 clarification, rather than as a state-of-the-art accuracy result.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{fig_grpo_insights.png}
-\caption{Training on \fininteract. (a) The leak-proof learning signals (AxisHit@1,
+\caption{Training on \fininteract. (a) The leak-proof learning signals (CategoryHit@1,
 interaction) jump at SFT and saturate; accuracy (hatched) is leak-confounded.
 (b) True multi-turn GRPO on the 4B policy: mean reward and clarifying turns rise
 together over training.}
@@ -1771,20 +1771,20 @@ together over training.}
 A benchmark that models eventually memorize stops measuring. Because \fininteract
 couples a grounded data-generation pipeline (\S\ref{sec:construction}) to a
 trainable policy (\S\ref{sec:grpo}), it can in principle \emph{co-evolve}: generate
-fresh instances on an axis the current model fails, train on them, and repeat, a
+fresh instances on a category the current model fails, train on them, and repeat, a
 data$\leftrightarrow$model loop in the spirit of self-improving
 generators~\citep{mae2025}, but \emph{grounded} in real filings rather than the
 ungrounded self-play those methods risk. We run three gated rounds, on the scarce,
-subordinate axis (\texttt{recognition\_policy}), the abundant, salient axis
-(\texttt{entity\_scope}), and the abundant-but-only-weakly-scale-learnable axis
+subordinate category (\texttt{recognition\_policy}), the abundant, salient category
+(\texttt{entity\_scope}), and the abundant-but-only-weakly-scale-learnable category
 (\texttt{metric\_definition}, \S\ref{sec:skills}), to ask not \emph{whether} the
 loop works but \emph{when}.
 
 \begin{table}[t]
 \centering
-\caption{Three co-evolution rounds (axis-guided SFT on a 4B policy). Targeting
-(AxisHit@1) is on a \emph{held-out human} probe never seen in training. The loop
-closes on both \emph{abundant} axes and fails only on the \emph{scarce} one; whether
+\caption{Three co-evolution rounds (category-guided SFT on a 4B policy). Targeting
+(CategoryHit@1) is on a \emph{held-out human} probe never seen in training. The loop
+closes on both \emph{abundant} categories and fails only on the \emph{scarce} one; whether
 asking \emph{helps accuracy} flips on whether the base could already answer.}
 \label{tab:coevolve}
 \small
@@ -1805,8 +1805,8 @@ De-leaked accuracy                   & $32.5\to22.5$ & $15\to\textbf{60}$ & $11\
 
 All three rounds run end-to-end: the Constructor$\to$Verifier pipeline yields hard
 instances (every one passes the adversarial gate: the base fails it answer-only)
-and axis-guided SFT converges. The outcome splits cleanly by \emph{abundance}, not
-by scale-learnability. On both abundant axes, \texttt{entity\_scope} and
+and category-guided SFT converges. The outcome splits cleanly by \emph{abundance}, not
+by scale-learnability. On both abundant categories, \texttt{entity\_scope} and
 \texttt{metric\_definition}, Targeting generalizes to held-out \emph{human} items
 ($.00\to.68$ and $.00\to.58$, each $\sim$4$\times$ the $+.15$ bar) and to held-out
 \emph{generated} items, with no catastrophic forgetting. On the scarce
@@ -1817,12 +1817,12 @@ recognition-basis distinction. The contrast rules out a broken pipeline, the
 metric is only \emph{weakly} scale-learnable yet trains as well as entity, it rules
 out scale-learnability as the gate (\S\ref{sec:learnability}).
 
-\textbf{Finding 12: the loop closes on abundant axes and fails on scarce ones;
-whether elicitation \emph{helps} is a separate, per-axis property.} A self-refreshing
+\textbf{Finding 12: the loop closes on abundant categories and fails on scarce ones;
+whether elicitation \emph{helps} is a separate, per-category property.} A self-refreshing
 \fininteract is viable wherever the data arm can supply enough frontier
-instances, both abundant axes install and generalize; the scarce axis
+instances, both abundant categories install and generalize; the scarce category
 (recognition's $36$-instance ceiling from just $30/1{,}847$ primary passages) does
-not reliably (Finding~14). But installing on-axis elicitation is not automatically beneficial: it
+not reliably (Finding~14). But installing on-category elicitation is not automatically beneficial: it
 \emph{helps} metric (accuracy $15\to60$, $+45$: the base cannot answer without the
 metric definition, so the clarifying question \emph{supplies} it: $18$
 wrong$\to$correct, $0$ regressions) and \emph{hurts} entity (accuracy $32.5\to22.5$,
@@ -1833,12 +1833,12 @@ training-time face of the ``interaction can hurt versus plain answering'' effect
 seen at inference (\S\ref{sec:ceiling}). The actionable step, which we demonstrate
 next, is a \emph{conditional when-to-ask gate}, elicit only where the model cannot
 already answer, plus multi-round curriculum and fresh-filing ingestion to lift the
-scarce axes above their availability ceiling.
+scarce categories above their availability ceiling.
 
 \textbf{Finding 12b: the over-elicitation regression is fixable at inference, but
 not by a train-time gate.} We test the when-to-ask gate directly on the frozen human
-probes ($n{=}40$ per axis). A \emph{train-time} gate that mixes no-ask demonstrations
-into the axis-guided SFT backfires: even $7$ of $164$ no-ask demonstrations tip the
+probes ($n{=}40$ per category). A \emph{train-time} gate that mixes no-ask demonstrations
+into the category-guided SFT backfires: even $7$ of $164$ no-ask demonstrations tip the
 policy into a bimodal collapse in which it answers directly without retrieving, which
 is fatal because in \fininteract almost nothing is answerable from parametric memory
 (entity accuracy $32.5\to7.5$, metric $60\to2.5$). An \emph{inference-time} gate
@@ -1855,51 +1855,51 @@ question, so a confidence-calibrated gate that asks when the silent answer would
 \subsubsection{What Gates Co-Evolvability? A Falsification Test}
 \label{sec:learnability}
 
-The three rounds let us isolate \emph{which} axis property predicts whether the loop
-closes. Two candidates are natural, an axis's \emph{scale-learnability} (does
+The three rounds let us isolate \emph{which} category property predicts whether the loop
+closes. Two candidates are natural, a category's \emph{scale-learnability} (does
 zero-shot Targeting rise with model size?) and its \emph{source-abundance} (can the
 data arm supply frontier instances?), and we had also hypothesized a
-representational version: \emph{learnable iff the axis is linearly decodable} from
+representational version: \emph{learnable iff the category is linearly decodable} from
 hidden states. The \texttt{metric\_definition} round was designed to discriminate the
 first two; a linear probe tests the third. Both tidy hypotheses fail.
 
 \textbf{Scale-learnability does not gate co-evolution.} \texttt{metric\_definition}
 is abundant ($498$ primary passages) but only \emph{weakly} scale-learnable
-(zero-shot AxisHit $.05\!\to\!.26$, slope $+0.21$, versus entity's $+0.77$). We
+(zero-shot CategoryHit $.05\!\to\!.26$, slope $+0.21$, versus entity's $+0.77$). We
 pre-registered the two-factor prediction that it would co-evolve only
 \emph{partially}. It did not: metric is a \emph{full} GO (Targeting $+0.55$, matching
 entity's $+0.61$; Table~\ref{tab:coevolve}). What separates GO from NO-GO is not the
-scale-slope but \emph{abundance}, both abundant axes close the loop; only the scarce
-axis fails.
+scale-slope but \emph{abundance}, both abundant categories close the loop; only the scarce
+category fails.
 
 \textbf{Representation does not gate it either, and is not the bottleneck.} A
-per-layer one-vs-rest linear probe decodes every axis from base hidden states, and
+per-layer one-vs-rest linear probe decodes every category from base hidden states, and
 the pattern \emph{anti}-tracks learnability: \texttt{recognition\_policy}, the
-un-learnable, NO-GO axis, is the \emph{most} decodable (AUROC $0.93$ on a
+un-learnable, NO-GO category, is the \emph{most} decodable (AUROC $0.93$ on a
 size-matched sample, above entity/metric at $\sim0.77$); decodability is \emph{flat}
-across the $4\text{B}\!\to\!32\text{B}$ sweep even as behavioural AxisHit climbs
-$.12\!\to\!.89$; and axis-guided SFT leaves it unchanged. The axis is fully
+across the $4\text{B}\!\to\!32\text{B}$ sweep even as behavioural CategoryHit climbs
+$.12\!\to\!.89$; and category-guided SFT leaves it unchanged. The category is fully
 \emph{represented} at every scale, before and after training: the model simply does
 not \emph{act} on it, the ``represents-but-doesn't-act'' gap of
-\S\ref{sec:mechanistic}, now shown to hold even for the axis co-evolution cannot fix.
+\S\ref{sec:mechanistic}, now shown to hold even for the category co-evolution cannot fix.
 
 \begin{table}[t]
 \centering
 \caption{What predicts co-evolvability. The observed outcomes track
-\emph{abundance/salience}, \emph{not} the AxisHit scale-slope (metric: low slope,
+\emph{abundance/salience}, \emph{not} the CategoryHit scale-slope (metric: low slope,
 GO) and \emph{not} decodability (recognition: highest AUROC, yet does not
 co-evolve). Salience = primary$/$any-candidate passages; decodability = peak
 one-vs-rest AUROC (recognition on a size-matched augmented sample; raw $n{=}9$
 overfits to $1.0$). $^*$metric is a GO but needs ${\sim}2$ accumulated slices
 (${\sim}50$ instances); one $30$-instance slice teaches it nothing (Finding~14).
 $^\ddagger$recognition is \emph{unreliable} rather than a clean fail: held-out human
-AxisHit ranges $0$--$0.44$ across training runs on the scarce $n{=}9$ probe.}
+CategoryHit ranges $0$--$0.44$ across training runs on the scarce $n{=}9$ probe.}
 \label{tab:learnability}
 \small
 \resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lrrccc}
 \toprule
-Axis & Primary & Salience & Slope & Decode & Co-evolve \\
+Category & Primary & Salience & Slope & Decode & Co-evolve \\
 \midrule
 entity\_scope       & 905 & \textbf{0.92} & $+0.77$ & 0.77 & \textbf{GO} \\
 metric\_definition  & 498 & 0.48 & $+0.21$ & 0.77 & \textbf{GO}$^*$ \\
@@ -1913,14 +1913,14 @@ recognition\_policy &  30 & \textbf{0.04} & $+0.00$ & \textbf{0.93} & weak$^{\dd
 \textbf{Finding 13: co-evolvability is gated by source \emph{abundance}, driven by
 \emph{salience}, not by scale-learnability or representational decodability.} What
 survives both falsifications is a single upstream cause. \texttt{recognition\_policy}
-is a candidate axis in $796$ passages but \emph{primary} in only $30$ (salience
+is a candidate category in $796$ passages but \emph{primary} in only $30$ (salience
 $0.04$): it is almost always the \emph{subordinate} ambiguity, behind a more salient
-entity or period axis in the same passage. Low salience produces both the scarcity
+entity or period category in the same passage. Low salience produces both the scarcity
 that starves the data arm and the salient competitor the model's prior reaches for
 instead, so the representation is present but never acted on and cannot be cheaply
-trained in. Salient axes behave oppositely (entity, salience $0.92$: abundant and
+trained in. Salient categories behave oppositely (entity, salience $0.92$: abundant and
 trainable). For a practitioner, \textbf{salience, not scale curves or probe
-accuracy, is the cheap, up-front signal} of which axes a co-evolving benchmark can
+accuracy, is the cheap, up-front signal} of which categories a co-evolving benchmark can
 keep hard and which need fresh human curation. The corollary for evaluation is
 sharper: the hardest ambiguity to make models \emph{handle} is not the one they
 cannot represent, but the one that is always someone else's more-obvious question.
@@ -1929,8 +1929,8 @@ cannot represent, but the one that is always someone else's more-obvious questio
 \centering
 \includegraphics[width=\linewidth]{fig_multiround.png}
 \caption{Multi-round co-evolution with a validation guard. \emph{Left}: validation
-AxisHit@1 (selection metric) per round. \emph{Right}: held-out \emph{human}-probe
-AxisHit (never used for selection). Entity learns targeting from a single $30$-instance
+CategoryHit@1 (selection metric) per round. \emph{Right}: held-out \emph{human}-probe
+CategoryHit (never used for selection). Entity learns targeting from a single $30$-instance
 slice and transfers to humans ($0.63\!\to\!0.93$); metric needs \emph{accumulation}
 (one slice teaches nothing, brown, flat, while two accumulated slices reach
 $0.75$, green); recognition stays at base ($\approx0.05$) even with a fair
@@ -1939,25 +1939,25 @@ candidate, which regresses on validation).}
 \label{fig:multiround}
 \end{figure}
 
-\textbf{Finding 14: salience predicts an axis's \emph{data-need}, not just a binary
-outcome, and a validation-guarded arms race confirms it.} Extending each axis to a
+\textbf{Finding 14: salience predicts a category's \emph{data-need}, not just a binary
+outcome, and a validation-guarded arms race confirms it.} Extending each category to a
 multi-round curriculum (Fig.~\ref{fig:multiround}), with checkpoints selected on a
 frozen validation set and reported on the held-out human probe, refines the binary
 gate into a gradient that tracks salience. \textbf{Entity} (salience $0.92$) learns
-axis-targeting from a \emph{single} $30$-instance slice and transfers to human
+category-targeting from a \emph{single} $30$-instance slice and transfers to human
 ambiguity at $0.88$--$0.93$. \textbf{Metric} ($0.48$) needs \emph{accumulation}: one
 slice yields $0.0$, two accumulated slices reach $0.75$, so its earlier single-round
-GO used ${\sim}60$ instances precisely because that is roughly what the axis requires.
+GO used ${\sim}60$ instances precisely because that is roughly what the category requires.
 \textbf{Recognition} ($0.04$) is \emph{unreliable}: across training runs its human
-AxisHit ranges only $0$--$0.44$ on the scarce $n{=}9$ probe, weak and inconsistent,
+CategoryHit ranges only $0$--$0.44$ on the scarce $n{=}9$ probe, weak and inconsistent,
 not a clean zero. Scoring the same runs as an \emph{Elo arms race} between the solver
-and a hard-example miner (win $=$ AxisHit, which, unlike recall-walled resolution, %
+and a hard-example miner (win $=$ CategoryHit, which, unlike recall-walled resolution, %
 varies across checkpoints) makes the instrument non-degenerate: entity is
 \emph{solver-runaway} (solver Elo $1000\!\to\!1551$, outpacing a corpus-bounded miner
 that cannot synthesize adversarially harder targeting), while recognition
 \emph{stalls} (flat). Two guarded rounds peak; the third overfits and is rolled back.
 The practical reading: salience is an up-front estimate not just of \emph{whether} an
-axis co-evolves but of \emph{how much} data it needs, and one well-targeted round,
+category co-evolves but of \emph{how much} data it needs, and one well-targeted round,
 guarded on held-out validation, is close to the sweet spot.
 
 
@@ -1977,7 +1977,7 @@ accepted instances).
 Re-running the pipeline over a held-out sample of candidate passages reproduces
 a sharp funnel (Table~\ref{tab:cost}). Only $11.5\%$ of keyword-tagged candidate
 passages survive the constructor, which rejects the rest as containing
-\emph{no viable ambiguity} for the target axis; but of those that survive,
+\emph{no viable ambiguity} for the target category; but of those that survive,
 $98.5\%$ pass the $10$-trial adversarial verifier. In other words, the
 construction prompt is strict and the verifier rarely needs to fire, the cost
 of the benchmark is dominated by constructor calls spent on candidate passages
@@ -2017,7 +2017,7 @@ benchmark is therefore inexpensive to scale in API terms, an order of
 \$300 takes it to $1000$ instances, and the true constraint is the supply of
 candidate passages that contain structured, verifiable ambiguity. This favors
 \emph{better passage pre-selection} (raising the $11.5\%$ viability rate) over
-brute-force compute, and explains why the rare axes (e.g.\ filing\_vintage),
+brute-force compute, and explains why the rare categories (e.g.\ filing\_vintage),
 whose candidate passages almost never survive the constructor, are the expensive
 ones to grow.
 
@@ -2046,7 +2046,7 @@ R5  & $Q$ must ask about a substantive financial metric \\
 R6  & Answer type consistent with question type \\
 R7  & Context $C$ must not contain the answer value \\
 R8  & Intended and default interpretations must differ \\
-R9  & All axis labels must be valid vocabulary items \\
+R9  & All category labels must be valid vocabulary items \\
 R10 & Answer must be non-trivial (not empty or ``0'') \\
 R11 & \texttt{default\_answer} present and differs from \texttt{answer} \\
 R12 & Both evidence spans non-empty \\
