@@ -169,8 +169,9 @@ of financial ambiguity. Grading the \emph{same} model outputs against the defaul
 versus the intended interpretation exposes the illusion directly, and a per-category
 skill metric then localizes \emph{which} clarification ability a model lacks.
 We evaluate agents under a ReAct protocol where a user simulator answers only from
-the disambiguating context, so the benchmark measures whether an agent elicits the
-clarification it needs rather than whether it can be handed the answer.
+the disambiguating context (Figure~\ref{fig:framework}), so the benchmark measures
+whether an agent elicits the clarification it needs rather than whether it can be
+handed the answer.
 
 \paragraph{Findings.}
 Our study answers the three questions. \textbf{(RQ1)} Frontier models detect ambiguity but
@@ -396,10 +397,10 @@ Apps segment, \$62.87B) and an intended (consolidated GAAP, \$46.75B), separated
 disambiguating context $C$. \textbf{(2)~Let the agent resolve it:} seeing the question and
 filing passages, the agent either answers without clarifying (Part~A, a plausible but wrong
 interpretation) or asks a clarifying question that a user simulator answers only from $C$
-(Part~B, correct elicitation and answer). \textbf{(3)~\fininteract scores the behavior:}
-final-answer correctness against the intended interpretation, interaction quality (did the
-agent ask, target the right category, and resolve the user's intent), and the single-gold
-failure a conventional benchmark makes by rewarding the defensible default.}
+(Part~B, correct elicitation and answer). \textbf{(3)~\fininteract scores the behavior}
+on three signals: final-answer correctness against the intended interpretation, interaction
+quality (did the agent ask, target the right category, and resolve the user's intent), and
+the single-gold failure a conventional benchmark makes by rewarding the defensible default.}
 \label{fig:framework}
 \end{figure*}
 
