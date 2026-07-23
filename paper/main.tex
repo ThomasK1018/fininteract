@@ -36,29 +36,27 @@
 \maketitle
 
 \begin{abstract}
-Question-answering benchmarks grade each query against a single gold answer.
-When a query is genuinely ambiguous, this rewards a model for producing the
-\emph{most common} reading rather than for recognizing that the query is
-under-specified: a model that guesses the default and one that identifies the
-ambiguity score the same. We call this the \emph{single-gold illusion}. Because
-single-gold grading credits the default reading in any domain, we study it where
-it is measured most cleanly: finance, where the same query is routinely ambiguous
-(Meta Platforms' ``operating income'' is \$46.75B consolidated or \$62.87B for the
-Family of Apps segment, a 34\% gap) yet each reading's ground truth is exact and
-programmatically verifiable. We release \fininteract, a bilingual (English/Chinese)
+Large language model agents are increasingly deployed for financial analysis over
+regulatory filings, returning a single number that an analyst or investor may act on.
+But financial terminology is specific, and a question that looks fully specified often
+admits several defensible readings that yield materially different values. Meta
+Platforms' ``operating income'' is \$46.75B consolidated or \$62.87B for the Family of
+Apps segment, a 34\% gap, yet each reading's ground truth is exact and programmatically
+verifiable. A capable agent should recognize the ambiguity and ask a clarifying question
+rather than commit to a plausible but unintended reading. Yet existing financial
+benchmarks attach one gold answer per question and cannot tell an agent that resolves the
+ambiguity from one that guesses the common reading, a blind spot we call the
+\emph{single-gold illusion}. We release \fininteract, a bilingual (English/Chinese)
 benchmark of 173 instances that pairs each question with a \emph{default} and an
-\emph{intended} interpretation (fixed by a disambiguating context) across a
-five-axis ambiguity taxonomy. Re-grading the \emph{same} outputs against the
-intended rather than default interpretation cuts apparent accuracy by up to
-$3\times$. The failure is elicitation, not knowledge: given the resolved
-interpretation models answer $93$--$95\%$ correctly, yet the best model resolves
-only $20\%$ under free interaction, and \emph{adding} clarification lowers accuracy
-below plain search for all but the strongest model. A per-axis skill metric turns
-``the model was wrong'' into ``the model failed to elicit axis $X$'', and shows the
-required skills dissociate by \emph{salience}: axis-guided self-training installs
-salient axes from little data but reaches the least-salient (recognition basis)
-only unreliably. A replication on general-domain AmbigQA confirms the illusion is
-not finance-specific ($2.1$--$2.3\times$ across three models).
+\emph{intended} interpretation (fixed by a disambiguating context) across a five-axis
+ambiguity taxonomy, and grades whether an agent elicits the right clarification.
+Re-grading the \emph{same} outputs against the intended rather than the default
+interpretation cuts apparent accuracy by up to $3\times$. The failure is elicitation, not
+knowledge: given the resolved interpretation models answer $93$--$95\%$ correctly, yet the
+best model resolves only $20\%$ under free interaction, and \emph{adding} clarification
+lowers accuracy below plain search for all but the strongest model. A per-axis skill
+metric localizes \emph{which} clarification ability fails and reveals recognition basis as
+a blind spot no current model targets.
 \end{abstract}
 
 %% ============================================================
@@ -66,25 +64,28 @@ not finance-specific ($2.1$--$2.3\times$ across three models).
 \label{sec:intro}
 %% ============================================================
 
-Question-answering benchmarks grade each query against a single gold answer.
-This convention is invisible when queries are fully specified, but real queries
-often are not, and when a query is genuinely ambiguous, single-gold grading
-silently rewards a model for producing the \emph{most common} reading rather than
-for recognizing that the query is under-specified at all. A model that blindly
-guesses the default interpretation and a model that correctly identifies the
-ambiguity receive the \emph{same} score. The benchmark therefore cannot see the
-capability that matters most in deployment: knowing when to ask.
+Large language model agents are increasingly deployed for financial analysis,
+answering questions over regulatory filings and earnings
+reports~\citep{islam2023financebench,chen2021finqa,reddy2024docfinqa} and carrying out
+multi-step research and retrieval over corporate
+disclosures~\citep{bigeard2025financeagent,choi2025finagentbench,krumdick2024bizbench,xie2024finben}.
+In a typical deployment the agent reads a user's question, searches the relevant filings,
+and returns a numeric answer that an analyst or investor may act on.
 
-We call this the \emph{single-gold illusion}, and we study it where it can be
-measured most cleanly. Financial question answering is an ideal instrument: the
-same query is routinely ambiguous. \emph{``What was Meta Platforms' operating
-income?''} (Figure~\ref{fig:teaser}) is \$46.75B as the consolidated GAAP figure
-for FY2023 or \$62.87B for the Family of Apps segment, a 34\% difference, yet the
-ground truth for each reading is exact and programmatically verifiable against SEC
-filings. A skilled analyst would not guess; they would ask a clarifying question.
-Existing benchmarks reward the model that guesses correctly and cannot distinguish
-it from one that recognizes the ambiguity, the same blind spot, we will argue,
-that any single-gold benchmark inherits on ambiguous inputs, in finance or out.
+Financial questions are often deceptively under-specified. Financial terminology is highly
+specific, and a natural-language question that looks complete can map to several defensible
+readings that yield materially different numbers. Asked \emph{``What was Meta Platforms'
+operating income?''} (Figure~\ref{fig:teaser}), an agent must decide whether the user means
+the consolidated GAAP figure (\$46.75B for FY2023) or the Family of Apps segment
+(\$62.87B), a 34\% difference, and each is the correct answer to a \emph{different} reading
+of the same question. A capable agent should recognize the ambiguity and \emph{follow up
+with the user} rather than blindly commit to one plausible but possibly unintended reading.
+Yet existing financial benchmarks attach a single gold answer to each question and grade
+only the final number, so they cannot distinguish an agent that resolves the ambiguity from
+one that guesses the common reading and happens to match, a measurement blind spot we call
+the \emph{single-gold illusion}. Capturing the capability that matters most in deployment,
+knowing when and what to ask, requires a benchmark built specifically around ambiguity and
+interaction.
 
 \begin{figure*}[t]
 \centering
@@ -138,52 +139,22 @@ Default span &
 \end{tabular}}
 \end{table}
 
-\paragraph{Limitations of Existing Benchmarks.}
-FinanceBench~\citep{islam2023financebench} provides 150 expert-curated
-questions over SEC filings, each with a unique correct answer verified against
-the source document; queries are pre-disambiguated by construction.
-FinQA~\citep{chen2021finqa} and DocFinQA~\citep{reddy2024docfinqa} target
-numerical reasoning over earnings reports but give the model the exact evidence
-table alongside the question, bypassing retrieval and interaction entirely.
-BizBench~\citep{krumdick2024bizbench} and FinBen~\citep{xie2024finben}
-aggregate multiple financial tasks but treat QA as closed-book or
-retrieval-augmented reading comprehension.
-None of these benchmarks ask whether a model \emph{recognizes} that a
-question is ambiguous, nor whether it can \emph{resolve} that ambiguity
-through strategic interaction with a user. Table~\ref{tab:comparison}
-summarizes how \fininteract differs from these benchmarks along ambiguity
-pairing, interaction, per-axis diagnosis, and verifiable ground truth.
-
-\paragraph{The Ambiguous-QA Gap in Finance.}
-The ambiguous-QA literature has matured in the general domain:
-AmbigQA~\citep{min2020ambigqa} introduced multi-answer formulations;
-CondAmbigQA~\citep{li2025condambigqa} added condition-structured annotations;
-CLAM~\citep{kuhn2022clam} demonstrated that clarification pipelines improve
-accuracy on ambiguous queries.
-However, all of this work operates on general-domain Wikipedia questions.
-Finance is structurally different in three ways.
-First, financial ambiguity is \emph{endemic and systematic}, a single
-number such as ``net income'' can legitimately differ by 30--40\% depending
-on reporting scope, accounting basis, and filing vintage.
-Second, \emph{misanswers are costly}, an investor acting on the wrong revenue
-figure or a compliance officer citing the wrong filing version can cause real
-financial harm.
-Third, \emph{ground truth is programmatically verifiable}, SEC filings
-and XBRL facts provide exact machine-readable values for every metric,
-period, and scope.
-
-\paragraph{The Interaction Stagnation Hypothesis.}
-\interactcomp~\citep{interactcomp2026} established an important longitudinal
-finding: while retrieval accuracy on web search benchmarks has improved
-rapidly with model scale, interaction capability has not kept pace.
-Across eight frontier models on general-domain tasks, fewer than 14\% of
-questions were answered correctly in full-interaction mode, even though
-forced-interaction experiments showed the same models could achieve 60--70\%
-accuracy when required to elicit disambiguating context.
-We hypothesize that this stagnation is more severe in finance, where
-\emph{domain knowledge is required to even recognize the axes of ambiguity}:
-a model that does not know what ``non-GAAP'' means cannot recognize that
-``adjusted net income'' is under-specified.
+\paragraph{Why existing benchmarks miss this.}
+Financial QA benchmarks pre-disambiguate their questions or hand the model the exact
+evidence, so they never test ambiguity recognition or interaction. FinanceBench~\citep{islam2023financebench}
+verifies one correct answer per pre-disambiguated question, FinQA~\citep{chen2021finqa} and
+DocFinQA~\citep{reddy2024docfinqa} supply the evidence table alongside the query, and
+BizBench~\citep{krumdick2024bizbench} and FinBen~\citep{xie2024finben} treat QA as
+closed-book reading comprehension (Table~\ref{tab:comparison}). The ambiguous-QA literature
+tackles under-specification directly, but only in the general Wikipedia
+domain~\citep{min2020ambigqa,li2025condambigqa,kuhn2022clam}, where ground truth is not
+exactly verifiable. Finance is a sharper instrument. Ambiguity is endemic and systematic,
+a single figure such as ``net income'' can legitimately differ by 30--40\% depending on
+reporting scope, accounting basis, or filing vintage. Misanswers are costly, and ground
+truth is programmatically verifiable against SEC XBRL facts. Interaction capability has
+also lagged retrieval as models scale~\citep{interactcomp2026}, and we expect the gap to be
+worse in finance, where domain knowledge is needed even to recognize that a term is
+under-specified.
 
 \paragraph{Design Considerations.}
 Measuring the single-gold illusion cleanly demands more than a set of hard questions.
@@ -200,17 +171,16 @@ truth and automatic judges validated against human annotators. These four goals,
 developed in \S\ref{sec:task}, shape the design choices that follow.
 
 \paragraph{Our Proposal.}
-We operationalize the single-gold illusion and measure its consequences. We
-release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances
-(53 English / 120 Chinese): each question $Q$ is paired with a \emph{default}
+We release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances
+(53 English / 120 Chinese). Each question $Q$ is paired with a \emph{default}
 interpretation (the reading a non-expert assumes) and an \emph{intended}
 interpretation fixed by a disambiguating context $C$, across a five-axis taxonomy
 of financial ambiguity. Grading the \emph{same} model outputs against the default
-versus the intended interpretation exposes the illusion directly; a per-axis
+versus the intended interpretation exposes the illusion directly, and a per-axis
 skill metric then localizes \emph{which} clarification ability a model lacks.
-Finance is the instrument, chosen for exact, verifiable ground truth and endemic
-ambiguity, but the phenomenon it reveals is a general fact about how we grade
-ambiguous queries.
+We evaluate agents under a ReAct protocol where a user simulator answers only from
+the disambiguating context, so the benchmark measures whether an agent elicits the
+clarification it needs rather than whether it can be handed the answer.
 
 \paragraph{Research Questions.}
 We organize the study around three questions.
