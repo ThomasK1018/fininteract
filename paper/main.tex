@@ -79,13 +79,17 @@ operating income?''} (Figure~\ref{fig:teaser}), an agent must decide whether the
 the consolidated GAAP figure (\$46.75B for FY2023) or the Family of Apps segment
 (\$62.87B), a 34\% difference, and each is the correct answer to a \emph{different} reading
 of the same question. A capable agent should recognize the ambiguity and \emph{follow up
-with the user} rather than blindly commit to one plausible but possibly unintended reading.
-Yet existing financial benchmarks attach a single gold answer to each question and grade
-only the final number, so they cannot distinguish an agent that resolves the ambiguity from
-one that guesses the common reading and happens to match, a measurement blind spot we call
-the \emph{single-gold illusion}. Capturing the capability that matters most in deployment,
-knowing when and what to ask, requires a benchmark built specifically around ambiguity and
-interaction.
+with the user} rather than commit to one plausible but unintended reading. Existing
+financial benchmarks cannot measure this. They pre-disambiguate their questions or hand the
+model the exact evidence and grade only the final
+number~\citep{islam2023financebench,chen2021finqa,reddy2024docfinqa,krumdick2024bizbench,xie2024finben},
+so they cannot distinguish an agent that resolves the ambiguity from one that guesses the
+common reading and happens to match, a blind spot we call the \emph{single-gold illusion}
+(Table~\ref{tab:comparison}). The general ambiguous-QA literature tackles under-specification
+but only on Wikipedia questions, where ground truth is not exactly
+verifiable~\citep{min2020ambigqa,li2025condambigqa,kuhn2022clam}. Finance is a sharper
+instrument: ambiguity is endemic and systematic, misanswers are costly, and ground truth is
+programmatically verifiable against SEC XBRL facts.
 
 \begin{figure*}[t]
 \centering
@@ -139,36 +143,21 @@ Default span &
 \end{tabular}}
 \end{table}
 
-\paragraph{Why existing benchmarks miss this.}
-Financial QA benchmarks pre-disambiguate their questions or hand the model the exact
-evidence, so they never test ambiguity recognition or interaction. FinanceBench~\citep{islam2023financebench}
-verifies one correct answer per pre-disambiguated question, FinQA~\citep{chen2021finqa} and
-DocFinQA~\citep{reddy2024docfinqa} supply the evidence table alongside the query, and
-BizBench~\citep{krumdick2024bizbench} and FinBen~\citep{xie2024finben} treat QA as
-closed-book reading comprehension (Table~\ref{tab:comparison}). The ambiguous-QA literature
-tackles under-specification directly, but only in the general Wikipedia
-domain~\citep{min2020ambigqa,li2025condambigqa,kuhn2022clam}, where ground truth is not
-exactly verifiable. Finance is a sharper instrument. Ambiguity is endemic and systematic,
-a single figure such as ``net income'' can legitimately differ by 30--40\% depending on
-reporting scope, accounting basis, or filing vintage. Misanswers are costly, and ground
-truth is programmatically verifiable against SEC XBRL facts. Interaction capability has
-also lagged retrieval as models scale~\citep{interactcomp2026}, and we expect the gap to be
-worse in finance, where domain knowledge is needed even to recognize that a term is
-under-specified.
+\paragraph{Research Questions.}
+We organize the study around three questions.
+\textbf{RQ1 (Detection and resolution).} Do frontier models recognize financial-report
+ambiguity, and does interactive clarification improve resolution over autonomous search?
+\textbf{RQ2 (Where the bottleneck lies).} Is the binding constraint knowing \emph{when}
+and on \emph{which} axis to ask (elicitation) rather than access to evidence (grounding)?
+\textbf{RQ3 (Intervention).} Can targeted interventions on the ambiguity axis, at inference
+time and through training, measurably improve resolution?
 
-\paragraph{Design Considerations.}
-Measuring the single-gold illusion cleanly demands more than a set of hard questions.
-A benchmark that exposes it must satisfy four requirements. It must draw
-\emph{representative} ambiguity from real filings rather than synthetic templates, so
-the phenomenon it measures is the one models face in deployment. It must support
-\emph{fine-grained} diagnosis, pairing every instance with a default and an intended
-reading and labeling its ambiguity axis, so evaluation localizes \emph{which}
-clarification ability fails rather than returning one aggregate score. It must be
-\emph{low-cost and leak-safe} to construct, keeping the answer out of the
-disambiguating context so that retrieval alone cannot resolve the question. And it
-must be \emph{high-quality and verifiable}, with programmatically checkable ground
-truth and automatic judges validated against human annotators. These four goals,
-developed in \S\ref{sec:task}, shape the design choices that follow.
+\paragraph{Design considerations.}
+A benchmark that answers these questions must draw \emph{representative} ambiguity from real
+filings, support \emph{fine-grained} per-axis diagnosis through paired default and intended
+readings, admit \emph{low-cost, leak-safe} construction that keeps the answer out of the
+disambiguating context, and provide \emph{verifiable}, human-validated ground truth
+(\S\ref{sec:task}).
 
 \paragraph{Our Proposal.}
 We release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances
@@ -182,47 +171,32 @@ We evaluate agents under a ReAct protocol where a user simulator answers only fr
 the disambiguating context, so the benchmark measures whether an agent elicits the
 clarification it needs rather than whether it can be handed the answer.
 
-\paragraph{Research Questions.}
-We organize the study around three questions.
-\textbf{RQ1 (Detection and resolution).} Do frontier models recognize financial-report
-ambiguity, and does interactive clarification improve resolution over autonomous search?
-\textbf{RQ2 (Where the bottleneck lies).} Is the binding constraint knowing \emph{when}
-and on \emph{which} axis to ask (elicitation) rather than access to evidence (grounding)?
-\textbf{RQ3 (Intervention).} Can targeted interventions on the ambiguity axis, at inference
-time and through training, measurably improve resolution?
+\paragraph{Findings.}
+Our study answers the three questions. \textbf{(RQ1)} Frontier models detect ambiguity but
+rarely resolve it, asking about the correct axis almost always yet converting the
+clarification into the right answer only occasionally, and the recognition-basis axis is a
+blind spot no current model targets (\S\ref{sec:skills}). \textbf{(RQ2)} The bottleneck is
+elicitation, not knowledge: given the resolved interpretation models answer $93$--$95\%$
+correctly, yet the best resolves only $20\%$ under free interaction and adding clarification
+lowers accuracy for all but the strongest model (\S\ref{sec:ceiling}). \textbf{(RQ3)}
+Axis-conditioned interventions at inference and in training raise resolution over their
+untargeted counterparts, so the benchmark is not only diagnostic but actionable
+(Appendix~\ref{app:findings}).
 
-\noindent\textbf{Contributions.} Our contributions answer these questions in turn.
-\begin{enumerate}[leftmargin=*]
-  \item \textbf{The single-gold illusion.} We identify and quantify a
-    measurement-validity failure: grading ambiguous queries against one gold
-    answer overstates model competence by up to $3\times$, because it credits the
-    default reading and cannot distinguish recognizing ambiguity from guessing it.
-    We measure it precisely in finance (\S\ref{sec:illusion}) and confirm it
-    replicates on the general-domain AmbigQA benchmark across three models, where it
-    overstates competence $2.1$--$2.3\times$ (\S\ref{sec:general}).
-  \item \textbf{An elicitation bottleneck, not a knowledge gap (RQ2).} Given the
-    resolved interpretation, models answer $93$--$95\%$ correctly, yet the best
-    model resolves only $20\%$ under free interaction, and \emph{adding}
-    clarification turns \emph{lowers} accuracy below plain search for every model
-    but the strongest, isolating elicitation as the binding constraint
-    (\S\ref{sec:ceiling}).
-  \item \textbf{A per-axis skill decomposition and a capability dissociation (RQ1).} We
-    turn accuracy into a skill metric (AxisHit) that localizes \emph{which}
-    clarification ability fails, and show the ambiguity axes are different
-    \emph{kinds} of skill: some are solved by scale alone while others (recognition
-    basis) resist scale and are only unreliably teachable
-    (\S\ref{sec:skills}).
-  \item \textbf{Interventions on the ambiguity axis (RQ3).} We show the benchmark is
-    actionable: an inference-time Axis-Aware ReAct policy and a training-time
-    axis-guided fine-tuning recipe both raise resolution over their untargeted
-    counterparts, turning the evaluation signal into measurable improvement
-    (\S\ref{sec:axisreact}, \S\ref{sec:grpo}).
-  \item \textbf{\fininteract, the instrument.} A bilingual benchmark of 173
-    verifiable, ambiguity-paired instances with a five-axis taxonomy, construction
-    pipeline, and evaluation harness that make the above measurable and
-    reproducible (\S\ref{sec:construction}). The benchmark and all construction,
-    evaluation, and training code are released for reproducible follow-on work at
-    \url{https://anonymous.4open.science/r/FinInteract}.% TODO: replace with the live anonymized repository URL before submission
+\noindent\textbf{Contributions.}
+\begin{enumerate}[leftmargin=*,itemsep=1pt]
+  \item \textbf{The single-gold illusion}, a measurement-validity failure we identify and
+    quantify: single-gold grading overstates competence by up to $3\times$ on ambiguous
+    financial queries (\S\ref{sec:illusion}).
+  \item \textbf{\fininteract}, a bilingual benchmark of 173 verifiable, ambiguity-paired
+    instances across a five-axis taxonomy, with a per-axis AxisHit skill metric that
+    localizes \emph{which} clarification ability a model lacks (\S\ref{sec:task},
+    \S\ref{sec:construction}).
+  \item \textbf{Axis-conditioned interventions} at inference and training time that raise
+    resolution over untargeted counterparts, showing the benchmark is actionable
+    (Appendix~\ref{app:findings}).
+  \item \textbf{An open release} of the benchmark and all construction, evaluation, and
+    training code at \url{https://anonymous.4open.science/r/FinInteract}.% TODO: replace with the live anonymized repository URL before submission
 \end{enumerate}
 
 
