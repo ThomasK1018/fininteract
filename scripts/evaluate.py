@@ -523,7 +523,37 @@ def simulate_user(question: str, context: str, oai: OpenAI,
         )
     if mode == "noisy":
         return _noisy_user_answer(question, context, oai)
+    if mode == "freeform":
+        return _freeform_user_answer(question, context, oai)
     return _llm_user_answer(question, context, oai)
+
+
+FREEFORM_SIM_SYSTEM = """\
+You are the user who submitted a financial question. Your intended interpretation is described below.
+Answer the agent's clarifying question truthfully and concisely from that intended interpretation
+(entity scope, period, metric, reporting basis). If the question is yes/no, answer Yes, No, or I don't know.
+If it is open-ended (for example "which fiscal year?" or "which segment?"), give the specific detail.
+Never state the final numeric answer, since the agent must compute that itself. Keep your answer under 15 words.
+"""
+
+
+def _freeform_user_answer(question: str, context: str, oai: OpenAI) -> str:
+    """Free-form simulator: answers open-ended clarifying questions from the intended
+    interpretation C without revealing the numeric answer. Robustness check for the reviewer
+    concern that a yes/no-only simulator manufactures the elicitation bottleneck."""
+    resp = chat(
+        oai, USER_SIM_MODEL,
+        messages=[
+            {"role": "system", "content": FREEFORM_SIM_SYSTEM},
+            {"role": "user",   "content": (
+                f"My intended interpretation is described by: {context}\n\n"
+                f"Agent's clarifying question: {question}\n\nYour answer:"
+            )},
+        ],
+        temperature=TEMPERATURE_SIM,
+        max_tokens=40,
+    )
+    return (resp or "I don't know").strip()
 
 
 # ---------------------------------------------------------------------------
@@ -1018,8 +1048,9 @@ def main():
     p.add_argument("--forced-interact", type=int, default=0, dest="forced_n",
                    help="Forced-interaction ablation: require N asks before answering")
     p.add_argument("--user-sim", default="llm",
-                   choices=["oracle", "llm", "noisy"],
-                   help="User simulator: oracle (rule-based), llm (GPT-5), noisy (GPT-5 + 15%% random)")
+                   choices=["oracle", "llm", "noisy", "freeform"],
+                   help="User simulator: oracle (rule-based), llm (GPT-5 yes/no), noisy (GPT-5 + 15%% random), "
+                        "freeform (GPT-5 answers open-ended questions from C without leaking the answer)")
     p.add_argument("--passage-file", default=None,
                    help="Path to passages.jsonl (for oracle retrieval lookup)")
     p.add_argument("--elicit-confidence", action="store_true",
