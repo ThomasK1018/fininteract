@@ -51,12 +51,13 @@ benchmark of 173 instances that pairs each question with a \emph{default} and an
 \emph{intended} interpretation (fixed by a disambiguating context) across a five-category
 ambiguity taxonomy, and grades whether an agent elicits the right clarification.
 Re-grading the \emph{same} outputs against the intended rather than the default
-interpretation cuts apparent accuracy by up to $3\times$. The failure is elicitation, not
-knowledge: given the resolved interpretation models answer $93$--$95\%$ correctly, yet the
-best model resolves only $20\%$ under free interaction, and \emph{adding} clarification
-lowers accuracy below plain search for all but the strongest model. A per-category skill
-metric localizes \emph{which} clarification ability fails and reveals recognition basis as
-a blind spot no current model targets.
+interpretation cuts apparent accuracy by up to $3\times$ (for GPT-4o under retrieval). The
+failure is elicitation, not knowledge: given the resolved interpretation models answer
+$93$--$95\%$ correctly, yet under free interaction even the strongest models reach only
+$29\%$ at full scale and $44\%$ in a cross-vendor pilot, far short of that ceiling, and a
+clarification turn helps only two of the twelve models evaluated and lowers accuracy for the
+rest. A per-category skill metric localizes \emph{which} clarification ability fails and
+reveals recognition basis as a blind spot no current model targets.
 \end{abstract}
 
 %% ============================================================
@@ -104,17 +105,18 @@ and the intended \$46.75B (consolidated GAAP), both plausible without clarificat
 \textbf{(3)}~A search-only agent retrieves evidence and returns the plausible default, which
 a conventional single-gold benchmark scores as correct, the \emph{single-gold illusion} that
 overstates competence by up to $3\times$. \textbf{(4)}~\fininteract instead measures whether
-an agent resolves the ambiguity by asking: the best free-interaction accuracy is $20.2\%$
-while accuracy once the ambiguity is resolved is $93$--$95\%$, so the bottleneck is issuing
-the right clarification without missing knowledge.}
+an agent resolves the ambiguity by asking: for the GPT-5 agent shown, free-interaction
+accuracy is $20.2\%$ while accuracy once the ambiguity is resolved is $93$--$95\%$, so the
+bottleneck is issuing the right clarification without missing knowledge.}
 \label{fig:teaser}
 \end{figure*}
 
 \begin{table}[h]
 \centering
 \caption{Running example: a \fininteract instance.
-The same question yields two defensible answers.
-Without the disambiguating context $C$, a model's default interpretation
+The paired default and intended readings are shown; $H_0{=}\log_2 3{\approx}1.58$ reflects
+three plausible entity scopes for this question (consolidated total and two reportable
+segments). Without the disambiguating context $C$, a model's default interpretation
 leads to the wrong answer.}
 \label{tab:example}
 \small
@@ -179,8 +181,9 @@ rarely resolve it, asking about the correct category almost always yet convertin
 clarification into the right answer only occasionally, and the recognition-basis category is a
 blind spot no current model targets (\S\ref{sec:skills}). \textbf{(RQ2)} The bottleneck is
 elicitation, not knowledge: given the resolved interpretation models answer $93$--$95\%$
-correctly, yet the best resolves only $20\%$ under free interaction and adding clarification
-lowers accuracy for all but the strongest model (\S\ref{sec:ceiling}). \textbf{(RQ3)}
+correctly, yet under free interaction even the strongest models reach only $29\%$ at full
+scale and $44\%$ in a cross-vendor pilot, and a clarification turn helps only two of twelve
+models (\S\ref{sec:ceiling}). \textbf{(RQ3)}
 Category-conditioned interventions at inference and in training raise resolution over their
 untargeted counterparts, so the benchmark is not only diagnostic but actionable
 (Appendix~\ref{app:findings}).
@@ -382,8 +385,8 @@ we \textbf{(1)~construct} ambiguous instances from public filings,
 expert review, \textbf{(3)~evaluate} agents under a ReAct interaction protocol with
 a user simulator that answers only from the disambiguating context $C$, and
 \textbf{(4)~score and diagnose} with accuracy plus interaction-quality,
-calibration, and efficiency metrics. This section covers stages~1--2;
-\S\ref{sec:eval} and \S\ref{sec:exp} cover stages~3--4.
+calibration, and efficiency metrics. This section covers stages~1--2, and the experiments
+section (\S\ref{sec:exp}) covers stages~3--4.
 Figure~\ref{fig:framework} illustrates a worked instance and how \fininteract scores
 an agent's two resolution paths.
 
@@ -445,7 +448,7 @@ Category-specific instructions are injected per primary category to prevent the
 constructor from drifting toward whichever category is easiest to generate.
 
 \paragraph{Step 2: Pre-verifier sanity checks ($\sim$instant).}
-Thirteen automated code-level rules are applied without any API calls
+Fourteen automated code-level rules are applied without any API calls
 (Table~\ref{tab:qc}).
 Any failure immediately rejects the passage, avoiding wasted verifier budget.
 
@@ -497,9 +500,10 @@ $1.00$ for the category label (H7), substantial-to-near-perfect agreement. Only 
 instance was rejected by \emph{both} annotators on the same item (consensus
 rejection $1.7\%$); adjudication confirmed it as a category over-reach (a
 revenue-recognition-timing pairing whose plausible default is the firm's total
-revenue, not a disaggregation component). We quarantine it from the public
-release (\texttt{v1.1}, $N{=}172$); all experiments below are computed on the
-frozen \texttt{v1.0} evaluation snapshot ($N{=}173$), which retains it. The
+revenue, not a disaggregation component). We quarantine it from the recommended public
+release (\texttt{v1.1}, $N{=}172$) but also release the frozen \texttt{v1.0} evaluation
+snapshot ($N{=}173$), which retains it, so every table in this paper reproduces exactly;
+all experiments below use \texttt{v1.0}. The
 instance is unsolved by every model in every \emph{interactive} mode; it is
 answerable only when the resolving context is supplied outright (context-oracle),
 where removing it shifts the ceiling by $<\!0.05$pp ($93$--$95\%$ unchanged), so
@@ -664,11 +668,13 @@ reports the secondary interaction diagnostics IR (\% asked), CategoryHit@1, and 
 CategoryHit@1 here is the human-validated \emph{touch} form (the clarifying question names
 a true ambiguity category, agreement $0.75$ with human annotators, matching inter-annotator
 agreement $0.73$). A stricter central-category form is analyzed in \S\ref{sec:skills}.
-$^{\dagger}$The human CategoryHit@1 was computed with the earlier classifier and awaits
-recomputation. $^{\ddagger}$Category-Aware ReAct is a GPT-5-backbone pilot at $N{=}50$ run
+The human CategoryHit@1 ($0.72$) uses the same corrected touch classifier as the model
+rows. $^{\ddagger}$Category-Aware ReAct is a GPT-5-backbone pilot at $N{=}50$ run
 through the same OpenRouter harness (\S\ref{sec:axisreact}). Its accuracy is best read
 against its own matched Standard ReAct baseline in that run ($34.0$), a $+12$ point gain,
-rather than against the full $N{=}173$ GPT-5 row. CategoryHit@1 is left blank for this row
+rather than against the full $N{=}173$ GPT-5 row. That $34.0$ exceeds the $20.2$ full-scale
+GPT-5 row, so this stratified $50$-instance subset is somewhat easier, and the pilot gain
+should be read within-run and confirmed at full scale. CategoryHit@1 is left blank for this row
 because the category-conditioned policy deliberately sweeps multiple categories to rule them out, so
 a single-category hit rate is not comparable (an any-category form near saturation is discussed in
 \S\ref{sec:axisreact}). DisE$^+$ and the default-capture comparison are reported separately
@@ -709,7 +715,7 @@ Qwen3.5-35B-A3B & 0.6 & \textbf{35.8} & 28.9 & 36 & .81 & -- \\
 \multicolumn{7}{l}{\textit{Proposed method (GPT-5 backbone, $N{=}50$ pilot)}} \\
 Category-Aware ReAct$^{\ddagger}$ & -- & -- & 46.0 & 100 & -- & .24 \\
 \midrule
-Human (50-inst) & -- & -- & \textbf{30.0} & 100 & \textbf{.68}$^{\dagger}$ & -- \\
+Human (50-inst) & -- & -- & \textbf{30.0} & 100 & .72 & -- \\
 \bottomrule
 \end{tabular}}
 \end{table*}
@@ -1126,9 +1132,9 @@ MoE models at full scale ($n{=}173$); a seven-model, six-vendor panel of current
 frontier models is additionally evaluated in a preliminary pilot ($N{=}50$/mode,
 Table~\ref{tab:crossvendor}), which reproduces the central finding but at reduced
 statistical resolution---a full-scale multi-vendor evaluation remains in progress.
-The human baseline ($N{=}50$) establishes the performance
-ceiling but is collected from two annotators on a subset; a larger expert panel
-remains future work. \textbf{Grader and simulator.} Correctness and
+The human baseline ($N{=}50$, a single yes/no clarification) is a constrained reference
+rather than an upper bound, since models given up to ten rounds can exceed it, and it is
+collected from two annotators on a subset. A larger expert panel remains future work. \textbf{Grader and simulator.} Correctness and
 category-targeting are judged by GPT-4o-mini and the user is simulated by GPT-5. We validate
 these against humans on a stratified, blindly double-annotated sample (five annotators).
 The correctness grader agrees with human consensus at Cohen $\kappa{=}0.85$ (raw agreement
@@ -1163,7 +1169,8 @@ up to $3\times$ when models commit to the wrong category-reading), is
 \emph{linearly represented} inside open models yet left unacted-on, and is the
 lever for intervention. Our central finding is that interaction capability, not
 financial knowledge, is the bottleneck: agents answer $93$--$95\%$ correctly once
-the category is resolved but $\sim$8\% on their own, amplifying the stagnation
+the category is resolved but far less on their own (a mean of $8\%$ across the OpenAI
+ladder, at most $29\%$ among full-scale models), amplifying the stagnation
 \interactcomp identified in the general domain. We turn this diagnosis into
 intervention with two category-conditioned methods, at inference (Category-Aware ReAct)
 and at training (category-guided SFT/GRPO), and release \fininteract with full
@@ -1358,18 +1365,18 @@ identical GPT-4o-mini grader.
 
 \textbf{Finding 8: Even humans who can ask resolve only $30\%$, the task is hard,
 not merely mis-specified for models.} Annotators reach $30.0\%$ accuracy overall
-($34.4\%$ EN, $22.2\%$ ZH), above every model's $\le 20.2\%$ but far from the
-$93$--$95\%$ context-oracle ceiling. The gap between the oracle ceiling and the
+($34.4\%$ EN, $22.2\%$ ZH), above every full-scale model (which top out at $28.9\%$) but
+far from the $93$--$95\%$ context-oracle ceiling. The gap between the oracle ceiling and the
 human baseline is the cost of \emph{elicitation}: knowing the resolved answer is
 near-trivial, but extracting the right bit through a single clarification is hard
-even for experts. Humans ask far more on-target questions than any model
-(CategoryHit $0.68$ vs.\ $0.34$--$0.38$) yet still capture the default reading $50\%$
-of the time. Across models and the human baseline, targeting and resolution
+even for experts. Across models and the human baseline, targeting and resolution
 \emph{dissociate}: the models with the highest CategoryHit@1 (GPT-4o and GPT-5-mini at
-$0.94$) post the lowest accuracy, while the human, with the lowest CategoryHit ($0.68$),
-posts the highest (Figure~\ref{fig:humanllm}). The asymmetry is sharpest in Chinese: ZH annotators ask the
-\emph{best}-targeted questions ($0.72$ CategoryHit) but post the \emph{lowest}
-accuracy ($22.2\%$) and highest default-capture ($72.2\%$). Chinese instances are
+$0.94$) post the lowest accuracy, while the human, at a lower touch CategoryHit of $0.72$
+(one focused question rather than a sweep of several categories), posts the highest
+(Figure~\ref{fig:humanllm}). Notably the annotators never targeted the recognition-policy
+category either (CategoryHit $0$ on its eight items), so the blind spot is not
+model-specific. The asymmetry is sharpest in Chinese, where annotators still capture the
+default reading $72.2\%$ of the time at only $22.2\%$ accuracy. Chinese instances are
 therefore harder to \emph{resolve}, not harder to \emph{recognize}, the
 \emph{gui-mu}/\emph{kou-fei} (parent-attributable vs.\ deduction-of-nonrecurring) net-income
 distinction is sticky even once correctly surfaced, corroborating the
@@ -1550,7 +1557,8 @@ problem on an available signal, and motivates the category-conditioned intervent
 Our results converge on a single diagnosis. The benchmark localizes the
 bottleneck to \emph{eliciting} the disambiguation: agents answer $93$--$95\%$
 correctly once the intended interpretation is supplied
-(\S\ref{sec:ceiling}) but resolve only $\sim$8\% on their own, and the
+(\S\ref{sec:ceiling}) but far less on their own (a mean of $8\%$ across the OpenAI
+ladder), and the
 mechanistic probe shows why, open models \emph{linearly represent} the ambiguity
 \emph{category} yet do not act on it (\S\ref{sec:mechanistic}). The remaining gap is
 thus an \emph{action} problem on an already-available signal, and the
