@@ -1123,10 +1123,20 @@ over raw size, and Appendix~\ref{app:cost} shows the pipeline scales at
 \$0.31/instance. \textbf{Language balance.} The English split (53) is smaller
 than the Chinese split (120); per-language results (\S\ref{sec:exp}) should be
 read with this asymmetry in mind, and the EN portion is a target for growth.
-\textbf{Category coverage.} The taxonomy is intentionally five-category, but
-\texttt{filing\_vintage} is unrepresented and \texttt{temporal\_scope}/%
+\textbf{Category coverage and recognition-policy validity.} The taxonomy is intentionally
+five-category, but \texttt{filing\_vintage} is unrepresented and \texttt{temporal\_scope}/%
 \texttt{recognition\_policy} are sparse (Table~\ref{tab:stats}): viable
 structured ambiguity for these categories is rare in public filings (Appendix~\ref{app:cost}).
+We therefore treat entity scope ($n{=}94$) and metric definition ($n{=}63$) as the two
+well-powered categories and the other three as exploratory. An item-level audit of the nine
+\texttt{recognition\_policy} instances is a further caution: most are ASC~606 timing
+disaggregations (revenue recognized point-in-time versus over-time), where neither value is
+the total a non-expert would assume, and one pairs total GAAP revenue against an operating
+cash-flow proxy that is not a defensible reading of ``revenue.'' Even our human annotators
+never targeted the category (CategoryHit $0$ on its items). We therefore report the
+recognition-policy blind spot as a preliminary observation on a small, imperfect sample, not
+a headline result, and recommend rebuilding this category with analyst-audited pairs before
+drawing quantitative conclusions.
 \textbf{Model coverage.} We report the OpenAI tier ladder (3 models) and two open
 MoE models at full scale ($n{=}173$); a seven-model, six-vendor panel of current
 frontier models is additionally evaluated in a preliminary pilot ($N{=}50$/mode,
@@ -1341,9 +1351,12 @@ identifies metric-definition ambiguity as the distinctive financial challenge.
 
 \paragraph{Difficulty and headroom.} Per-instance accuracy falls monotonically
 with disambiguation entropy $H_0$ (from 10\% at $H_0{=}1$ to under 1\% at
-$H_0{\approx}3.6$), validating $H_0$ as a difficulty proxy; \textbf{125 of 173
-instances (72\%) are solved by no model in any mode}. The best configuration reaches 20.2\%,
-leaving the benchmark far from saturated. The supplementary clarification-efficiency
+$H_0{\approx}3.6$), validating $H_0$ as a difficulty proxy; \textbf{no full-scale model
+solves 79 of 173 instances (46\%) under free interaction}. These are not broken items:
+$96\%$ of them become solvable under the context-oracle, so they are hard specifically at
+the elicitation step, not invalid or unanswerable. With the best free-interaction accuracy
+at $28.9\%$ full scale (and $44\%$ in the cross-vendor pilot), the benchmark is far from
+saturated. The supplementary clarification-efficiency
 metric mirrors the accuracy ranking in interact mode (DisE$^+$ $=0.125$ for GPT-5
 vs.\ $0.039$ for GPT-4o): GPT-5 not only answers more ambiguous queries correctly
 but does so with fewer wasted asks.
