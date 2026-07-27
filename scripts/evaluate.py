@@ -238,6 +238,35 @@ Available actions (emit ONLY valid JSON, one action per turn):
   {"action": "answer",  "response": "<final answer — only when state is resolved>"}
 """
 
+AGENT_SYSTEM_GENERIC_STRUCTURED = """\
+You are an expert financial analyst agent with access to search and user interaction.
+
+## Structured Clarification Protocol
+
+**Step 1 — Ambiguity Pre-check.**
+Before doing anything else, identify every assumption the question leaves unspecified (for example
+which entity, which period, which metric definition, or which accounting treatment is meant). List
+what you would need to know to answer a single, unambiguous value.
+
+**Step 2 — Initialize Interpretation State.**
+Emit a state action listing each needed field as known or "unknown":
+  {"action": "state", "state": {"<field name>": "known value or unknown", ...}}
+
+**Step 3 — Targeted Clarification.**
+For each "unknown" field, ask ONE targeted yes/no question per turn, the one that most reduces the
+ambiguity. Ask about the specific missing detail. Never ask a generic "can you clarify?".
+
+**Step 4 — State-Gated Answering.**
+You may ONLY emit an answer action once no required field is still "unknown" OR the user has stated
+their intent. Do NOT answer while required fields are unresolved.
+
+Available actions (emit ONLY valid JSON, one action per turn):
+  {"action": "state",   "state": {<interpretation state>}}
+  {"action": "search",  "query": "<search query>"}
+  {"action": "interact","question": "<targeted yes/no question about one missing detail>"}
+  {"action": "answer",  "response": "<final answer — only when state is resolved>"}
+"""
+
 USER_SIM_SYSTEM = """\
 You are a user who has submitted a financial question. You know the specific interpretation you intended.
 When asked a yes/no clarifying question, respond with:
@@ -749,6 +778,8 @@ def run_agent(instance: dict, mode: str, agent_client: OpenAI,
         system = AGENT_SYSTEM_AXIS_ORACLE.replace("{axis}", primary_axis)
     elif mode == "axis-aware":
         system = AGENT_SYSTEM_AXIS_AWARE
+    elif mode == "generic-structured":
+        system = AGENT_SYSTEM_GENERIC_STRUCTURED
     elif mode == "interp-oracle":
         # Decompose the +interact gap: hand the agent the RESOLVED interpretation C
         # (which reading is intended) but NOT the answer-bearing evidence spans and
@@ -1038,7 +1069,7 @@ def main():
                    default=["answer-only", "answer+search", "answer+search+interact"],
                    choices=["answer-only", "answer+search", "answer+search+interact",
                             "always-ask", "axis-oracle", "template-oracle", "enumerate",
-                            "axis-aware", "interp-oracle", "context-oracle"])
+                            "axis-aware", "generic-structured", "interp-oracle", "context-oracle"])
     p.add_argument("--limit",      type=int, default=None,
                    help="Max instances to evaluate (for pilot runs)")
     p.add_argument("--out",        default="data/results/eval_results.jsonl",

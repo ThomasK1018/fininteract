@@ -196,8 +196,9 @@ untargeted counterparts, so the benchmark is not only diagnostic but actionable
   \item \textbf{\fininteract, a fine-grained financial ambiguity benchmark.} We build a
     bilingual benchmark of 173 instances extracted directly from source filings, each paired
     with a default and an intended interpretation and a per-category label, verified by an
-    adversarial constructor and careful human annotation. The benchmark and all code are
-    released at \url{https://anonymous.4open.science/r/FinInteract} (\S\ref{sec:methodology}).% TODO: replace with the live anonymized repository URL before submission
+    adversarial constructor and careful human annotation. The benchmark and all construction,
+    evaluation, and training code are provided in the supplementary material and will be released
+    publicly upon acceptance (\S\ref{sec:methodology}).
   \item \textbf{A broad empirical study.} We evaluate a range of proprietary and open-source
     models and localize where they fail, most sharply an elicitation bottleneck and a
     recognition-policy blind spot that no current model resolves (\S\ref{sec:exp}).
@@ -2149,6 +2150,23 @@ code are released for research use; redistribution of source filings follows the
 respective public-domain (EDGAR) and regulatory-disclosure (CSRC) terms.
 \textbf{Maintenance.} The frozen v1 release is versioned; corrections and the
 planned EN-split expansion will be issued as numbered releases.
+
+%% ============================================================
+\section*{Disclosure of Generative AI Use}
+%% ============================================================
+
+Generative AI tools were used in this work in two distinct roles. First, as
+\emph{components of the research artifact itself}: large language models act as the
+adversarial constructor, the user simulator, and the automated grader described in
+Section~\ref{sec:methodology} and Section~\ref{sec:eval}, and every such use is
+documented in the paper and the accompanying code with the specific model, version,
+and prompt. Second, generative AI tools were used to assist with \emph{manuscript
+preparation}, limited to language editing, \LaTeX{} formatting, and code refactoring.
+All research questions, experimental design, analyses, and scientific claims are the
+authors' own, and the authors have independently verified every result, table,
+figure, and citation reported here. The authors take full responsibility for the
+entire content of this paper, in accordance with the AAAI Code of Professional Ethics
+and Conduct.
 
 %% ============================================================
 \end{document}
