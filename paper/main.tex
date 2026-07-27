@@ -1342,7 +1342,11 @@ ever commits a value (also wrong), and just $1.3\%$ were format-unparseable. Eve
 in Answer+Search, where no interact channel exists, it asks instead of
 answering, capturing \emph{neither} the intended nor the default reading
 ($0.0/0.0\%$). This is an extreme form of Finding~4's integration gap and a
-distinct failure mode: clarification without commitment.
+distinct failure mode: clarification without commitment. The collapse is not an
+artifact of the yes/no protocol: with a \emph{free-form} simulator that answers its
+open-ended questions from $C$ (\S\ref{sec:limitations}), GPT-5-mini still resolves
+$0\%$ across all $50$ instances (zero wrong-to-correct conversions), so the failure
+is integrating a received clarification, not the interaction grammar.
 
 \paragraph{Language and category breakdown.} Splitting by language confirms the
 benchmark's bilingual-difficulty hypothesis: Chinese instances are consistently
