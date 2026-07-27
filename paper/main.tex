@@ -601,10 +601,10 @@ to the interaction capability this benchmark is built to isolate.
 We evaluate three OpenAI models (GPT-5, GPT-4o, GPT-5-mini) and a Qwen open-weight
 ladder (dense 4B, 8B, 14B, and 32B plus two mixture-of-experts models, Qwen3-30B-A3B
 and Qwen3.5-35B-A3B) at full scale ($N{=}173$) across all three primary modes
-(Table~\ref{tab:main}). To test cross-vendor generality we additionally run a
+(Table~\ref{tab:main}, panel (a)). To test cross-vendor generality we additionally run a
 seven-model, six-vendor frontier panel (Claude-Sonnet-5, Gemini-3.5-flash, Grok-4.5,
 DeepSeek-V4-flash, GLM-5.2, Kimi-K3, and GPT-5.6-sol) through a unified OpenRouter
-harness at a preliminary $N{=}50$ per mode (Table~\ref{tab:crossvendor}).
+harness at a preliminary $N{=}50$ per mode (Table~\ref{tab:main}, panel (b)).
 
 \subsubsection{Metrics}
 \label{sec:metrics}
@@ -668,97 +668,69 @@ case studies, the mechanistic probe, and the category-conditioned interventions
 
 \begin{table*}[t]
 \centering
-\caption{Main results. \textbf{Accuracy (\%)} graded against the intended
-interpretation is the primary metric (per mode); the interact mode additionally
-reports the secondary interaction diagnostics IR (\% asked), CategoryHit@1, and ECE.
-CategoryHit@1 here is the human-validated \emph{touch} form (the clarifying question names
-a true ambiguity category, agreement $0.75$ with human annotators, matching inter-annotator
-agreement $0.73$). A stricter central-category form is analyzed in \S\ref{sec:skills}.
-The human CategoryHit@1 ($0.72$) uses the same corrected touch classifier as the model
-rows. $^{\ddagger}$Category-Aware ReAct is a GPT-5-backbone pilot at $N{=}50$ run
-through the same OpenRouter harness (\S\ref{sec:axisreact}). Its accuracy is best read
-against its own matched Standard ReAct baseline in that run ($34.0$), a $+12$ point gain,
-rather than against the full $N{=}173$ GPT-5 row. That $34.0$ exceeds the $20.2$ full-scale
-GPT-5 row, so this stratified $50$-instance subset is somewhat easier, and the pilot gain
-should be read within-run and confirmed at full scale. CategoryHit@1 is left blank for this row
-because the category-conditioned policy deliberately sweeps multiple categories to rule them out, so
-a single-category hit rate is not comparable (an any-category form near saturation is discussed in
-\S\ref{sec:axisreact}). DisE$^+$ and the default-capture comparison are reported separately
-(Table~\ref{tab:illusion}). CategoryHit is undefined when no question is asked.
-The OpenAI tier ladder and a Qwen open-model ladder (dense 4B to 32B plus two MoE
-models, Qwen3-30B-A3B and Qwen3.5-35B-A3B) are evaluated at full scale; a
-seven-model, six-vendor panel of current frontier models is additionally evaluated
-in a preliminary pilot (Table~\ref{tab:crossvendor}).
-The human baseline is the single interaction condition (passage + one yes/no
-clarification + answer) on a stratified 50-instance subset; see \S\ref{sec:humanbaseline}.
-Open-model +Search/+Interact accuracy is measured over the full retrieval corpus.
-For both MoE models and the largest dense model, as for GPT-4o, added interaction
-\emph{underperforms} plain search, while GPT-5 converts it into a clear gain. The
-apparent 4B to 14B gains are confined to the subset these models answer \emph{without}
-asking and disappear on the subset where a clarification actually occurs (net
-$+2/+1/-3$ conversions on their $48/26/62$ asks), so they reflect answer variance
-rather than a benefit from interaction (open-model caveat, \S\ref{sec:mechanistic}).}
+\caption{\textbf{Evaluating financial agents on ambiguous queries, at two scales.}
+\textbf{Accuracy (\%)}, graded against the \emph{intended} interpretation, is the primary
+metric (reported per mode); ``$\Delta$'' is +Interact minus +Search accuracy, the sign of the
+interaction lever. The interact mode additionally reports the secondary diagnostics IR
+(\% of instances with an ask), CategoryHit@1, and ECE. CHit@1 is the human-validated
+\emph{touch} form (the clarifying question names a true ambiguity category; agreement $0.75$
+with annotators vs.\ inter-annotator $0.73$); a stricter central form is analyzed in
+\S\ref{sec:skills}. \emph{Panel (a)} evaluates the OpenAI tier ladder and a Qwen open-weight
+ladder (dense 4B--32B plus two MoE models, Qwen3-30B-A3B and Qwen3.5-35B-A3B) at full scale
+($N{=}173$). \emph{Panel (b)} is a preliminary seven-model, six-vendor frontier pilot run
+through the \emph{same} OpenRouter simulator/grader pipeline at $N{=}50$ per mode; these numbers
+are directional and will be updated to full scale ($N{=}50$ means one instance ${=}2$ points, so
+$|\Delta|{\lesssim}2$ is within noise), and two Grok +Search instances hit transient API errors
+and are scored incorrect (a lower bound). \emph{Panel (c)}: Category-Aware ReAct is a
+GPT-5-backbone pilot ($N{=}50$, same harness, \S\ref{sec:axisreact}); its $46.0$ is best read
+against its own matched Standard ReAct baseline in that run ($34.0$, a $+12$ gain) rather than the
+full-scale GPT-5 row, and since $34.0>20.2$ that stratified $50$-instance subset is somewhat
+easier, so the gain should be confirmed at full scale. Its CHit@1 is blank because the
+category-conditioned policy deliberately sweeps categories to rule them out (an any-category form
+near saturation is discussed in \S\ref{sec:axisreact}). The human baseline is a single interaction
+condition (passage + one yes/no clarification + answer) on a stratified $50$-instance subset
+(\S\ref{sec:humanbaseline}); its CHit@1 ($0.72$) uses the same corrected touch classifier. Across
+both scales, added interaction is flat-or-negative for the MoE and largest dense open models, for
+GPT-4o, and for six of the seven frontier models, while GPT-5 and Gemini (the weakest searcher)
+convert it into a clear gain; the apparent 4B--14B gains are confined to the no-ask subset and
+reflect answer variance (\S\ref{sec:mechanistic}). DisE$^+$ and default-capture are reported
+separately (Table~\ref{tab:illusion}); CHit@1 and ECE are undefined when no question is asked.}
 \label{tab:main}
 \small
-\resizebox{0.9\textwidth}{!}{%
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{lccccccc}
 \toprule
 & \multicolumn{2}{c}{Acc (\%)} &
-  \multicolumn{4}{c}{Answer+Search+Interact} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-7}
-Model & Ans-only & +Search & Acc & IR & CHit@1 & ECE \\
+  \multicolumn{5}{c}{Answer+Search+Interact} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-8}
+Model & Ans-only & +Search & Acc & $\Delta$ & IR & CHit@1 & ECE \\
 \midrule
-GPT-5           & 0.6 & 6.4  & \textbf{20.2} & 98.8 & .86 & .53 \\
-GPT-4o          & 0.6 & 12.1 & 4.6 & 99.4 & .94 & .82 \\
-GPT-5-mini      & 0.6 & 0.0 & 0.0 & 96.0 & .94 & .00 \\
-Qwen3-4B        & 0.0 & 8.1  & 12.1 & 28 & .85 & -- \\
-Qwen3-8B        & 0.6 & 14.4 & 24.9 & 15 & .88 & -- \\
-Qwen3-14B       & 0.0 & 18.5 & 22.5 & 36 & .74 & -- \\
-Qwen3-32B       & 1.2 & 27.2 & 8.4  & 61 & .96 & -- \\
-Qwen3-30B-A3B   & 1.2 & 28.3 & 11.6 & 72 & .90 & -- \\
-Qwen3.5-35B-A3B & 0.6 & \textbf{35.8} & 28.9 & 36 & .81 & -- \\
+\multicolumn{8}{l}{\textit{(a) Full-scale evaluation ($N{=}173$): OpenAI + Qwen open-weight ladders}} \\
+GPT-5           & 0.6 & 6.4  & \textbf{20.2} & $+13.8$ & 98.8 & .86 & .53 \\
+GPT-4o          & 0.6 & 12.1 & 4.6  & $-7.5$  & 99.4 & .94 & .82 \\
+GPT-5-mini      & 0.6 & 0.0  & 0.0  & $0.0$   & 96.0 & .94 & .00 \\
+Qwen3-4B        & 0.0 & 8.1  & 12.1 & $+4.0$  & 28 & .85 & -- \\
+Qwen3-8B        & 0.6 & 14.4 & 24.9 & $+10.5$ & 15 & .88 & -- \\
+Qwen3-14B       & 0.0 & 18.5 & 22.5 & $+4.0$  & 36 & .74 & -- \\
+Qwen3-32B       & 1.2 & 27.2 & 8.4  & $-18.8$ & 61 & .96 & -- \\
+Qwen3-30B-A3B   & 1.2 & 28.3 & 11.6 & $-16.7$ & 72 & .90 & -- \\
+Qwen3.5-35B-A3B & 0.6 & \textbf{35.8} & 28.9 & $-6.9$ & 36 & .81 & -- \\
 \midrule
-\multicolumn{7}{l}{\textit{Proposed method (GPT-5 backbone, $N{=}50$ pilot)}} \\
-Category-Aware ReAct$^{\ddagger}$ & -- & -- & 46.0 & 100 & -- & .24 \\
+\multicolumn{8}{l}{\textit{(b) Cross-vendor frontier pilot ($N{=}50$/mode, OpenRouter; directional)}} \\
+Claude-Sonnet-5   & 4.0  & \textbf{46.0} & \textbf{44.0} & $-2$  & -- & .98 & -- \\
+Grok-4.5          & 2.0  & 40.0 & 32.0 & $-8$  & -- & .87 & -- \\
+GLM-5.2           & 12.0 & 40.0 & 40.0 & $0$   & -- & .96 & -- \\
+Kimi-K3           & 16.0 & 38.0 & 34.0 & $-4$  & -- & .98 & -- \\
+GPT-5.6-sol       & 10.0 & 36.0 & 30.0 & $-6$  & -- & .98 & -- \\
+DeepSeek-V4-flash & 12.0 & 28.0 & 24.0 & $-4$  & -- & .96 & -- \\
+Gemini-3.5-flash  & 14.0 & 6.0  & 30.0 & $+24$ & -- & .96 & -- \\
 \midrule
-Human (50-inst) & -- & -- & \textbf{30.0} & 100 & .72 & -- \\
+\multicolumn{8}{l}{\textit{(c) Proposed method and human baseline ($N{=}50$)}} \\
+Category-Aware ReAct & -- & -- & 46.0 & -- & 100 & -- & .24 \\
+Human               & -- & -- & \textbf{30.0} & -- & 100 & .72 & -- \\
 \bottomrule
 \end{tabular}}
 \end{table*}
-
-\begin{table}[t]
-\centering
-\caption{\textbf{Preliminary cross-vendor evaluation} on \fininteract via a unified
-OpenRouter harness (identical simulator/grader pipeline to Table~\ref{tab:main}).
-\emph{Numbers are a pilot at $N{=}50$ instances per mode} and will be updated to the
-full evaluation; they are directional, not final (at $N{=}50$ one instance ${=}2$
-points, so $|\Delta|{\lesssim}2$ is within noise). ``$\Delta$'' is +Interact minus +Search
-accuracy: the sign of the interaction lever. Across seven models from six vendors, added
-interaction is flat-or-negative for six of seven (clearly negative for Grok $-8$,
-GPT-5.6 $-6$, Kimi and DeepSeek $-4$). Only Gemini, the weakest searcher (6\%), converts
-interaction into a clear gain. CHit@1 is the human-validated touch form (\S\ref{sec:metrics})
-and is undefined when no clarification is asked.
-Two Grok +Search instances returned transient API errors and are scored incorrect,
-so its +Search accuracy is a lower bound.}
-\label{tab:crossvendor}
-\small
-\resizebox{0.9\columnwidth}{!}{%
-\begin{tabular}{lccccc}
-\toprule
-& \multicolumn{2}{c}{Acc (\%)} & \multicolumn{3}{c}{+Interact} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-6}
-Model & Ans-only & +Search & Acc & $\Delta$ & CHit@1 \\
-\midrule
-Claude-Sonnet-5   & 4.0  & \textbf{46.0} & \textbf{44.0} & $-2$  & .98 \\
-Grok-4.5          & 2.0  & 40.0 & 32.0 & $-8$  & .87 \\
-GLM-5.2           & 12.0 & 40.0 & 40.0 & $0$   & .96 \\
-Kimi-K3           & 16.0 & 38.0 & 34.0 & $-4$  & .98 \\
-GPT-5.6-sol       & 10.0 & 36.0 & 30.0 & $-6$  & .98 \\
-DeepSeek-V4-flash & 12.0 & 28.0 & 24.0 & $-4$  & .96 \\
-Gemini-3.5-flash  & 14.0 & 6.0  & 30.0 & $+24$ & .96 \\
-\bottomrule
-\end{tabular}}
-\end{table}
 
 \subsection{Why Existing Benchmarks Miss This: The Single-Gold Illusion}
 \label{sec:illusion}
@@ -1146,7 +1118,7 @@ drawing quantitative conclusions.
 \textbf{Model coverage.} We report the OpenAI tier ladder (3 models) and two open
 MoE models at full scale ($n{=}173$); a seven-model, six-vendor panel of current
 frontier models is additionally evaluated in a preliminary pilot ($N{=}50$/mode,
-Table~\ref{tab:crossvendor}), which reproduces the central finding but at reduced
+Table~\ref{tab:main}, panel (b)), which reproduces the central finding but at reduced
 statistical resolution---a full-scale multi-vendor evaluation remains in progress.
 The human baseline ($N{=}50$, a single yes/no clarification) is a constrained reference
 rather than an upper bound, since models given up to ten rounds can exceed it, and it is
@@ -1284,7 +1256,7 @@ effect is an OpenAI-specific artifact, we additionally evaluate a preliminary
 seven-model, six-vendor panel of current frontier models (Claude-Sonnet-5,
 Gemini-3.5-flash, Grok-4.5, DeepSeek-V4, GLM-5.2, Kimi-K3, GPT-5.6) through a
 unified OpenRouter harness with an identical simulator/grader pipeline
-($N{=}50$/mode, Table~\ref{tab:crossvendor}); it reproduces the headline pattern:
+($N{=}50$/mode, Table~\ref{tab:main}, panel (b)); it reproduces the headline pattern:
 added interaction is flat-or-negative for six of seven vendors and yields a clear
 gain only for Gemini, the weakest autonomous searcher. All headline accuracy
 comparisons below are reported with
