@@ -1051,6 +1051,9 @@ def main():
                    choices=["oracle", "llm", "noisy", "freeform"],
                    help="User simulator: oracle (rule-based), llm (GPT-5 yes/no), noisy (GPT-5 + 15%% random), "
                         "freeform (GPT-5 answers open-ended questions from C without leaking the answer)")
+    p.add_argument("--max-interact", type=int, default=None,
+                   help="Override max interact actions per instance (default 6); caps "
+                        "clarification rounds for faster ablation runs (applies to all conditions).")
     p.add_argument("--passage-file", default=None,
                    help="Path to passages.jsonl (for oracle retrieval lookup)")
     p.add_argument("--elicit-confidence", action="store_true",
@@ -1126,6 +1129,9 @@ def main():
                 instances.append(json.loads(line))
     if args.limit:
         instances = instances[:args.limit]
+    if args.max_interact is not None:
+        globals()["MAX_INTERACT"] = args.max_interact
+        print(f"MAX_INTERACT overridden to {args.max_interact}")
     print(f"Loaded {len(instances)} instances")
 
     # Load passage texts for oracle retrieval (keyed by passage_id)
