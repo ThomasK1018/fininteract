@@ -1164,6 +1164,15 @@ questions from $C$ (for example ``which fiscal year?'') rather than only yes/no,
 stays at $0\%$ across all $50$ instances (identical to the yes/no simulator, zero
 wrong-to-correct conversions, three-round budget). Its failure is therefore a
 post-clarification integration failure, not an artifact of the interaction protocol.
+\textbf{Construction circularity.} The constructor, adversarial verifier, and user
+simulator are all GPT-5-family models, and the verifier removes instances the GPT-5 family
+answers correctly without $C$. This depresses GPT-5-family answer-only accuracy ($0.6\%$) by
+construction relative to the non-OpenAI vendors the filter does not target (mean $10.0\%$
+answer-only across six vendors), so cross-vendor answer-only comparisons are not fully
+apples-to-apples and the GPT-5-family floor is a filter-induced lower bound. The elicitation
+gap itself is unaffected: the filter targets answer-only solvability, not interactive
+resolution, and every vendor still resolves far below its oracle ceiling. Verifying a
+subsample with a non-OpenAI adversarial ensemble is a natural robustness check for future work.
 \textbf{Contamination.}
 Instances are freshly constructed from FY2022--2025 structured facts and
 answer-only accuracy is $\approx$0.6\% across all sources, but we do not claim
