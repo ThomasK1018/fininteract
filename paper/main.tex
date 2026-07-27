@@ -1158,7 +1158,13 @@ central targeting and integration rather than detection. A strict central-catego
 discriminative but not yet human-validated, so we report it only as a supplementary
 decomposition. Interaction results are also robust to the simulator: on a
 $50$-instance subset, standard +Interact accuracy is $34/28/26\%$ under the LLM, deterministic,
-and $15\%$-noisy simulators. \textbf{Contamination.}
+and $15\%$-noisy simulators. Crucially, the yes/no action grammar does not manufacture the
+weak-model collapse: with a \emph{free-form} simulator that answers open-ended clarifying
+questions from $C$ (for example ``which fiscal year?'') rather than only yes/no, GPT-5-mini
+stays at $0\%$ across all $50$ instances (identical to the yes/no simulator, zero
+wrong-to-correct conversions, three-round budget). Its failure is therefore a
+post-clarification integration failure, not an artifact of the interaction protocol.
+\textbf{Contamination.}
 Instances are freshly constructed from FY2022--2025 structured facts and
 answer-only accuracy is $\approx$0.6\% across all sources, but we do not claim
 absolute contamination safety for the DocFinQA-derived minority.
