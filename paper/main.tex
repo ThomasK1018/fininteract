@@ -118,7 +118,7 @@ single-clarification human baseline ($N{=}50$). Added interaction is flat-or-neg
 models, including the strongest open searchers and six of the seven frontier vendors; only GPT-5
 and Gemini convert it into a clear gain. Our Category-Aware ReAct lifts the GPT-5 backbone by
 $+12$ points over its matched Standard ReAct baseline in the same run. IR (\% of instances that
-ask), CategoryHit@1 (targeting quality), and ECE (calibration) are secondary diagnostics,
+ask), AC@1 (targeting quality), and ECE (calibration) are secondary diagnostics,
 undefined when no question is asked; see \S\ref{sec:metrics} and \S\ref{sec:axisreact} for
 definitions and caveats.}
 \label{tab:main}
@@ -129,7 +129,7 @@ definitions and caveats.}
 & \multicolumn{2}{c}{Acc (\%)} &
   \multicolumn{5}{c}{Answer+Search+Interact} \\
 \cmidrule(lr){2-3}\cmidrule(lr){4-8}
-Model & Ans-only & +Search & Acc & $\Delta$ & IR & CHit@1 & ECE \\
+Model & Ans-only & +Search & Acc & $\Delta$ & IR & AC@1 & ECE \\
 \midrule
 \multicolumn{8}{l}{\textit{(a) Full-scale evaluation ($N{=}173$): OpenAI + Qwen open-weight ladders}} \\
 GPT-5           & 0.6 & 6.4  & \textbf{20.2} & $+13.8$ & 98.8 & .86 & .53 \\
@@ -298,7 +298,7 @@ ability to recognize that a question is under-specified \emph{along that categor
 ask the question that resolves it. We make this measurable by decomposing each
 model's per-category \texttt{+interact} competence into three components:
 \textbf{Recognition} (interaction rate, does it ask when it should?),
-\textbf{Targeting} (CategoryHit@1, does it ask about the \emph{right} category?), and
+\textbf{Targeting} (AC@1, does it ask about the \emph{right} category?), and
 \textbf{Resolution} (accuracy, does asking yield the intended answer?). A model
 ``has'' a category skill only when all three are high; a low value localizes the
 failure to not-asking, asking-wrong, or asking-right-but-still-wrong.
@@ -307,10 +307,10 @@ Figure~\ref{fig:radar} shows the same profile as a capability radar.
 
 \begin{table}[t]
 \centering
-\caption{Per-category \textbf{Targeting} skill (CategoryHit@1, \emph{touch} form) in \texttt{+interact},
+\caption{Per-category \textbf{Targeting} skill (AC@1, \emph{touch} form) in \texttt{+interact},
 recomputed with the corrected classifier (\S\ref{sec:metrics}). Recognition policy is a robust
 blind spot (no model ever asks), temporal scope is fully solved, and entity and metric are
-touched almost always but rarely made the \emph{central} concern (central-form CategoryHit@1
+touched almost always but rarely made the \emph{central} concern (central-form AC@1
 $\leq0.16$, see text). The two sparse categories ($n{\le}9$) are preliminary.}
 \label{tab:skills}
 \small
@@ -330,7 +330,7 @@ temporal\_scope     &  7 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.72\linewidth]{fig_radar.png}
-\caption{\textbf{Per-category clarification-capability profile} (touch CategoryHit@1 from
+\caption{\textbf{Per-category clarification-capability profile} (touch AC@1 from
 Table~\ref{tab:skills}). Every model saturates entity, metric, and temporal targeting
 but collapses to zero on \texttt{recognition\_policy}, a blind spot shared across the
 closed frontier and the strongest open model.}
@@ -340,12 +340,12 @@ closed frontier and the strongest open model.}
 \textbf{Finding 3: Ambiguity clarification is a per-category skill with a sharp touch
 versus central-targeting dissociation.} Under the corrected classifier the pattern is
 precise. \texttt{recognition\_policy} is a robust blind spot. No model ever asks about it,
-in either the touch or the central form (CategoryHit@1 $=0$), so models essentially never
+in either the touch or the central form (AC@1 $=0$), so models essentially never
 question whether a figure is recognized point-in-time or over time. \texttt{temporal\_scope}
-is fully solved. Models both touch it and make it the central concern (central CategoryHit@1
+is fully solved. Models both touch it and make it the central concern (central AC@1
 $=1.0$). Entity and metric occupy a revealing middle. Models almost always \emph{touch} them
-(touch CategoryHit@1 $0.85$--$1.0$) yet rarely make them the \emph{central} point of the question
-(central CategoryHit@1 $\leq0.16$), defaulting instead to period confirmation. For these two categories
+(touch AC@1 $0.85$--$1.0$) yet rarely make them the \emph{central} point of the question
+(central AC@1 $\leq0.16$), defaulting instead to period confirmation. For these two categories
 the failure is not neglect but imprecision, the model names the entity or metric in passing
 while centering the question elsewhere. Resolution follows the same shape across all five models
 (GPT-5 resolves $57\%$ of temporal but $\leq23\%$ of entity and metric,
@@ -356,7 +356,7 @@ but missing specific targeting, which is precisely the intervention target
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{fig_axisperf.png}
-\caption{\textbf{Per-model, per-category performance.} \emph{(a)}~Targeting (CategoryHit@1
+\caption{\textbf{Per-model, per-category performance.} \emph{(a)}~Targeting (AC@1
 touch) versus \emph{(b)}~Resolution (\texttt{+interact} accuracy) for every model and
 ambiguity category. The top five rows are the full-scale panel ($n{=}173$, all categories) and
 the bottom seven are the proprietary pilot ($n{=}50$), for which only entity and metric
@@ -370,14 +370,14 @@ them better than the older OpenAI ladder, and no model targets recognition polic
 \textbf{Per-model, per-category case analysis.} Placing targeting and resolution side by
 side for every model and category (Figure~\ref{fig:axisperf}) surfaces three patterns.
 First, resolution does \emph{not} track targeting: GPT-4o and GPT-5-mini touch the
-correct category on entity and metric almost as often as any model (CategoryHit $0.94$--$1.0$)
-yet resolve those categories at $0$--$5\%$, so a high CategoryHit is no guarantee of a correct
+correct category on entity and metric almost as often as any model (AC@1 $0.94$--$1.0$)
+yet resolve those categories at $0$--$5\%$, so a high AC@1 is no guarantee of a correct
 answer. Second, the model ranking \emph{reorders} across categories. Among the full-scale
 models Qwen3.5-35B-A3B leads on the two abundant categories (entity $40\%$, metric $32\%$)
 while GPT-5 leads on temporal ($57\%$). Third, the seven proprietary models resolve
 entity and metric substantially better than the older OpenAI ladder (entity
 $21$--$48\%$, metric $26$--$42\%$, versus GPT-5's $23$ and $13\%$), yet they inherit the
-\emph{same} recognition blind spot, with touch CategoryHit $0$ on every recognition instance
+\emph{same} recognition blind spot, with touch AC@1 $0$ on every recognition instance
 they saw. \texttt{filing\_vintage} is untestable everywhere ($n{=}0$). A single
 aggregate interaction score therefore conceals which category a given model can actually
 resolve, which is why we report per category.
@@ -494,7 +494,7 @@ CLAMBER~\citep{zhang2024clamber} evaluates whether models identify and clarify
 ambiguous information needs, and QuestBench~\citep{li2025questbench} tests whether
 they can ask the minimal necessary question in reasoning tasks. Both are
 general-domain and judge a single clarifying step; \fininteract adds \emph{per-category}
-targeting (CategoryHit), programmatically verifiable financial grounding, and, via the
+targeting (AC@1), programmatically verifiable financial grounding, and, via the
 co-evolution rounds (\S\ref{sec:coevolve}), an analysis of \emph{when} asking helps
 versus hurts. We adapt this line's formalism to finance, replacing human-judged
 ambiguity labels with programmatically verifiable XBRL-grounded evidence pairs.
@@ -603,11 +603,10 @@ GPT-4o-mini grader marks a final answer correct against the intended interpretat
 financial-domain tolerance: a $\pm1\%$ numeric tolerance, entity/ticker equivalence, and currency
 normalization, with a fiscal-year mismatch counted as wrong.
 
-\paragraph{Interaction targeting (AC@1 / CategoryHit@1).}
+\paragraph{Interaction targeting (AC@1).}
 For each interact action, a GPT-4o-mini classifier decides whether the clarifying question targets a
-true ambiguity category for that instance. We report the targeting accuracy AC@1 (denoted
-\emph{CategoryHit@1} in the results tables) alongside AnyCategoryHit, WrongCategoryRate, and
-GenericAskRate. Because a single clarification is often compound (one question can name an entity, a
+true ambiguity category for that instance. We report the targeting accuracy AC@1 alongside the
+any-category, wrong-category, and generic-ask rates. Because a single clarification is often compound (one question can name an entity, a
 period, and a metric at once), AC@1 has two forms: a lenient \emph{touch} form (the question names
 any true category) and a strict \emph{central} form (the single most-central category is a true
 category). The touch form is validated against human annotators (\S\ref{sec:humanval}). These
@@ -756,7 +755,7 @@ Expected Calibration Error ranges from 0.53 (GPT-5, interact) to 0.95 (GPT-4o,
 answer-only); models report 85--95\% confidence while answering 0--20\%
 correctly. The remaining failure is not one of category \emph{detection}. Under a
 human-validated classifier (agreement $0.75$, matching inter-annotator agreement $0.73$),
-both models almost always ask a question that touches the correct ambiguity category (CategoryHit@1
+both models almost always ask a question that touches the correct ambiguity category (AC@1
 $0.86$ for GPT-5 and $0.94$ for GPT-4o). What they lack is precise \emph{central} targeting,
 only $0.06$ and $0.04$ of first questions make the true category their single central concern,
 and, above all, integration (Finding 8). The bottleneck is targeting precision and
@@ -826,11 +825,11 @@ far from the $93$--$95\%$ context-oracle ceiling. The gap between the oracle cei
 human baseline is the cost of \emph{elicitation}: knowing the resolved answer is
 near-trivial, but extracting the right bit through a single clarification is hard
 even for experts. Across models and the human baseline, targeting and resolution
-\emph{dissociate}: the models with the highest CategoryHit@1 (GPT-4o and GPT-5-mini at
-$0.94$) post the lowest accuracy, while the human, at a lower touch CategoryHit of $0.72$
+\emph{dissociate}: the models with the highest AC@1 (GPT-4o and GPT-5-mini at
+$0.94$) post the lowest accuracy, while the human, at a lower touch AC@1 of $0.72$
 (one focused question rather than a sweep of several categories), posts the highest
 (Figure~\ref{fig:humanllm}). Notably the annotators never targeted the recognition-policy
-category either (CategoryHit $0$ on its eight items), so the blind spot is not
+category either (AC@1 $0$ on its eight items), so the blind spot is not
 model-specific. The asymmetry is sharpest in Chinese, where annotators still capture the
 default reading $72.2\%$ of the time at only $22.2\%$ accuracy. Chinese instances are
 therefore harder to \emph{resolve}, not harder to \emph{recognize}, the
@@ -841,7 +840,7 @@ language-asymmetry caveat in \S\ref{sec:limitations} with a mechanism.
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.82\linewidth]{fig_humanllm.png}
-\caption{\textbf{Targeting does not imply resolution.} Accuracy against CategoryHit@1
+\caption{\textbf{Targeting does not imply resolution.} Accuracy against AC@1
 (touch) in the interact regime, for the five full-scale models and the human baseline
 (star). The relationship is inverted: models that ask on the correct category most often
 resolve the ambiguity least often, whereas the human asks less precisely yet resolves
@@ -853,7 +852,7 @@ more. Asking the right question and answering it are separate abilities.}
 
 \begin{table}[t]
 \centering
-\caption{Zero-shot \emph{central}-targeting (central-form CategoryHit@1) by base-model scale
+\caption{Zero-shot \emph{central}-targeting (central-form AC@1) by base-model scale
 (Qwen3, \texttt{+interact}, denominator = instances where the model asked). Under the
 validated touch form every scale already reaches $\approx0.9$ on entity and metric, so scale
 buys the precision to \emph{center} the question on the right category rather than detection.
@@ -882,7 +881,7 @@ scale-invariant blind spot. It is never targeted at any scale, in either the tou
 central form ($0.00$ at 4B, 14B, and 32B, including the same 32B that targets entity well),
 so more parameters buy no recognition-basis targeting at all. \texttt{entity\_scope} and
 \texttt{metric\_definition} tell a subtler story. Every scale already \emph{touches} them
-(touch CategoryHit@1 $\approx0.9$), but the ability to make them the \emph{central} point of the
+(touch AC@1 $\approx0.9$), but the ability to make them the \emph{central} point of the
 question emerges only with scale, entity central-targeting rising from $0.00$ at 4B and 14B to
 $0.68$ at 32B. Scale therefore does not buy ambiguity detection for these categories, which is
 already present, but the precision to center the question on the right category. The dissociation
@@ -963,7 +962,7 @@ encoding the category, both \emph{elicit}, and they differ in \emph{how} they as
 Qwen3-30B interacts on $72\%$ of instances but loops without committing in Chinese
 ($76\%$ of its interactive transcripts never produce a final answer), whereas
 Qwen3.5-35B interacts less ($36\%$) but commits in $95\%$ of cases and targets the
-gold category more often (CategoryHit $0.40$ vs.\ $0.16$). With the full retrieval corpus in
+gold category more often (AC@1 $0.40$ vs.\ $0.16$). With the full retrieval corpus in
 place their accuracy is now measured, and it exposes a sharper pattern: plain search
 reaches $28.3\%$/$35.8\%$, but \emph{adding} interaction \emph{lowers} accuracy to
 $11.6\%$/$28.9\%$ ($-16.8$/$-6.9$ points). Interaction is thus net-negative relative
@@ -1059,7 +1058,7 @@ E5 & \textbf{Clarification misuse}: right question, wrong answer
 E6 & \textbf{Evidence grounding}: template-oracle correct, agent wrong
    & Improved source-grounded extraction \\
 E7 & \textbf{Over-interaction}: correct but low DisE$^+$
-   & Penalize via DisE$^+$/CategoryHit efficiency signal \\
+   & Penalize via DisE$^+$/AC@1 efficiency signal \\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -1071,8 +1070,8 @@ failure attribution without additional annotation:
 
 \begin{itemize}[leftmargin=*,noitemsep]
   \item \textbf{Low IR + low Acc} $\to$ E1 (ambiguity blindness dominant)
-  \item \textbf{High IR + low CategoryHit@1} $\to$ E2/E3 (interacts but misdirected)
-  \item \textbf{High CategoryHit@1 + low Acc} $\to$ E5/E6 (right category, wrong grounding)
+  \item \textbf{High IR + low AC@1} $\to$ E2/E3 (interacts but misdirected)
+  \item \textbf{High AC@1 + low Acc} $\to$ E5/E6 (right category, wrong grounding)
   \item \textbf{High GenericAskRate} $\to$ E3 (lacks financial clarification structure)
   \item \textbf{High WrongCategoryRate} $\to$ E2 (confidently misdirected)
   \item \textbf{Always-ask $\gg$ Standard ReAct} $\to$ E1 dominant; latent capacity exists
@@ -1133,7 +1132,7 @@ answers immediately after finding a plausible number in a search result.
 \paragraph{Expected outcomes.}
 Relative to standard Answer+Search+Interact, Category-Aware ReAct should reduce
 GenericAskRate (E3), WrongCategoryRate (E2), and IR=0 failures (E1), while
-improving CategoryHit@1 and ultimately Accuracy.
+improving AC@1 and ultimately Accuracy.
 Template-oracle provides an upper bound: if Category-Aware ReAct approaches
 template-oracle performance, it confirms that category recognition is the dominant
 remaining bottleneck after the E1--E3 errors are addressed.
@@ -1146,10 +1145,10 @@ against the $34.0\%$ of Standard ReAct in the same run, a $+12$ point gain, and 
 best calibration of any condition (ECE $0.241$ versus $0.308$ for Standard ReAct). Always-Ask
 collapses to $10.0\%$, confirming that asking indiscriminately is worse than not asking and
 that the gain comes from asking \emph{selectively} on the right category. The single-category
-diagnostics (CategoryHit@1, WrongCategoryRate) are not informative for this policy: because the
+diagnostics (AC@1, WrongCategoryRate) are not informative for this policy: because the
 Ambiguity Pre-Check deliberately enumerates every candidate category to rule each in or out, an
 any-category touch form saturates near $1.0$ while the strict central-category form is near $0$, so
-neither cleanly credits the policy and we omit CategoryHit@1 for it in Table~\ref{tab:main}. The
+neither cleanly credits the policy and we omit AC@1 for it in Table~\ref{tab:main}. The
 accuracy and calibration gains are the load-bearing result. We report this as a pilot rather
 than a full-panel row because it is a single backbone at $N{=}50$, and we expect the effect
 size to tighten at full scale. One caveat bears directly on the mechanism: the policy bundles all
@@ -1164,7 +1163,7 @@ remains future work.
 
 The per-category skill analysis (\S\ref{sec:skills}) gives this intervention a precise
 target: models do not lack clarification ability uniformly, they lack \emph{specific}
-category skills (CategoryHit $=0$ on recognition policy, partial on metric). The question is
+category skills (AC@1 $=0$ on recognition policy, partial on metric). The question is
 whether those missing skills can be installed by training rather than prompting.
 The second intervention applies the \emph{same} idea, condition on the
 category, but in the weights rather than the prompt, showing the benchmark is not
@@ -1172,7 +1171,7 @@ only diagnosable but \emph{trainable}. Starting from Qwen3-4B-Instruct (4-bit
 QLoRA), we run an RLVR ladder, supervised fine-tuning (SFT), KTO, then GRPO, on
 the \fininteract training split, with all user simulators, graders, and category
 judges served locally (zero API cost). We score each stage with the two
-\emph{leak-proof} metrics, CategoryHit@1 and interaction rate (Table~\ref{tab:grpo});
+\emph{leak-proof} metrics, AC@1 and interaction rate (Table~\ref{tab:grpo});
 accuracy is reported only with the caveat that the training environment's
 retrieval returns the disambiguated evidence span, so it is partly leaked and is
 \emph{not} a reliable learning signal.
@@ -1188,7 +1187,7 @@ clarification task.
 
 \begin{table}[t]
 \centering
-\caption{RLVR ladder on \fininteract (Qwen3-4B, held-out $n{=}51$). CategoryHit@1 and
+\caption{RLVR ladder on \fininteract (Qwen3-4B, held-out $n{=}51$). AC@1 and
 interaction are leak-proof signals of learned clarification; accuracy ($^{*}$) is
 partly leaked by oracle retrieval and should not be read as a learning signal.}
 \label{tab:grpo}
@@ -1196,7 +1195,7 @@ partly leaked by oracle retrieval and should not be read as a learning signal.}
 \resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
-Stage & CategoryHit@1 & Interaction & Accuracy$^{*}$ & Reward \\
+Stage & AC@1 & Interaction & Accuracy$^{*}$ & Reward \\
 \midrule
 Base (Qwen3-4B)          & 25.0 & 54.9 & 84.3 & 0.96 \\
 \;\;+\,SFT (category-guided) & 68.6 & \textbf{100} & 88.2 & 1.28 \\
@@ -1207,7 +1206,7 @@ Base (Qwen3-4B)          & 25.0 & 54.9 & 84.3 & 0.96 \\
 \end{table}
 
 \textbf{SFT does the heavy lifting.} The leak-proof signals jump almost entirely
-at the supervised stage, CategoryHit@1 rises $25\to69$ and interaction $55\to100$
+at the supervised stage, AC@1 rises $25\to69$ and interaction $55\to100$
 (Figure~\ref{fig:grpo}a), while KTO and GRPO move within run-to-run noise at
 $n{=}51$. Training teaches the model to \emph{always interact and target the
 correct category}, the behavior \fininteract is built to elicit. Whether this gain
@@ -1233,7 +1232,7 @@ clarification, rather than as a state-of-the-art accuracy result.
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{fig_grpo_insights.png}
-\caption{Training on \fininteract. (a) The leak-proof learning signals (CategoryHit@1,
+\caption{Training on \fininteract. (a) The leak-proof learning signals (AC@1,
 interaction) jump at SFT and saturate; accuracy (hatched) is leak-confounded.
 (b) True multi-turn GRPO on the 4B policy: mean reward and clarifying turns rise
 together over training.}
@@ -1258,7 +1257,7 @@ loop works but \emph{when}.
 \begin{table}[t]
 \centering
 \caption{Three co-evolution rounds (category-guided SFT on a 4B policy). Targeting
-(CategoryHit@1) is on a \emph{held-out human} probe never seen in training. The loop
+(AC@1) is on a \emph{held-out human} probe never seen in training. The loop
 closes on both \emph{abundant} categories and fails only on the \emph{scarce} one; whether
 asking \emph{helps accuracy} flips on whether the base could already answer.}
 \label{tab:coevolve}
@@ -1340,7 +1339,7 @@ first two; a linear probe tests the third. Both tidy hypotheses fail.
 
 \textbf{Scale-learnability does not gate co-evolution.} \texttt{metric\_definition}
 is abundant ($498$ primary passages) but only \emph{weakly} scale-learnable
-(zero-shot CategoryHit $.05\!\to\!.26$, slope $+0.21$, versus entity's $+0.77$). We
+(zero-shot AC@1 $.05\!\to\!.26$, slope $+0.21$, versus entity's $+0.77$). We
 pre-registered the two-factor prediction that it would co-evolve only
 \emph{partially}. It did not: metric is a \emph{full} GO (Targeting $+0.55$, matching
 entity's $+0.61$; Table~\ref{tab:coevolve}). What separates GO from NO-GO is not the
@@ -1352,7 +1351,7 @@ per-layer one-vs-rest linear probe decodes every category from base hidden state
 the pattern \emph{anti}-tracks learnability: \texttt{recognition\_policy}, the
 un-learnable, NO-GO category, is the \emph{most} decodable (AUROC $0.93$ on a
 size-matched sample, above entity/metric at $\sim0.77$); decodability is \emph{flat}
-across the $4\text{B}\!\to\!32\text{B}$ sweep even as behavioural CategoryHit climbs
+across the $4\text{B}\!\to\!32\text{B}$ sweep even as behavioural AC@1 climbs
 $.12\!\to\!.89$; and category-guided SFT leaves it unchanged. The category is fully
 \emph{represented} at every scale, before and after training: the model simply does
 not \emph{act} on it, the ``represents-but-doesn't-act'' gap of
@@ -1361,14 +1360,14 @@ not \emph{act} on it, the ``represents-but-doesn't-act'' gap of
 \begin{table}[t]
 \centering
 \caption{What predicts co-evolvability. The observed outcomes track
-\emph{abundance/salience}, \emph{not} the CategoryHit scale-slope (metric: low slope,
+\emph{abundance/salience}, \emph{not} the AC@1 scale-slope (metric: low slope,
 GO) and \emph{not} decodability (recognition: highest AUROC, yet does not
 co-evolve). Salience = primary$/$any-candidate passages; decodability = peak
 one-vs-rest AUROC (recognition on a size-matched augmented sample; raw $n{=}9$
 overfits to $1.0$). $^*$metric is a GO but needs ${\sim}2$ accumulated slices
 (${\sim}50$ instances); one $30$-instance slice teaches it nothing (Finding~17).
 $^\ddagger$recognition is \emph{unreliable} rather than a clean fail: held-out human
-CategoryHit ranges $0$--$0.44$ across training runs on the scarce $n{=}9$ probe.}
+AC@1 ranges $0$--$0.44$ across training runs on the scarce $n{=}9$ probe.}
 \label{tab:learnability}
 \small
 \resizebox{0.9\columnwidth}{!}{%
@@ -1404,8 +1403,8 @@ cannot represent, but the one that is always someone else's more-obvious questio
 \centering
 \includegraphics[width=\linewidth]{fig_multiround.png}
 \caption{Multi-round co-evolution with a validation guard. \emph{Left}: validation
-CategoryHit@1 (selection metric) per round. \emph{Right}: held-out \emph{human}-probe
-CategoryHit (never used for selection). Entity learns targeting from a single $30$-instance
+AC@1 (selection metric) per round. \emph{Right}: held-out \emph{human}-probe
+AC@1 (never used for selection). Entity learns targeting from a single $30$-instance
 slice and transfers to humans ($0.63\!\to\!0.93$); metric needs \emph{accumulation}
 (one slice teaches nothing, brown, flat, while two accumulated slices reach
 $0.75$, green); recognition stays at base ($\approx0.05$) even with a fair
@@ -1424,9 +1423,9 @@ ambiguity at $0.88$--$0.93$. \textbf{Metric} ($0.48$) needs \emph{accumulation}:
 slice yields $0.0$, two accumulated slices reach $0.75$, so its earlier single-round
 GO used ${\sim}60$ instances precisely because that is roughly what the category requires.
 \textbf{Recognition} ($0.04$) is \emph{unreliable}: across training runs its human
-CategoryHit ranges only $0$--$0.44$ on the scarce $n{=}9$ probe, weak and inconsistent,
+AC@1 ranges only $0$--$0.44$ on the scarce $n{=}9$ probe, weak and inconsistent,
 not a clean zero. Scoring the same runs as an \emph{Elo arms race} between the solver
-and a hard-example miner (win $=$ CategoryHit, which, unlike recall-walled resolution, %
+and a hard-example miner (win $=$ AC@1, which, unlike recall-walled resolution, %
 varies across checkpoints) makes the instrument non-degenerate: entity is
 \emph{solver-runaway} (solver Elo $1000\!\to\!1551$, outpacing a corpus-bounded miner
 that cannot synthesize adversarially harder targeting), while recognition
@@ -1462,7 +1461,7 @@ well-powered categories and the other three as exploratory. An item-level audit 
 disaggregations (revenue recognized point-in-time versus over-time), where neither value is
 the total a non-expert would assume, and one pairs total GAAP revenue against an operating
 cash-flow proxy that is not a defensible reading of ``revenue.'' Even our human annotators
-never targeted the category (CategoryHit $0$ on its items). We therefore report the
+never targeted the category (AC@1 $0$ on its items). We therefore report the
 recognition-policy blind spot as a preliminary observation on a small, imperfect sample, not
 a headline result, and recommend rebuilding this category with analyst-audited pairs before
 drawing quantitative conclusions.
@@ -1481,10 +1480,10 @@ category-targeting are judged by GPT-4o-mini and the user is simulated by GPT-5.
 these against humans on a stratified, blindly double-annotated sample (five annotators).
 The correctness grader agrees with human consensus at Cohen $\kappa{=}0.85$ (raw agreement
 $0.92$), exceeding inter-annotator agreement ($0.86$), so accuracy figures hold under human
-labels. The CategoryHit classifier initially agreed only weakly ($0.53$). A single-label design
+labels. The AC@1 classifier initially agreed only weakly ($0.53$). A single-label design
 over-assigned \texttt{temporal\_scope} to compound questions that also name an entity or
 metric. The corrected multi-label \emph{touch} classifier reaches $0.75$ agreement, matching
-inter-annotator agreement ($0.73$), and the CategoryHit@1 values reported here use it. Because
+inter-annotator agreement ($0.73$), and the AC@1 values reported here use it. Because
 this shows models mostly do ask on-category, the corrected reading is that the gap lies in
 central targeting and integration rather than detection. A strict central-category variant is
 discriminative but not yet human-validated, so we report it only as a supplementary
@@ -1679,7 +1678,7 @@ default interpretation plausible for a non-expert?} H3 \emph{Does $C$ uniquely i
 interpretation?} H4 \emph{Does $C$ avoid directly stating the answer?} H5 \emph{Is $A$ correct under
 the intended interpretation?} H6 \emph{Is $A_d$ correct under the default interpretation?} H7
 \emph{Is the primary category label correct?} H8 \emph{What yes/no question would a financial analyst
-naturally ask to resolve the ambiguity?} (free text, used to compute human CategoryHit). Acceptance
+naturally ask to resolve the ambiguity?} (free text, used to compute human AC@1). Acceptance
 requires H1--H6 to hold after adjudication by the primary author. On a stratified 60-instance sample
 (by language and category), per-item raw agreement is $0.82$--$0.97$. Because the labels are heavily
 skewed toward ``yes'' ($>85\%$ per item), Cohen's $\kappa$ is degenerate under the
