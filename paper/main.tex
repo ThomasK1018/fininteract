@@ -44,7 +44,15 @@ Large language model agents are increasingly deployed for financial information 
 \label{sec:intro}
 %% ============================================================
 
-Large language model (LLM) agents are increasingly utilized in financial analysis to answer questions over regulatory filings reports~\citep{islam2023financebench,chen2021finqa,reddy2024docfinqa}, carry out multi-stepresearch and retrieval over corporate disclosures~\citep{bigeard2025financeagent,choi2025finagentbench,krumdick2024bizbench,xie2024finben}. In a typical deployment, the agent reads a user's question, searches through relevant filings and returns the answer for downstream actions. However, financial questions are often deceptively under-specified. Financial terminology is highly specific, and a natural language question may map to several defensible readings for different numbers, e.g. in the question \emph{``What was Meta Platforms' operating income?''} (Figure~\ref{fig:teaser}), an agent must decide whether the user means the consolidated GAAP figure (\$46.75B for FY2023) or the Family of Apps segment (\$62.87B), both being programmatically verifiable against SEC facts. A capable agent should recognize the ambiguity and follow up with the user instead of directly commiting into a plausible but unintended reading. Existing financial benchmarks cannot measure this as they grade only the final answer by assuming the question is disambiguated~\citep{islam2023financebench,chen2021finqa,reddy2024docfinqa,krumdick2024bizbench,xie2024finben}. Without grounding check, they cannot distinguish whether the agent actually resolves the ambiguity or guesses the common reading. We call such blind spot \emph{single-gold illusion} (Table~\ref{tab:comparison}), which is currently underexplored in the financial domain relative to general ambiguous QA literature~\citep{min2020ambigqa,li2025condambigqa,kuhn2022clam}.  
+Large language model (LLM) agents are increasingly utilized in financial analysis to answer questions in regulatory filings~\citep{islam2023financebench,chen2021finqa,reddy2024docfinqa}, carry out multi-step research and retrieval over corporate disclosures~\citep{bigeard2025financeagent,choi2025finagentbench,krumdick2024bizbench,xie2024finben}. The agent reads a user's question, searches through relevant filings and returns the answer for downstream actions. 
+
+However, financial questions are often deceptively under-specified. Financial terminology is highly specific, and a natural language question may map to several defensible readings for different numbers, e.g. in the question \emph{``What was Meta Platforms' operating income?''} (Figure~\ref{fig:teaser}), an agent must decide whether the user means the consolidated GAAP figure (\$46.75B for FY2023) or the Family of Apps segment (\$62.87B), both being programmatically verifiable against SEC facts. A capable agent should recognize the ambiguity and follow up with the user instead of directly committing into a plausible but unintended reading. 
+
+Existing financial benchmarks cannot measure this as they grade only the final answer by assuming the question is disambiguated~\citep{islam2023financebench,chen2021finqa,reddy2024docfinqa,krumdick2024bizbench,xie2024finben}. Without grounding check, they cannot distinguish whether the agent actually resolves the ambiguity or guesses the common reading. We call such blind spot \emph{single-gold illusion} (Table~\ref{tab:comparison}), which is currently underexplored in the financial domain relative to general ambiguous QA literature~\citep{min2020ambigqa,li2025condambigqa,kuhn2022clam}. We study financial ambiguity over three research questions: \begin{itemize}[leftmargin=*, topsep=3pt, itemsep=1pt, parsep=0pt]
+    \item \textbf{RQ1}: Do frontier models recognize financial report ambiguity? 
+    \item \textbf{RQ2}: What financial ambiguity leads to most failures?
+    \item \textbf{RQ3}: Can we incorporate interventions at inference time to improve resolution?
+\end{itemize}
 
 \begin{figure*}[t]
 \centering
@@ -100,35 +108,12 @@ Default span &
 \end{tabular}}
 \end{table}
 
-\textbf{Research Questions.} We study financial ambiguity over three research questions: \begin{itemize}[leftmargin=*, topsep=3pt, itemsep=1pt, parsep=0pt]
-    \item \textbf{RQ1 (Detection and resolution).} Do frontier models recognize financial-report ambiguity, and does interactive clarification improve resolution over autonomous search?
-    \item \textbf{RQ2 (Where the bottleneck lies).} Is the binding constraint knowing \emph{when} and on \emph{which} category to ask (elicitation) rather than access to evidence (grounding)?
-    \item \textbf{RQ3 (Intervention).} Can targeted interventions on the ambiguity category, at inference time and through training, measurably improve resolution?
-\end{itemize}
+Answering these questions requires three design properties. First,
+the benchmark must draw representative ambiguity from real filings. Second, it must expose fine-grained dimensions of ambiguity through paired default and intended readings. Third, benchmark construction should have low cost and is safe from potential leakage to keep answer out of disambiguating context, with verifiable ground truth validated by domain experts. (Sec. \ref{sec:task}).
 
-\textbf{Design considerations.} A benchmark that answers these questions must draw \emph{representative} ambiguity from real filings, support \emph{fine-grained} per-category diagnosis through paired default and intended readings, admit \emph{low-cost, leak-safe} construction that keeps the answer out of the disambiguating context, and provide \emph{verifiable}, human-validated ground truth
-(\S\ref{sec:task}).
+We release \fininteract, a bilingual benchmark in English and Chinese containing 173 instances, classified into five financial ambiguity categories. Each question $Q$ is paired with a \emph{default} interpretation recording a possible non-expert assumption and an \emph{intended} interpretation fixed by the disambiguating context. By grading the same model outputs against the default and intended interpretations, we effectively expose this single-gold illusion. \fininteract includes skill metric to localize which clarification ability the model lacks, and evaluates the agents under a ReAct protocol where the user simulator answers only from the disambiguating context (Figure~\ref{fig:framework}) to measure the agent's quality of clarify-then-integrate action. 
 
-\textbf{Our Proposal.} We release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances (53 English / 120 Chinese). Each question $Q$ is paired with a \emph{default} interpretation (the reading a non-expert assumes) and an \emph{intended} interpretation fixed by a disambiguating context $C$, across a five-category taxonomy of financial ambiguity. By grading the same model outputs against the default versus intended interpretation, we expose the illusion directly. A per-category
-skill metric then localizes \emph{which} clarification ability a model lacks.
-We evaluate agents under a ReAct protocol where a user simulator answers only from
-the disambiguating context (Figure~\ref{fig:framework}), so the benchmark measures
-whether an agent elicits and then integrates the clarification it needs rather than
-whether it can be handed the answer.
-
-\paragraph{Findings.}
-Our study answers the three questions. \textbf{(RQ1)} Frontier models detect ambiguity but
-rarely resolve it, asking about the correct category almost always yet converting the
-clarification into the right answer only occasionally, and the sparse recognition-basis
-category ($n{=}9$, exploratory) is one no current model targets (\S\ref{sec:skills}).
-\textbf{(RQ2)} The bottleneck is interaction, not knowledge, and it spans both eliciting the
-clarification and integrating it: given the resolved interpretation models answer $93$--$95\%$
-correctly, yet under free interaction even the strongest models reach only $29\%$ at full
-scale and $44\%$ in a cross-vendor pilot, and a clarification turn helps only two of twelve
-models (\S\ref{sec:ceiling}). \textbf{(RQ3)}
-Category-conditioned interventions at inference and in training raise resolution over their
-untargeted counterparts, so the benchmark is not only diagnostic but actionable
-(Appendix~\ref{app:findings}).
+Our evaluation answers the research questions in turn. First, while frontier models detect ambiguity, they rarely resolve it effectively, as they ask the correct clarification question but still \textbf{failing to convert into the correct answer at the end} (Sec. \ref{sec:skills}). Second, \textbf{policy-related ambiguities} are the least resolved, as none of the proprietary models would initiate clarifications when facing this sparse category. Third, inference intervention facilitates ambiguity resolution, increasing accuracy from about 44\% to above 90\%, suggesting that this benchmark is not only diagnostic but also actionable. (Appendix~\ref{app:findings}).
 
 \noindent\textbf{Contributions.}
 \begin{enumerate}[leftmargin=*,itemsep=1pt]
