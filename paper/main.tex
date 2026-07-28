@@ -36,27 +36,7 @@
 \maketitle
 
 \begin{abstract}
-Large language model agents are increasingly deployed for financial analysis over
-regulatory filings, returning a single number that an analyst or investor may act on.
-But financial terminology is specific, and a question that looks fully specified often
-admits several defensible readings that yield materially different values. Meta
-Platforms' ``operating income'' is \$46.75B consolidated or \$62.87B for the Family of
-Apps segment, a 34\% gap, yet each reading's ground truth is exact and programmatically
-verifiable. A capable agent should recognize the ambiguity and ask a clarifying question
-rather than commit to a plausible but unintended reading. Yet existing financial
-benchmarks attach one gold answer per question and cannot tell an agent that resolves the
-ambiguity from one that guesses the common reading, a blind spot we call the
-\emph{single-gold illusion}. We release \fininteract, a bilingual (English/Chinese)
-benchmark of 173 instances that pairs each question with a \emph{default} and an
-\emph{intended} interpretation (fixed by a disambiguating context) across a five-category
-ambiguity taxonomy, and grades whether an agent elicits and then integrates the right
-clarification. Re-grading the \emph{same} outputs against the intended rather than the default
-interpretation cuts apparent accuracy by up to $3\times$ (for GPT-4o under retrieval). The
-failure is interaction, not knowledge: given the resolved interpretation models answer
-$93$--$95\%$ correctly, yet under free interaction even the strongest models reach only
-$29\%$ at full scale and $44\%$ in a cross-vendor pilot, far short of that ceiling, and a
-clarification turn helps only two of the twelve models evaluated and lowers accuracy for the
-rest. The gap is not merely a failure to ask: models ask about the right category almost
+Large language model agents are increasingly deployed for financial analysis over regulatory filings, retrieving information that an analyst or investor may further act on. But financial terminology is specific, and a question that looks fully specified may admit multiple defensible readings that yield materially different values, e.g. Meta Platforms' ``operating income'' is \$46.75B consolidated or \$62.87B for the Family of Apps segment, a 34\% gap, but each reading's ground truth is exact and programmatically verifiable. A capable agent should recognize the ambiguity and ask a clarification question instead of committing to a plausible yet unintended reading. However, existing financial benchmarks generally attach only one gold answer per question and cannot distinguish agents which resolve the ambiguity from making an ungrounded guess. We call such blind spot \emph{single-gold illusion}. To address this illusion, we release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances that pairs each question with a \emph{default} and an \emph{intended} interpretation (fixed by a disambiguating context) across a five-category ambiguity taxonomy, and grades whether an agent elicits and then integrates the right clarification. Our experiments show that re-grading the \emph{same} outputs against the intended would lead to actual accuracy drop for more than $3\times$ for GPT-4o. By mandating a clarification turn, state-of-the-art models only reach about 45\% accuracy compared to over $90\%$ under resolved interpretation scenarios. This suggests that even when models may ask for the correct clarification, they fail to convert the answer received into the correct value. The gap is not merely a failure to ask: models ask about the right category almost
 always, yet convert the answer they receive into the correct value only rarely, so the
 bottleneck spans both \emph{eliciting} the clarification and \emph{integrating} it. A
 per-category skill metric localizes \emph{which} of these abilities fails. Coverage
