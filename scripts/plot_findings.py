@@ -64,7 +64,7 @@ def fig_lever(out):
 
 
 def fig_humanllm(out):
-    # Accuracy vs CategoryHit@1 (interact): tab:main + Finding 8 human row
+    # Accuracy vs AC@1 (interact): tab:main + Finding 8 human row
     pts = [("GPT-5", 0.86, 20.2, NAVY), ("GPT-4o", 0.94, 4.6, NAVY),
            ("GPT-5-mini", 0.94, 0.0, NAVY), ("Qwen3-30B", 0.90, 11.6, NAVY),
            ("Qwen3.5-35B", 0.81, 28.9, NAVY), ("Human", 0.68, 30.0, ORANGE)]
@@ -77,7 +77,7 @@ def fig_humanllm(out):
         dx = 0.006 if name != "GPT-4o" else -0.006
         ha = "left" if name != "GPT-4o" else "right"
         ax.annotate(name, (ah, acc), xytext=(ah + dx, acc + 1.1), fontsize=8.5, ha=ha)
-    ax.set_xlabel("Targeting: CategoryHit@1 (asks on the right category)")
+    ax.set_xlabel("Targeting: AC@1 (asks on the right category)")
     ax.set_ylabel("Resolution: accuracy (\\%)".replace("\\%", "%"))
     ax.set_title("Asking on target does not imply resolving", fontsize=10.5)
     ax.set_xlim(0.6, 1.0); ax.set_ylim(-2, 34)

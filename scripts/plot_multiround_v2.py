@@ -21,13 +21,13 @@ for tag, label, col, style in RUNS:
     ax2.plot(xs, [r["test_human_axishit"] for r in rs], style, color=col, label=label, linewidth=2)
 
 ax1.axhline(0.05, color="gray", ls=":", lw=1); ax1.annotate("base ≈ 0.05", (1, 0.07), color="gray", fontsize=8)
-ax1.set_title("VAL CategoryHit@1 per round (selection metric)", fontsize=11)
-ax1.set_xlabel("solver checkpoint S_i"); ax1.set_ylabel("val CategoryHit@1")
+ax1.set_title("VAL AC@1 per round (selection metric)", fontsize=11)
+ax1.set_xlabel("solver checkpoint S_i"); ax1.set_ylabel("val AC@1")
 ax1.set_ylim(0, 1); ax1.set_xticks([1, 2, 3]); ax1.legend(fontsize=8); ax1.grid(alpha=0.3)
 
 ax2.axhline(0.0, color="gray", ls=":", lw=1)
-ax2.set_title("TEST human-probe CategoryHit@1 (held out; guard preserves transfer)", fontsize=11)
-ax2.set_xlabel("solver checkpoint S_i"); ax2.set_ylabel("human-probe CategoryHit@1")
+ax2.set_title("TEST human-probe AC@1 (held out; guard preserves transfer)", fontsize=11)
+ax2.set_xlabel("solver checkpoint S_i"); ax2.set_ylabel("human-probe AC@1")
 ax2.set_ylim(0, 1); ax2.set_xticks([1, 2, 3]); ax2.legend(fontsize=8); ax2.grid(alpha=0.3)
 
 plt.tight_layout(); plt.savefig("data/results/multiround_v2_axishit.png", dpi=130)

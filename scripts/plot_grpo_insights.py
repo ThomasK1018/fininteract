@@ -2,7 +2,7 @@
 results/grpo/RESULTS_REPORT.md (raw per-step logs live on the GPU box).
 
 Panel (a): the RLVR ladder -- separates the LEAK-PROOF learning signal
-           (CategoryHit@1, Interaction) from leak-confounded Accuracy across
+           (AC@1, Interaction) from leak-confounded Accuracy across
            base -> SFT -> KTO -> GRPO (n=51 held-out).
 Panel (b): true multi-turn GRPO (verl, 4B, 6 GPUs) -- reward and clarifying
            turns rise together over 15 steps -> the axis-aware reward is
@@ -29,7 +29,7 @@ turns_mean = [5.7, 6.1, 8.6, 7.3]
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(9.6, 3.6))
 
 x = np.arange(len(stages)); w = 0.27
-a1.bar(x - w, axishit,  w, label="CategoryHit@1 (leak-proof)", color="C0")
+a1.bar(x - w, axishit,  w, label="AC@1 (leak-proof)", color="C0")
 a1.bar(x,      interact, w, label="Interaction % (leak-proof)", color="C2")
 a1.bar(x + w, acc,      w, label="Accuracy (leak-confounded)", color="C3", alpha=0.55, hatch="//")
 a1.set_xticks(x); a1.set_xticklabels(stages)
@@ -53,7 +53,7 @@ fig.savefig(out, bbox_inches="tight"); print("wrote", out)
 
 # --- printed insights ---
 print("\n=== TRAINING INSIGHTS (from reported aggregates) ===")
-print(f"CategoryHit@1  base->SFT: {axishit[0]}->{axishit[1]}  (+{axishit[1]-axishit[0]:.1f}); "
+print(f"AC@1  base->SFT: {axishit[0]}->{axishit[1]}  (+{axishit[1]-axishit[0]:.1f}); "
       f"SFT->GRPO: {axishit[1]}->{axishit[3]} ({axishit[3]-axishit[1]:+.1f})")
 print(f"Interaction base->SFT: {interact[0]}->{interact[1]}  (+{interact[1]-interact[0]:.1f}); saturates at 100 thereafter")
 print(f"Accuracy base->GRPO: {acc[0]}->{acc[3]} (+{acc[3]-acc[0]:.1f})  <- tiny gap = leak-confounded, ignore as learning signal")
