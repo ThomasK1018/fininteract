@@ -776,7 +776,7 @@ GPT-5-mini & Answer-only   & 0.6 & 0.0 & $-0.6$ \\
 \end{tabular}}
 \end{table}
 
-\textbf{Finding 0: A single-gold convention over-states competence by up to
+\textbf{Finding 1: A single-gold convention over-states competence by up to
 $3\times$, and the gap is the benchmark's reason to exist.} In the
 retrieval-augmented regime where current single-gold benchmarks operate, the
 larger models return the \emph{default} reading more often than the intended one:
@@ -849,7 +849,7 @@ failing to \emph{elicit} the disambiguation itself, not missing knowledge.}
 \label{fig:bottleneck}
 \end{figure}
 
-\textbf{Finding 7: Models can answer once the ambiguity is resolved, they
+\textbf{Finding 2: Models can answer once the ambiguity is resolved, they
 cannot resolve it themselves.} The context-oracle ceiling is $93$--$95\%$ for all
 three models, including GPT-5-mini, which scores $0\%$ under free interaction.
 Latent answering capacity is therefore near-ceiling and roughly scale-invariant;
@@ -908,7 +908,7 @@ closed frontier and the strongest open model.}
 \label{fig:radar}
 \end{figure}
 
-\textbf{Finding 9: Ambiguity clarification is a per-category skill with a sharp touch
+\textbf{Finding 3: Ambiguity clarification is a per-category skill with a sharp touch
 versus central-targeting dissociation.} Under the corrected classifier the pattern is
 precise. \texttt{recognition\_policy} is a robust blind spot. No model ever asks about it,
 in either the touch or the central form (CategoryHit@1 $=0$), so models essentially never
@@ -1228,7 +1228,7 @@ Model & Mode & Intended & Any-valid & Def.-cap & Ask \\
 \end{tabular}}
 \end{table}
 
-\textbf{Finding 0b: the single-gold illusion is domain-general.} Running the
+\textbf{Finding 4: the single-gold illusion is domain-general.} Running the
 identical default-vs-intended measurement on AmbigQA~\citep{min2020ambigqa}
 (Table~\ref{tab:general}) reproduces all three effects outside finance,
 \emph{consistently across three models}. Grading the \emph{same} answer-only outputs
@@ -1262,9 +1262,10 @@ gain only for Gemini, the weakest autonomous searcher. All headline accuracy
 comparisons below are reported with
 bootstrap $95\%$ CIs over instances, and we test each within-model mode
 transition with a two-sided paired bootstrap ($n{=}173$). Six findings emerge
-here, with a seventh (the latent-capacity ceiling) in \S\ref{sec:ceiling}.
+here (Findings 5--10); the closely related latent-capacity ceiling is reported
+as a headline result in the main text (\S\ref{sec:ceiling}).
 
-\textbf{Finding 1: Interaction is a capability, not a free lever, it helps
+\textbf{Finding 5: Interaction is a capability, not a free lever, it helps
 the strong model and \emph{harms} the weak one.} Adding interaction raises
 GPT-5 from 6.4\% to 20.2\% (95\% CI $[14.5,26.6]$; paired bootstrap $p{<}0.001$),
 but \emph{lowers} GPT-4o from 12.1\% to 4.6\% ($p{=}0.002$). Forcing the weaker
@@ -1285,19 +1286,19 @@ the other ten, so the ability to convert clarification into a correct answer is 
 \label{fig:lever}
 \end{figure}
 
-\textbf{Finding 2: Model rankings flip with the interaction category.} GPT-4o
+\textbf{Finding 6: Model rankings flip with the interaction category.} GPT-4o
 \emph{outperforms} GPT-5 under pure retrieval (12.1 vs.\ 6.4) yet is
 \emph{dominated} by it under interaction (4.6 vs.\ 20.2). A single-mode benchmark
 would mis-rank these models; the interaction category is what separates them, which
 is precisely the dimension FinInteract is designed to measure.
 
-\textbf{Finding 3: Retrieval cannot substitute for interaction.} Oracle retrieval
+\textbf{Finding 7: Retrieval cannot substitute for interaction.} Oracle retrieval
 lifts GPT-5 to only 6.4\%: because each disambiguating passage contains
 \emph{both} the intended and default values, retrieval surfaces the ambiguity but
 does not resolve it. Only a targeted clarification collapses the question to a
 unique answer, which interaction (20.2\%) begins to do.
 
-\textbf{Finding 4: The weak model's failure is clarification non-integration, not
+\textbf{Finding 8: The weak model's failure is clarification non-integration, not
 inability to ask.} GPT-4o asks readily (IR 99\%, 4.7 questions on average) but
 fails to \emph{integrate} the user's responses: 87\% of its interactive errors
 are non-committal refusals (e.g.\ ``please specify the exact period'') issued
@@ -1305,7 +1306,7 @@ are non-committal refusals (e.g.\ ``please specify the exact period'') issued
 cannot close the loop and commit, a multi-turn integration gap, not a protocol
 artifact (only 2\% produced no answer at all).
 
-\textbf{Finding 5: Models are severely overconfident on ambiguous queries.}
+\textbf{Finding 9: Models are severely overconfident on ambiguous queries.}
 Expected Calibration Error ranges from 0.53 (GPT-5, interact) to 0.95 (GPT-4o,
 answer-only); models report 85--95\% confidence while answering 0--20\%
 correctly. The remaining failure is not one of category \emph{detection}. Under a
@@ -1313,11 +1314,11 @@ human-validated classifier (agreement $0.75$, matching inter-annotator agreement
 both models almost always ask a question that touches the correct ambiguity category (CategoryHit@1
 $0.86$ for GPT-5 and $0.94$ for GPT-4o). What they lack is precise \emph{central} targeting,
 only $0.06$ and $0.04$ of first questions make the true category their single central concern,
-and, above all, integration (Finding 4). The bottleneck is targeting precision and
+and, above all, integration (Finding 8). The bottleneck is targeting precision and
 commitment rather tha category detection, which motivates the category-conditioned policy of
 \S\ref{sec:error}.
 
-\textbf{Finding 6: A smaller model collapses into ill-formed clarification, 
+\textbf{Finding 10: A smaller model collapses into ill-formed clarification, 
 it asks the most but commits the least.} GPT-5-mini scores $0.6/0.0/0.0\%$ across
 the three modes. The cause is not ambiguity-blindness but the opposite: it is the
 \emph{most} eager to clarify (interact IR $96\%$, $4.6$ asks/instance), yet it
@@ -1328,7 +1329,7 @@ question and $35\%$ exhaust the $10$-round budget still asking; only $1$ instanc
 ever commits a value (also wrong), and just $1.3\%$ were format-unparseable. Even
 in Answer+Search, where no interact channel exists, it asks instead of
 answering, capturing \emph{neither} the intended nor the default reading
-($0.0/0.0\%$). This is an extreme form of Finding~4's integration gap and a
+($0.0/0.0\%$). This is an extreme form of Finding~8's integration gap and a
 distinct failure mode: clarification without commitment. The collapse is not an
 artifact of the yes/no protocol: with a \emph{free-form} simulator that answers its
 open-ended questions from $C$ (\S\ref{sec:limitations}), GPT-5-mini still resolves
@@ -1373,7 +1374,7 @@ the agent's \texttt{search}$\to$\texttt{interact}$\to$\texttt{answer} loop, so t
 human row is directly comparable to the +Interact column; we grade it with the
 identical GPT-4o-mini grader.
 
-\textbf{Finding 8: Even humans who can ask resolve only $30\%$, the task is hard,
+\textbf{Finding 11: Even humans who can ask resolve only $30\%$, the task is hard,
 not merely mis-specified for models.} Annotators reach $30.0\%$ accuracy overall
 ($34.4\%$ EN, $22.2\%$ ZH), above every full-scale model (which top out at $28.9\%$) but
 far from the $93$--$95\%$ context-oracle ceiling. The gap between the oracle ceiling and the
@@ -1428,7 +1429,7 @@ recognition\_policy & \textbf{.00} & \textbf{.00} & \textbf{.00} \\
 \end{tabular}}
 \end{table}
 
-\textbf{Finding 11: the categories are different \emph{kinds} of skill, some
+\textbf{Finding 12: the categories are different \emph{kinds} of skill, some
 scale-solvable, one a scale-invariant blind spot.} A controlled scale ladder
 (Qwen3 $4\text{B}\!\to\!32\text{B}$, Table~\ref{tab:scaledissoc}) separates the categories
 sharply, once we look at \emph{central} targeting. \texttt{recognition\_policy} is a
@@ -1542,7 +1543,7 @@ split (peaks $0.71$/$0.74$ vs.\ baseline $0.60$).
   \label{fig:crossmodel}
 \end{figure}
 
-\paragraph{Finding 10: Open models linearly represent both ambiguity and its category, replicating
+\paragraph{Finding 13: Open models linearly represent both ambiguity and its category, replicating
 from 4B to 35B and across dense and MoE architectures.} The representation is type-specific
 (entity vs.\ metric decodable at $0.80$) and robust to scale and architecture, yet behaviorally
 these same models still default rather than clarify. The behavioral gap is thus better read as a
@@ -1649,7 +1650,7 @@ GPT-5, $89\%$ for GPT-4o, $90\%$ for GPT-5-mini, and $75\%$ for Qwen3-30B, while
 bottleneck is converting a correctly targeted clarification into the intended answer, not
 deciding whether or what to ask. Qwen3.5-35B-A3B is the informative exception, asking less
 (E1 $21\%$) but resolving more of what it attempts (Correct $35\%$), so its failures lean
-toward under-asking rather than misintegration. This corroborates Findings~4 and~9 across
+toward under-asking rather than misintegration. This corroborates Findings~3 and~8 across
 the full error budget and motivates the state-gated answering of \S\ref{sec:axisreact}.
 
 \subsubsection{Inference-Time Intervention: Category-Aware Clarification ReAct}
@@ -1836,12 +1837,12 @@ recognition-basis distinction. The contrast rules out a broken pipeline, the
 metric is only \emph{weakly} scale-learnable yet trains as well as entity, it rules
 out scale-learnability as the gate (\S\ref{sec:learnability}).
 
-\textbf{Finding 12: the loop closes on abundant categories and fails on scarce ones;
+\textbf{Finding 14: the loop closes on abundant categories and fails on scarce ones;
 whether elicitation \emph{helps} is a separate, per-category property.} A self-refreshing
 \fininteract is viable wherever the data arm can supply enough frontier
 instances, both abundant categories install and generalize; the scarce category
 (recognition's $36$-instance ceiling from just $30/1{,}847$ primary passages) does
-not reliably (Finding~14). But installing on-category elicitation is not automatically beneficial: it
+not reliably (Finding~17). But installing on-category elicitation is not automatically beneficial: it
 \emph{helps} metric (accuracy $15\to60$, $+45$: the base cannot answer without the
 metric definition, so the clarifying question \emph{supplies} it: $18$
 wrong$\to$correct, $0$ regressions) and \emph{hurts} entity (accuracy $32.5\to22.5$,
@@ -1854,7 +1855,7 @@ next, is a \emph{conditional when-to-ask gate}, elicit only where the model cann
 already answer, plus multi-round curriculum and fresh-filing ingestion to lift the
 scarce categories above their availability ceiling.
 
-\textbf{Finding 12b: the over-elicitation regression is fixable at inference, but
+\textbf{Finding 15: the over-elicitation regression is fixable at inference, but
 not by a train-time gate.} We test the when-to-ask gate directly on the frozen human
 probes ($n{=}40$ per category). A \emph{train-time} gate that mixes no-ask demonstrations
 into the category-guided SFT backfires: even $7$ of $164$ no-ask demonstrations tip the
@@ -1910,7 +1911,7 @@ GO) and \emph{not} decodability (recognition: highest AUROC, yet does not
 co-evolve). Salience = primary$/$any-candidate passages; decodability = peak
 one-vs-rest AUROC (recognition on a size-matched augmented sample; raw $n{=}9$
 overfits to $1.0$). $^*$metric is a GO but needs ${\sim}2$ accumulated slices
-(${\sim}50$ instances); one $30$-instance slice teaches it nothing (Finding~14).
+(${\sim}50$ instances); one $30$-instance slice teaches it nothing (Finding~17).
 $^\ddagger$recognition is \emph{unreliable} rather than a clean fail: held-out human
 CategoryHit ranges $0$--$0.44$ across training runs on the scarce $n{=}9$ probe.}
 \label{tab:learnability}
@@ -1929,7 +1930,7 @@ recognition\_policy &  30 & \textbf{0.04} & $+0.00$ & \textbf{0.93} & weak$^{\dd
 \end{tabular}}
 \end{table}
 
-\textbf{Finding 13: co-evolvability is gated by source \emph{abundance}, driven by
+\textbf{Finding 16: co-evolvability is gated by source \emph{abundance}, driven by
 \emph{salience}, not by scale-learnability or representational decodability.} What
 survives both falsifications is a single upstream cause. \texttt{recognition\_policy}
 is a candidate category in $796$ passages but \emph{primary} in only $30$ (salience
@@ -1958,7 +1959,7 @@ candidate, which regresses on validation).}
 \label{fig:multiround}
 \end{figure}
 
-\textbf{Finding 14: salience predicts a category's \emph{data-need}, not just a binary
+\textbf{Finding 17: salience predicts a category's \emph{data-need}, not just a binary
 outcome, and a validation-guarded arms race confirms it.} Extending each category to a
 multi-round curriculum (Fig.~\ref{fig:multiround}), with checkpoints selected on a
 frozen validation set and reported on the held-out human probe, refines the binary
