@@ -131,33 +131,14 @@ GPT-5-mini & Answer-only   & 0.6 & 0.0 & $-0.6$ \\
 
 \subsection{Recognition Policy Leads to the Most Failures}
 \label{sec:skills}
+We extend the study into each ambiguity group. Table ~\ref{tab:skills} shows that in the high AC@1 shown in Table~\ref{tab:main}, while models are capable of determining ambiguity category in most cases, it consistently fails in the recognition policy group. This motivates us to study this blind spot of existing models by examining the following case study. Given the question ``XXX'', we have the answer ``XXX'', which are two completely different values under different policies. Models fail here as they consistently select XXX given the \textcolor{red}{XXX reason}, ignoring the financial practice of \textcolor{red}{XXX}. This suggests that the domain-specific practice might not align too well with existing model's generalized behavior, hence suggesting the need of specific tuning. We attach details and further case studies in in Appendix~\ref{app:maindetails}.
 
-Not all ambiguity categories are equally hard, and one, \texttt{recognition\_policy}, drives the
-sharpest failure. Decomposing per-category \texttt{+interact} competence into whether a model asks
-(Recognition), asks about the right category (Targeting, AC@1), and resolves the intended answer
-(Resolution), \texttt{recognition\_policy} is the clear outlier in Table~\ref{tab:skills}: every
-model scores AC@1 $=0$ on it, so \emph{no} model ever asks which recognition basis is meant, while
-the remaining categories are targeted almost perfectly. It is therefore a genuine blind spot
-rather than a merely harder skill.
-
-We examine this with a case study. Asked \emph{``What were Tesla's revenues?''}, the answer is
-\$97.69B under GAAP accrual recognition but only \$14.92B under a cash-basis proxy, a $6.5\times$
-difference driven entirely by the recognition basis. We find that models fail here because they
-never surface the recognition basis as a source of ambiguity: when given the chance to clarify,
-their question reverts to the more salient period or entity dimension, so the recognition
-ambiguity is never raised and the default figure is reported as fact. The capability radar, the
-per-model matrix, and further case studies are in Appendix~\ref{app:maindetails}.
-
-\begin{table}[t]
+\begin{table}[H]
 \centering
-\caption{Per-category \textbf{Targeting} skill (AC@1, \emph{touch} form) in \texttt{+interact},
-recomputed with the corrected classifier (\S\ref{sec:metrics}). Recognition policy is a robust
-blind spot (no model ever asks), temporal scope is fully solved, and entity and metric are
-touched almost always but rarely made the \emph{central} concern (central-form AC@1
-$\leq0.16$, see text). The two sparse categories ($n{\le}9$) are preliminary.}
+\caption{We observe that recognition policy seems to be a blind spot of existing models as they can never detect and seek clarification from it, compared to the rest categories where the model is aware of the ambiguity.}
 \label{tab:skills}
 \small
-\resizebox{0.9\columnwidth}{!}{%
+\resizebox{0.95\columnwidth}{!}{%
 \begin{tabular}{lrccccc}
 \toprule
 Category & $n$ & GPT-5 & GPT-4o & {\footnotesize GPT-5-m} & {\footnotesize Q3-30B} & {\footnotesize Q3.5-35B} \\
