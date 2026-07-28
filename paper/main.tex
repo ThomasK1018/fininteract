@@ -28,7 +28,7 @@
 \newcommand{\disep}{$\text{DisE}^+$\xspace}
 \newcommand{\disei}{$\text{DisE}^+$\xspace}
 
-\title{FinInteract: The Single-Gold Illusion and the Elicitation Bottleneck in Ambiguous Question Answering}
+\title{FinInteract: The Single-Gold Illusion and the Elicitation--Integration Gap in Ambiguous Question Answering}
 \author{Anonymous Submission}
 \affiliations{Paper under double-blind review}
 
@@ -49,15 +49,19 @@ ambiguity from one that guesses the common reading, a blind spot we call the
 \emph{single-gold illusion}. We release \fininteract, a bilingual (English/Chinese)
 benchmark of 173 instances that pairs each question with a \emph{default} and an
 \emph{intended} interpretation (fixed by a disambiguating context) across a five-category
-ambiguity taxonomy, and grades whether an agent elicits the right clarification.
-Re-grading the \emph{same} outputs against the intended rather than the default
+ambiguity taxonomy, and grades whether an agent elicits and then integrates the right
+clarification. Re-grading the \emph{same} outputs against the intended rather than the default
 interpretation cuts apparent accuracy by up to $3\times$ (for GPT-4o under retrieval). The
-failure is elicitation, not knowledge: given the resolved interpretation models answer
+failure is interaction, not knowledge: given the resolved interpretation models answer
 $93$--$95\%$ correctly, yet under free interaction even the strongest models reach only
 $29\%$ at full scale and $44\%$ in a cross-vendor pilot, far short of that ceiling, and a
 clarification turn helps only two of the twelve models evaluated and lowers accuracy for the
-rest. A per-category skill metric localizes \emph{which} clarification ability fails and
-reveals recognition basis as a blind spot no current model targets.
+rest. The gap is not merely a failure to ask: models ask about the right category almost
+always, yet convert the answer they receive into the correct value only rarely, so the
+bottleneck spans both \emph{eliciting} the clarification and \emph{integrating} it. A
+per-category skill metric localizes \emph{which} of these abilities fails. Coverage
+concentrates in two well-powered categories (entity scope and metric definition); the sparser
+categories, including a recognition-basis category that no model targets, are exploratory.
 \end{abstract}
 
 %% ============================================================
@@ -172,15 +176,16 @@ versus the intended interpretation exposes the illusion directly, and a per-cate
 skill metric then localizes \emph{which} clarification ability a model lacks.
 We evaluate agents under a ReAct protocol where a user simulator answers only from
 the disambiguating context (Figure~\ref{fig:framework}), so the benchmark measures
-whether an agent elicits the clarification it needs rather than whether it can be
-handed the answer.
+whether an agent elicits and then integrates the clarification it needs rather than
+whether it can be handed the answer.
 
 \paragraph{Findings.}
 Our study answers the three questions. \textbf{(RQ1)} Frontier models detect ambiguity but
 rarely resolve it, asking about the correct category almost always yet converting the
-clarification into the right answer only occasionally, and the recognition-basis category is a
-blind spot no current model targets (\S\ref{sec:skills}). \textbf{(RQ2)} The bottleneck is
-elicitation, not knowledge: given the resolved interpretation models answer $93$--$95\%$
+clarification into the right answer only occasionally, and the sparse recognition-basis
+category ($n{=}9$, exploratory) is one no current model targets (\S\ref{sec:skills}).
+\textbf{(RQ2)} The bottleneck is interaction, not knowledge, and it spans both eliciting the
+clarification and integrating it: given the resolved interpretation models answer $93$--$95\%$
 correctly, yet under free interaction even the strongest models reach only $29\%$ at full
 scale and $44\%$ in a cross-vendor pilot, and a clarification turn helps only two of twelve
 models (\S\ref{sec:ceiling}). \textbf{(RQ3)}
@@ -192,7 +197,9 @@ untargeted counterparts, so the benchmark is not only diagnostic but actionable
 \begin{enumerate}[leftmargin=*,itemsep=1pt]
   \item \textbf{A five-category formulation of financial ambiguity.} We formalize the ways a
     financial question can be under-specified into five categories, entity scope, metric
-    definition, temporal scope, filing vintage, and recognition policy (\S\ref{sec:task}).
+    definition, temporal scope, filing vintage, and recognition policy, of which we populate
+    two densely (entity scope, metric definition) and treat the other three as exploratory
+    (\S\ref{sec:task}).
   \item \textbf{\fininteract, a fine-grained financial ambiguity benchmark.} We build a
     bilingual benchmark of 173 instances extracted directly from source filings, each paired
     with a default and an intended interpretation and a per-category label, verified by an
@@ -200,8 +207,9 @@ untargeted counterparts, so the benchmark is not only diagnostic but actionable
     evaluation, and training code are provided in the supplementary material and will be released
     publicly upon acceptance (\S\ref{sec:methodology}).
   \item \textbf{A broad empirical study.} We evaluate a range of proprietary and open-source
-    models and localize where they fail, most sharply an elicitation bottleneck and a
-    recognition-policy blind spot that no current model resolves (\S\ref{sec:exp}).
+    models and localize where they fail, most sharply an interaction bottleneck that spans both
+    eliciting and integrating clarifications; a sparse recognition-basis category is an
+    exploratory observation rather than a headline (\S\ref{sec:exp}).
 \end{enumerate}
 
 
@@ -659,7 +667,8 @@ DisE$^+$ is a diagnostic of clarification efficiency, never the ranking metric.
 
 The main text highlights three headline results, one per research question. The
 \emph{single-gold illusion} that motivates the benchmark (\S\ref{sec:illusion}), the
-\emph{elicitation ceiling} that localizes the bottleneck to asking rather than knowing
+\emph{elicitation--integration ceiling} that localizes the bottleneck to interacting
+(asking and then using the answer) rather than knowing
 (\textbf{RQ2}, \S\ref{sec:ceiling}), and the \emph{per-category skill dissociation} that
 shows which clarification abilities models lack (\textbf{RQ1}, \S\ref{sec:skills}). The
 full set of per-model findings, the general-domain replication, the human baseline, the
@@ -668,33 +677,18 @@ case studies, the mechanistic probe, and the category-conditioned interventions
 
 \begin{table*}[t]
 \centering
-\caption{\textbf{Evaluating financial agents on ambiguous queries, at two scales.}
-\textbf{Accuracy (\%)}, graded against the \emph{intended} interpretation, is the primary
-metric (reported per mode); ``$\Delta$'' is +Interact minus +Search accuracy, the sign of the
-interaction lever. The interact mode additionally reports the secondary diagnostics IR
-(\% of instances with an ask), CategoryHit@1, and ECE. CHit@1 is the human-validated
-\emph{touch} form (the clarifying question names a true ambiguity category; agreement $0.75$
-with annotators vs.\ inter-annotator $0.73$); a stricter central form is analyzed in
-\S\ref{sec:skills}. \emph{Panel (a)} evaluates the OpenAI tier ladder and a Qwen open-weight
-ladder (dense 4B--32B plus two MoE models, Qwen3-30B-A3B and Qwen3.5-35B-A3B) at full scale
-($N{=}173$). \emph{Panel (b)} is a preliminary seven-model, six-vendor frontier pilot run
-through the \emph{same} OpenRouter simulator/grader pipeline at $N{=}50$ per mode; these numbers
-are directional and will be updated to full scale ($N{=}50$ means one instance ${=}2$ points, so
-$|\Delta|{\lesssim}2$ is within noise), and two Grok +Search instances hit transient API errors
-and are scored incorrect (a lower bound). \emph{Panel (c)}: Category-Aware ReAct is a
-GPT-5-backbone pilot ($N{=}50$, same harness, \S\ref{sec:axisreact}); its $46.0$ is best read
-against its own matched Standard ReAct baseline in that run ($34.0$, a $+12$ gain) rather than the
-full-scale GPT-5 row, and since $34.0>20.2$ that stratified $50$-instance subset is somewhat
-easier, so the gain should be confirmed at full scale. Its CHit@1 is blank because the
-category-conditioned policy deliberately sweeps categories to rule them out (an any-category form
-near saturation is discussed in \S\ref{sec:axisreact}). The human baseline is a single interaction
-condition (passage + one yes/no clarification + answer) on a stratified $50$-instance subset
-(\S\ref{sec:humanbaseline}); its CHit@1 ($0.72$) uses the same corrected touch classifier. Across
-both scales, added interaction is flat-or-negative for the MoE and largest dense open models, for
-GPT-4o, and for six of the seven frontier models, while GPT-5 and Gemini (the weakest searcher)
-convert it into a clear gain; the apparent 4B--14B gains are confined to the no-ask subset and
-reflect answer variance (\S\ref{sec:mechanistic}). DisE$^+$ and default-capture are reported
-separately (Table~\ref{tab:illusion}); CHit@1 and ECE are undefined when no question is asked.}
+\caption{\textbf{Across scales and vendors, added interaction rarely helps.} Accuracy (\%),
+graded against the \emph{intended} interpretation, is the primary metric (per mode); $\Delta$
+is +Interact minus +Search accuracy, the sign of the interaction lever. \emph{(a)}~Full-scale
+evaluation ($N{=}173$); \emph{(b)}~a preliminary cross-vendor frontier pilot ($N{=}50$/mode,
+same simulator/grader pipeline, directional); \emph{(c)}~our proposed method and a
+single-clarification human baseline ($N{=}50$). Added interaction is flat-or-negative for most
+models, including the strongest open searchers and six of the seven frontier vendors; only GPT-5
+and Gemini convert it into a clear gain. Our Category-Aware ReAct lifts the GPT-5 backbone by
+$+12$ points over its matched Standard ReAct baseline in the same run. IR (\% of instances that
+ask), CategoryHit@1 (targeting quality), and ECE (calibration) are secondary diagnostics,
+undefined when no question is asked; see \S\ref{sec:metrics} and \S\ref{sec:axisreact} for
+definitions and caveats.}
 \label{tab:main}
 \small
 \resizebox{\textwidth}{!}{%
@@ -853,13 +847,16 @@ failing to \emph{elicit} the disambiguation itself, not missing knowledge.}
 cannot resolve it themselves.} The context-oracle ceiling is $93$--$95\%$ for all
 three models, including GPT-5-mini, which scores $0\%$ under free interaction.
 Latent answering capacity is therefore near-ceiling and roughly scale-invariant;
-what varies, and what \fininteract measures, is whether a model can
-\emph{elicit} the disambiguating context. Crucially, \emph{forcing} clarification
+what varies, and what \fininteract measures, is whether a model can \emph{resolve}
+the ambiguity end to end, eliciting the disambiguating context and then integrating
+it into a committed answer. Crucially, \emph{forcing} clarification
 does not recover this capacity: requiring four asks leaves GPT-4o and GPT-5-mini
 near $0\%$ ($0.0\%$ and $0.6\%$) and \emph{lowers} GPT-5 from $20.2\%$ to $1.5\%$, because forced asks
 consume the round budget on low-value questions without converging on a committed
-answer. The bottleneck is targeted, self-initiated disambiguation, which neither
-scale nor brute-force asking supplies.
+answer. This already points past pure elicitation: models frequently ask on-category
+yet still fail to commit the right value (the dominant error mode, \S\ref{sec:error}),
+so the bottleneck is targeted, self-initiated disambiguation \emph{and} the integration
+of the resulting answer, which neither scale nor brute-force asking supplies.
 
 \subsection{Per-Category Skills: Which Clarification Abilities Do Models Lack?}
 \label{sec:skills}
@@ -1119,7 +1116,7 @@ drawing quantitative conclusions.
 MoE models at full scale ($n{=}173$); a seven-model, six-vendor panel of current
 frontier models is additionally evaluated in a preliminary pilot ($N{=}50$/mode,
 Table~\ref{tab:main}, panel (b)), which reproduces the central finding but at reduced
-statistical resolution---a full-scale multi-vendor evaluation remains in progress.
+statistical resolution, and a full-scale multi-vendor evaluation remains in progress.
 The human baseline ($N{=}50$, a single yes/no clarification) is a constrained reference
 rather than an upper bound, since models given up to ten rounds can exceed it, and it is
 collected from two annotators on a subset. A larger expert panel remains future work. \textbf{Grader and simulator.} Correctness and
@@ -1151,10 +1148,50 @@ apples-to-apples and the GPT-5-family floor is a filter-induced lower bound. The
 gap itself is unaffected: the filter targets answer-only solvability, not interactive
 resolution, and every vendor still resolves far below its oracle ceiling. Verifying a
 subsample with a non-OpenAI adversarial ensemble is a natural robustness check for future work.
+A related construct-validity caveat is that questions are reverse-constructed from filings
+rather than drawn from real user queries, and the ``intended'' interpretation is a
+constructor-assigned hidden context. The benchmark therefore measures a model's ability to
+recover a \emph{specified} interpretation, a necessary and controllable proxy for, but not
+identical to, disambiguating the intent of a real analyst.
 \textbf{Contamination.}
 Instances are freshly constructed from FY2022--2025 structured facts and
 answer-only accuracy is $\approx$0.6\% across all sources, but we do not claim
 absolute contamination safety for the DocFinQA-derived minority.
+\textbf{All instances are ambiguous by construction.} Every one of the 173 items is built to
+require clarification, so a model can succeed by assuming ambiguity is always present.
+FinInteract therefore measures \emph{what} to ask and \emph{how} to integrate the answer, not a
+calibrated \emph{when}-to-ask policy: it does not score false-positive clarification, over-asking
+on already-specified questions, or the correct choice to answer directly when a mild ambiguity
+does not change the value. Adding matched unambiguous and answer-invariant controls is the single
+most important extension for turning the benchmark into a test of calibrated interaction, and we
+accordingly frame our claims around asking-and-integrating rather than when-to-ask.
+\textbf{Intervention evidence is preliminary and not component-attributed.} The Category-Aware
+ReAct gain ($34\to46\%$) is a single GPT-5 backbone on $N{=}50$ (about six additional items),
+without a significance test, and its matched-baseline subset scores above the full-scale GPT-5
+row, so the effect must be confirmed at full scale with confidence intervals. Just as important,
+the policy bundles three components (ambiguity pre-check, category-conditioned questioning, and
+interpretation-state-gated answering) that we do not ablate: the improvement may stem
+substantially from the state-gated commit, an \emph{integration} fix, rather than from better
+category \emph{elicitation}, so the pilot does not by itself isolate the taxonomy's mechanistic
+role. A generic-structured clarification baseline and a per-component ablation are the needed
+controls. The training-time results are likewise early, resting on a small held-out probe, gains
+dominated by supervised fine-tuning with only a short reinforcement phase, an optimistic
+oracle-retrieval reference, and interaction driven to near-total compliance rather than a learned
+when-to-ask policy.
+\textbf{A single protocol confounds ability with interface adherence.} All vendors share one
+ReAct prompt and yes/no action grammar. GPT-5-mini's $0\%$ is partly a protocol-adherence failure
+(it keeps asking open-ended questions, exhausts the round budget, and rarely commits a final
+answer) rather than proof of zero financial-ambiguity ability. A free-form simulator rules out
+the yes/no grammar as the cause (the collapse persists), but tool schema, few-shot examples,
+constrained decoding, and model-specific adapters all shape protocol compliance, so a fixed
+cross-vendor prompt is a conservative rather than a maximally fair comparison; per-model interface
+tuning is future work.
+\textbf{Scope.} The paper spans a benchmark, the single-gold illusion, the taxonomy, and several
+exploratory studies (representation probing, inference and training interventions, co-evolution,
+and salience). The three main-text findings are the load-bearing contribution and the rest are
+explicitly exploratory and appendix-scoped; the two highest-value additions they point to,
+matched ambiguous/unambiguous evaluation and a component ablation of the intervention, are our
+priority follow-ups.
 
 %% ============================================================
 \section{Conclusion}
@@ -1167,11 +1204,13 @@ The five-category financial ambiguity taxonomy, paired default/intended
 interpretation design, and adversarial verifier-based construction pipeline
 yield 173 high-quality instances that resist trivial disambiguation.
 One unit organizes the whole story, the ambiguity \emph{category}: it structures the
-taxonomy, is what an agent must elicit (single-gold grading overstates competence
+taxonomy, is what an agent must elicit and then act on (single-gold grading overstates competence
 up to $3\times$ when models commit to the wrong category-reading), is
 \emph{linearly represented} inside open models yet left unacted-on, and is the
 lever for intervention. Our central finding is that interaction capability, not
-financial knowledge, is the bottleneck: agents answer $93$--$95\%$ correctly once
+financial knowledge, is the bottleneck, and that this capability has two parts a model
+must both possess, eliciting the right clarification and integrating the answer it receives:
+agents answer $93$--$95\%$ correctly once
 the category is resolved but far less on their own (a mean of $8\%$ across the OpenAI
 ladder, at most $29\%$ among full-scale models), amplifying the stagnation
 \interactcomp identified in the general domain. We turn this diagnosis into
@@ -1190,7 +1229,7 @@ construction, evaluation, and training code for reproducible follow-on work.
 \label{app:findings}
 %% ============================================================
 
-The main text reports the three headline findings (the single-gold illusion, the elicitation ceiling, and the per-category skill dissociation). This appendix collects the remaining empirical findings and the category-conditioned interventions.
+The main text reports the three headline findings (the single-gold illusion, the elicitation--integration ceiling, and the per-category skill dissociation). This appendix collects the remaining empirical findings and the category-conditioned interventions.
 
 \subsection{The Illusion Is Not Finance-Specific: A General-Domain Replication}
 \label{sec:general}
@@ -1557,6 +1596,11 @@ two well-populated categories (entity\_scope, metric\_definition). We deliberate
 behavioral conclusions from these open models' free-form generations, where surface cues (chain-of-thought
 markers, retrieval that surfaces the evidence span) confound naive clarification counts; the
 asking-behavior claims come solely from the graded closed-model evaluation in \S\ref{sec:exp}.
+A further caveat is that the ambiguity direction is a difference between $Q$ and $Q{+}C$ inputs,
+which also differ in length and surface lexicon, so it may partly encode the presence of added
+context rather than ambiguity as such. Matched neutral-context controls, a bag-of-words lexical
+control, a cross-company split, and causal steering are needed before reading the probe as more
+than evidence that category information is \emph{linearly decodable} from the representation.
 That the category is \emph{represented but not acted on} frames the bottleneck as an action
 problem on an available signal, and motivates the category-conditioned interventions of
 \S\ref{sec:error}, which target exactly that signal.
@@ -1702,7 +1746,12 @@ any-category touch form saturates near $1.0$ while the strict central-category f
 neither cleanly credits the policy and we omit CategoryHit@1 for it in Table~\ref{tab:main}. The
 accuracy and calibration gains are the load-bearing result. We report this as a pilot rather
 than a full-panel row because it is a single backbone at $N{=}50$, and we expect the effect
-size to tighten at full scale.
+size to tighten at full scale. One caveat bears directly on the mechanism: the policy bundles all
+three components above, and we do not ablate them here, so part of the $+12$ may come from the
+state-gated commit (Component~3, an integration fix) rather than from better category-conditioned
+elicitation (Component~2). A generic-structured clarification baseline that keeps the structure
+but drops the named categories, together with a per-component ablation, is the clean control and
+remains future work.
 
 \subsubsection{Training-Time Intervention: Category-Guided SFT and GRPO}
 \label{sec:grpo}
