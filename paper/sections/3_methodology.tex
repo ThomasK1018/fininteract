@@ -73,4 +73,6 @@ We include standard metrics from ambiguous QA and interactive retrieval literatu
 
 \textbf{Interaction diagnostics} includes the interaction rate (IR) which measures proportion of instances with more than one clarification question, average turns of clarification (Round), and accuracy on predicting the true ambiguity category (AC@1). Specifically, we report AC@1 by whether the question names any true category and whether it can name the single most important category. 
 
-\textbf{Confidence} measures the Expected Calibration Error (ECE) between stated confidence and correctness to capture how overconfident the agent is when reading the ambiguous queries. 
+\textbf{Confidence} measures the Expected Calibration Error (ECE) between stated confidence and correctness to capture how overconfident the agent is when reading the ambiguous queries.
+
+Full metric definitions, including the accuracy grading tolerance, the AC@1 decomposition, and a supplementary clarification-efficiency score (\disep), are in Appendix~\ref{app:metrics}.

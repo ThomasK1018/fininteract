@@ -591,6 +591,46 @@ construction, evaluation, and training code for reproducible follow-on work.
 \appendix
 
 %% ============================================================
+\section{Metric Details}
+\label{app:metrics}
+%% ============================================================
+
+This appendix expands the metrics defined in \S\ref{sec:metrics}.
+
+\paragraph{Accuracy grading.}
+Accuracy is the primary ranking metric, mirroring \interactcomp, BrowseComp, and FinanceBench. A
+GPT-4o-mini grader marks a final answer correct against the intended interpretation under
+financial-domain tolerance: a $\pm1\%$ numeric tolerance, entity/ticker equivalence, and currency
+normalization, with a fiscal-year mismatch counted as wrong.
+
+\paragraph{Interaction targeting (AC@1 / CategoryHit@1).}
+For each interact action, a GPT-4o-mini classifier decides whether the clarifying question targets a
+true ambiguity category for that instance. We report the targeting accuracy AC@1 (denoted
+\emph{CategoryHit@1} in the results tables) alongside AnyCategoryHit, WrongCategoryRate, and
+GenericAskRate. Because a single clarification is often compound (one question can name an entity, a
+period, and a metric at once), AC@1 has two forms: a lenient \emph{touch} form (the question names
+any true category) and a strict \emph{central} form (the single most-central category is a true
+category). The touch form is validated against human annotators (\S\ref{sec:humanval}). These
+diagnostics characterize \emph{how} a model interacts and do not rank models.
+
+\paragraph{Calibration.}
+The Expected Calibration Error (ECE) between stated confidence and correctness uses five equal-width
+confidence bins.
+
+\paragraph{Clarification efficiency (\disep).}
+As a single supplementary number folding accuracy and clarification cost together, we report the
+efficiency of \emph{successful} clarification,
+\[
+  \text{DisE}^+ = \mathbf{1}[\text{correct}] \times \mathbf{1}[n_\text{asks}{>}0] \times
+  \frac{H_0}{n_\text{asks}},
+\]
+which is positive only when the agent asked at least one question and then answered correctly, and
+decreases with redundant asks. We restrict it to the asked-and-correct case to avoid the perverse
+incentive of an all-instances variant, which would award its maximum to a confident \emph{zero-ask}
+answer, rewarding the very behavior the benchmark penalizes. \disep is a diagnostic of
+clarification efficiency, never the ranking metric.
+
+%% ============================================================
 \section{Additional Findings and Analyses}
 \label{app:findings}
 %% ============================================================
