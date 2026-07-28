@@ -134,41 +134,61 @@ conceals which category a model can actually resolve. The per-category tables, t
 the per-model matrix, and the full analysis are in Appendix~\ref{app:maindetails}.
 
 %% ============================================================
-\section{Discussion and Research Opportunities}
+\section{Discussion}
 \label{sec:discussion}
 %% ============================================================
 
-\paragraph{Elicitation is a trainable skill that current models lack.} Our central result
-is that models fail to resolve ambiguity not for want of knowledge but for want of asking
-the right question (RQ2). This reframes the problem for future work. Progress will come less
-from larger backbones, which barely move interaction accuracy, and more from policies and
-objectives that reward asking on the correct category at the right time. The Category-Aware ReAct
-policy and category-guided fine-tuning (RQ3) are first steps, and both leave a large gap to the
-oracle ceiling, so reward shaping on the ambiguity category and calibrated deferral are natural
-next directions.
+\textbf{Elicitation is a trainable skill current models lack.} Progress will come less from larger
+backbones, which barely move interaction accuracy, than from policies and objectives that reward
+asking on the right category at the right time.
+\textbf{Categories are different learning problems.} Some clarification abilities are solved by
+scale while others, notably recognition basis, resist it, so a single aggregate score hides where
+the difficulty sits and curricula should budget data per category.
+\textbf{Human--AI collaboration under ambiguity.} Because models confidently return the default
+reading, the safe behavior is often to ask rather than answer, motivating interfaces and metrics
+that credit well-timed clarification and calibrated abstention over raw commitment.
+\textbf{Self-refreshing benchmarks and broader scope.} A benchmark can extend itself on categories
+whose evidence is abundant under held-out validation, and the paired default/intended construction
+transfers to further categories, languages, and other high-stakes domains where one gold answer
+hides genuine ambiguity.
 
-\paragraph{Categories are different learning problems.} The per-category dissociation shows that some
-clarification abilities are solved by scale while others, notably recognition basis, resist
-it and are only unreliably teachable. A single aggregate interaction score therefore hides
-where the real difficulty sits. Future benchmarks and training curricula should treat each
-category as its own learning problem and budget data accordingly, which our salience estimate
-begins to quantify.
-
-\paragraph{Human and AI collaboration under ambiguity.} Because models confidently return
-the default reading, the safe behavior is often to ask rather than to answer. This motivates
-evaluation and interfaces that credit well-timed clarification and calibrated abstention
-rather than raw commitment, and it connects to mixed-initiative retrieval where the cost of
-a confident wrong answer is high.
-
-\paragraph{Self-refreshing benchmarks and broader scope.} Our co-evolution probes suggest a
-benchmark can extend itself on categories whose evidence is abundant, guarded by held-out
-validation, which offers a path to keep the instrument fresh as models improve. Natural
-extensions include more ambiguity categories, additional languages and filing regimes, and
-transfer of the paired default and intended construction to other high-stakes domains where
-a single gold answer hides genuine ambiguity.
-
+\medskip\noindent We also note the main limitations (each expanded in
+Appendix~\ref{app:limitations}), and give the extended discussion in Appendix~\ref{app:discussion}.
+\label{sec:limitations}
+\textbf{Scale.} At 173 instances FinInteract is small, a deliberate trade of raw size for
+per-instance construction rigor (every item is adversarially verified; the pipeline extends at
+\$0.31/instance). \textbf{Language balance.} The English split (53) is smaller than the Chinese
+(120), so per-language results should be read with this asymmetry in mind.
+\textbf{Two well-powered categories.} Entity scope ($n{=}94$) and metric definition ($n{=}63$)
+are densely populated; the other three categories are exploratory, and the recognition-policy
+blind spot ($n{=}9$, a partly imperfect sample) is a preliminary observation, not a headline.
+\textbf{Model and human coverage.} The seven-vendor frontier panel and the single-clarification
+human baseline are $N{=}50$ references (a pilot and a constrained baseline, not upper bounds);
+full-scale multi-vendor evaluation is in progress.
+\textbf{Grader and simulator.} Correctness grading, category classification, and the user
+simulator are LLM-based but human-validated (correctness $\kappa{=}0.85$; touch classifier
+$0.75$), and interaction results are robust across deterministic, noisy, and free-form simulators.
+\textbf{Construction circularity and synthetic intent.} GPT-5-family models drive construction
+and simulation, depressing GPT-5-family answer-only accuracy by construction, and questions are
+reverse-constructed, so the benchmark measures recovery of a \emph{specified} interpretation, a
+proxy for a real analyst's intent. \textbf{Contamination.} Instances are freshly constructed from
+FY2022--2025 facts (answer-only $\approx$0.6\%), though we do not claim absolute contamination
+safety for the DocFinQA-derived minority.
+\textbf{All instances are ambiguous by construction.} The benchmark measures \emph{what} to ask
+and \emph{how} to integrate the answer, not a calibrated \emph{when}-to-ask policy; matched
+unambiguous controls are the single most important extension.
+\textbf{Intervention evidence is preliminary and not component-attributed.} The Category-Aware
+ReAct gain ($34\to46\%$, single backbone, $N{=}50$) is not ablated across its three components, so
+it does not isolate the taxonomy's role, and the training-time results are likewise early.
+\textbf{A single protocol confounds ability with interface adherence.} GPT-5-mini's $0\%$ is
+partly protocol non-compliance, so a fixed cross-vendor prompt is a conservative rather than a
+maximally fair comparison.
+\textbf{Scope.} The three main-text findings are the load-bearing contribution; the remaining
+studies are explicitly exploratory, with matched ambiguous/unambiguous evaluation and a
+component ablation of the intervention as the priority follow-ups.
 
 %% ============================================================
+
 \section{Related Work}
 \label{sec:related}
 %% ============================================================
@@ -268,47 +288,6 @@ BrowseComp~\citep{wei2025browsecomp} tracks longitudinal retrieval trends;
 we test whether the interaction-capability gap identified there persists in
 finance.
 
-
-%% ============================================================
-\section{Limitations}
-\label{sec:limitations}
-%% ============================================================
-
-We summarize the main limitations here; Appendix~\ref{app:limitations} expands each, including
-the recognition-policy item audit, the grader and simulator validation, and the
-construction-circularity analysis.
-
-\textbf{Scale.} At 173 instances FinInteract is small, a deliberate trade of raw size for
-per-instance construction rigor (every item is adversarially verified; the pipeline extends at
-\$0.31/instance). \textbf{Language balance.} The English split (53) is smaller than the Chinese
-(120), so per-language results should be read with this asymmetry in mind.
-\textbf{Two well-powered categories.} Entity scope ($n{=}94$) and metric definition ($n{=}63$)
-are densely populated; the other three categories are exploratory, and the recognition-policy
-blind spot ($n{=}9$, a partly imperfect sample) is a preliminary observation, not a headline.
-\textbf{Model and human coverage.} The seven-vendor frontier panel and the single-clarification
-human baseline are $N{=}50$ references (a pilot and a constrained baseline, not upper bounds);
-full-scale multi-vendor evaluation is in progress.
-\textbf{Grader and simulator.} Correctness grading, category classification, and the user
-simulator are LLM-based but human-validated (correctness $\kappa{=}0.85$; touch classifier
-$0.75$), and interaction results are robust across deterministic, noisy, and free-form simulators.
-\textbf{Construction circularity and synthetic intent.} GPT-5-family models drive construction
-and simulation, depressing GPT-5-family answer-only accuracy by construction, and questions are
-reverse-constructed, so the benchmark measures recovery of a \emph{specified} interpretation, a
-proxy for a real analyst's intent. \textbf{Contamination.} Instances are freshly constructed from
-FY2022--2025 facts (answer-only $\approx$0.6\%), though we do not claim absolute contamination
-safety for the DocFinQA-derived minority.
-\textbf{All instances are ambiguous by construction.} The benchmark measures \emph{what} to ask
-and \emph{how} to integrate the answer, not a calibrated \emph{when}-to-ask policy; matched
-unambiguous controls are the single most important extension.
-\textbf{Intervention evidence is preliminary and not component-attributed.} The Category-Aware
-ReAct gain ($34\to46\%$, single backbone, $N{=}50$) is not ablated across its three components, so
-it does not isolate the taxonomy's role, and the training-time results are likewise early.
-\textbf{A single protocol confounds ability with interface adherence.} GPT-5-mini's $0\%$ is
-partly protocol non-compliance, so a fixed cross-vendor prompt is a conservative rather than a
-maximally fair comparison.
-\textbf{Scope.} The three main-text findings are the load-bearing contribution; the remaining
-studies are explicitly exploratory, with matched ambiguous/unambiguous evaluation and a
-component ablation of the intervention as the priority follow-ups.
 
 %% ============================================================
 \section{Conclusion}
@@ -1412,6 +1391,45 @@ category co-evolves but of \emph{how much} data it needs, and one well-targeted 
 guarded on held-out validation, is close to the sweet spot.
 
 
+\section{Extended Discussion}
+\label{app:discussion}
+%% ============================================================
+
+This appendix expands the discussion points summarized in \S\ref{sec:discussion}.
+
+\paragraph{Elicitation is a trainable skill that current models lack.} Our central result
+is that models fail to resolve ambiguity not for want of knowledge but for want of asking
+the right question (RQ2). This reframes the problem for future work. Progress will come less
+from larger backbones, which barely move interaction accuracy, and more from policies and
+objectives that reward asking on the correct category at the right time. The Category-Aware ReAct
+policy and category-guided fine-tuning (RQ3) are first steps, and both leave a large gap to the
+oracle ceiling, so reward shaping on the ambiguity category and calibrated deferral are natural
+next directions.
+
+\paragraph{Categories are different learning problems.} The per-category dissociation shows that some
+clarification abilities are solved by scale while others, notably recognition basis, resist
+it and are only unreliably teachable. A single aggregate interaction score therefore hides
+where the real difficulty sits. Future benchmarks and training curricula should treat each
+category as its own learning problem and budget data accordingly, which our salience estimate
+begins to quantify.
+
+\paragraph{Human and AI collaboration under ambiguity.} Because models confidently return
+the default reading, the safe behavior is often to ask rather than to answer. This motivates
+evaluation and interfaces that credit well-timed clarification and calibrated abstention
+rather than raw commitment, and it connects to mixed-initiative retrieval where the cost of
+a confident wrong answer is high.
+
+\paragraph{Self-refreshing benchmarks and broader scope.} Our co-evolution probes suggest a
+benchmark can extend itself on categories whose evidence is abundant, guarded by held-out
+validation, which offers a path to keep the instrument fresh as models improve. Natural
+extensions include more ambiguity categories, additional languages and filing regimes, and
+transfer of the paired default and intended construction to other high-stakes domains where
+a single gold answer hides genuine ambiguity.
+
+
+%% ============================================================
+
+%% ============================================================
 \section{Extended Limitations}
 \label{app:limitations}
 %% ============================================================
