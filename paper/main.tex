@@ -193,29 +193,20 @@ component ablation of the intervention as the priority follow-ups.
 \label{sec:related}
 %% ============================================================
 
-\paragraph{Financial QA Benchmarks.}
-Table~\ref{tab:comparison} compares \fininteract to major financial QA
-benchmarks.
-FinanceBench~\citep{islam2023financebench},
-FinQA~\citep{chen2021finqa},
-DocFinQA~\citep{reddy2024docfinqa},
-BizBench~\citep{krumdick2024bizbench},
-FinBen~\citep{xie2024finben}, and
-FinanceQA~\citep{mateega2025financeqa}
-all enforce single-gold-answer conventions and evaluate models in a single turn;
-FinanceQA further shows that frontier models fail $\sim$60\% of realistic
-analyst tasks, but attributes this to numerical rigor rather than ambiguity.
-FinEval~\citep{guo2023fineval}, a large Chinese financial-knowledge benchmark,
-incidentally identifies an ``ambiguity handling weakness'' error type in its
-agent tasks but does not isolate or control it. Recent \emph{agentic} financial
-benchmarks raise task realism, Finance Agent Benchmark~\citep{bigeard2025financeagent}
-(537 expert research tasks, where the best model reaches only $46.8\%$) and
-FinAgentBench~\citep{choi2025finagentbench} (agentic retrieval over EDGAR), but both
-remain single-turn and single-gold, evaluating analysis and retrieval rather than
-whether an agent recognizes that a query is under-specified. \fininteract is the
-first to make query ambiguity the central, controlled construct, via paired
-default/intended interpretations and multi-turn interaction, in the financial
-domain.
+\textbf{Financial QA benchmarks} such as FinanceBench~\citep{islam2023financebench},
+FinQA~\citep{chen2021finqa}, and DocFinQA~\citep{reddy2024docfinqa}, together with recent agentic
+successors, enforce single-gold, single-turn evaluation and test numerical reasoning or retrieval
+rather than whether a query is under-specified (Table~\ref{tab:comparison}). \fininteract is the
+first to make query ambiguity the central, controlled construct, through paired default/intended
+interpretations and multi-turn interaction in the financial domain.
+
+\textbf{Ambiguous QA and clarifying questions.} In the general domain,
+AmbigQA~\citep{min2020ambigqa}, CLAMBER~\citep{zhang2024clamber}, and
+QuestBench~\citep{li2025questbench} study whether a model identifies under-specification and asks
+the minimal clarifying question, building on a long clarifying-question line in retrieval and
+dialogue. \interactcomp~\citep{interactcomp2026} is our direct methodological ancestor, which we
+extend to finance with a domain-specific ambiguity taxonomy, per-category targeting (AC@1), and
+programmatically verifiable XBRL-grounded evidence pairs.
 
 \begin{table*}[t]
 \centering
@@ -254,42 +245,9 @@ FinEval~\citep{guo2023fineval}
 \end{tabular}}
 \end{table*}
 
-\paragraph{Ambiguous QA.}
-AmbigQA~\citep{min2020ambigqa},
-ASQA~\citep{stelmakh2022asqa},
-CondAmbigQA~\citep{li2025condambigqa}, and
-CLAM~\citep{kuhn2022clam}
-have matured in the general (Wikipedia) domain.
-More recent benchmarks target the agent's \emph{own} ability to ask:
-CLAMBER~\citep{zhang2024clamber} evaluates whether models identify and clarify
-ambiguous information needs, and QuestBench~\citep{li2025questbench} tests whether
-they can ask the minimal necessary question in reasoning tasks. Both are
-general-domain and judge a single clarifying step; \fininteract adds \emph{per-category}
-targeting (AC@1), programmatically verifiable financial grounding, and, via the
-co-evolution rounds (\S\ref{sec:coevolve}), an analysis of \emph{when} asking helps
-versus hurts. We adapt this line's formalism to finance, replacing human-judged
-ambiguity labels with programmatically verifiable XBRL-grounded evidence pairs.
+Additional financial and general-domain benchmarks and the full clarifying-question lineage are
+discussed in Appendix~\ref{app:related}.
 
-\paragraph{Clarifying Questions.}
-Asking clarifying questions is a long-standing goal in information retrieval and
-dialogue. Rao and Daum\'e III~\citep{rao2018clarification} rank clarification
-questions by expected value of perfect information; ClariQ~\citep{aliannejadi2020clariq}
-established a shared task for generating clarifying questions in open-domain dialogue;
-and the mixed-initiative paradigm is surveyed in Conversational Information
-Seeking~\citep{zamani2023cis}. \fininteract instantiates this lineage with a
-leak-proof, per-category measure of \emph{which} clarification an agent should issue and a
-verifiable outcome for whether issuing it resolves the query.
-
-\paragraph{Interactive Search Agents.}
-\interactcomp~\citep{interactcomp2026} is the direct methodological ancestor.
-We extend its general-domain setting to finance with a domain-specific
-ambiguity taxonomy and bilingual evaluation.
-BrowseComp~\citep{wei2025browsecomp} tracks longitudinal retrieval trends;
-we test whether the interaction-capability gap identified there persists in
-finance.
-
-
-%% ============================================================
 \section{Conclusion}
 \label{sec:conclusion}
 %% ============================================================
@@ -1391,6 +1349,76 @@ category co-evolves but of \emph{how much} data it needs, and one well-targeted 
 guarded on held-out validation, is close to the sweet spot.
 
 
+\section{Extended Related Work}
+\label{app:related}
+%% ============================================================
+
+This appendix expands the related work summarized in \S\ref{sec:related}.
+
+\paragraph{Financial QA Benchmarks.}
+Table~\ref{tab:comparison} compares \fininteract to major financial QA
+benchmarks.
+FinanceBench~\citep{islam2023financebench},
+FinQA~\citep{chen2021finqa},
+DocFinQA~\citep{reddy2024docfinqa},
+BizBench~\citep{krumdick2024bizbench},
+FinBen~\citep{xie2024finben}, and
+FinanceQA~\citep{mateega2025financeqa}
+all enforce single-gold-answer conventions and evaluate models in a single turn;
+FinanceQA further shows that frontier models fail $\sim$60\% of realistic
+analyst tasks, but attributes this to numerical rigor rather than ambiguity.
+FinEval~\citep{guo2023fineval}, a large Chinese financial-knowledge benchmark,
+incidentally identifies an ``ambiguity handling weakness'' error type in its
+agent tasks but does not isolate or control it. Recent \emph{agentic} financial
+benchmarks raise task realism, Finance Agent Benchmark~\citep{bigeard2025financeagent}
+(537 expert research tasks, where the best model reaches only $46.8\%$) and
+FinAgentBench~\citep{choi2025finagentbench} (agentic retrieval over EDGAR), but both
+remain single-turn and single-gold, evaluating analysis and retrieval rather than
+whether an agent recognizes that a query is under-specified. \fininteract is the
+first to make query ambiguity the central, controlled construct, via paired
+default/intended interpretations and multi-turn interaction, in the financial
+domain.
+
+
+
+\paragraph{Ambiguous QA.}
+AmbigQA~\citep{min2020ambigqa},
+ASQA~\citep{stelmakh2022asqa},
+CondAmbigQA~\citep{li2025condambigqa}, and
+CLAM~\citep{kuhn2022clam}
+have matured in the general (Wikipedia) domain.
+More recent benchmarks target the agent's \emph{own} ability to ask:
+CLAMBER~\citep{zhang2024clamber} evaluates whether models identify and clarify
+ambiguous information needs, and QuestBench~\citep{li2025questbench} tests whether
+they can ask the minimal necessary question in reasoning tasks. Both are
+general-domain and judge a single clarifying step; \fininteract adds \emph{per-category}
+targeting (AC@1), programmatically verifiable financial grounding, and, via the
+co-evolution rounds (\S\ref{sec:coevolve}), an analysis of \emph{when} asking helps
+versus hurts. We adapt this line's formalism to finance, replacing human-judged
+ambiguity labels with programmatically verifiable XBRL-grounded evidence pairs.
+
+\paragraph{Clarifying Questions.}
+Asking clarifying questions is a long-standing goal in information retrieval and
+dialogue. Rao and Daum\'e III~\citep{rao2018clarification} rank clarification
+questions by expected value of perfect information; ClariQ~\citep{aliannejadi2020clariq}
+established a shared task for generating clarifying questions in open-domain dialogue;
+and the mixed-initiative paradigm is surveyed in Conversational Information
+Seeking~\citep{zamani2023cis}. \fininteract instantiates this lineage with a
+leak-proof, per-category measure of \emph{which} clarification an agent should issue and a
+verifiable outcome for whether issuing it resolves the query.
+
+\paragraph{Interactive Search Agents.}
+\interactcomp~\citep{interactcomp2026} is the direct methodological ancestor.
+We extend its general-domain setting to finance with a domain-specific
+ambiguity taxonomy and bilingual evaluation.
+BrowseComp~\citep{wei2025browsecomp} tracks longitudinal retrieval trends;
+we test whether the interaction-capability gap identified there persists in
+finance.
+
+
+%% ============================================================
+
+%% ============================================================
 \section{Extended Discussion}
 \label{app:discussion}
 %% ============================================================
