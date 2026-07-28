@@ -1091,107 +1091,41 @@ finance.
 \label{sec:limitations}
 %% ============================================================
 
-\textbf{Scale.} At 173 instances FinInteract is small (comparable to
-FinanceBench's 150~\citep{islam2023financebench}); we prioritize per-instance
-construction rigor (every item is adversarially verified and R14-discriminating)
-over raw size, and Appendix~\ref{app:cost} shows the pipeline scales at
-\$0.31/instance. \textbf{Language balance.} The English split (53) is smaller
-than the Chinese split (120); per-language results (\S\ref{sec:exp}) should be
-read with this asymmetry in mind, and the EN portion is a target for growth.
-\textbf{Category coverage and recognition-policy validity.} The taxonomy is intentionally
-five-category, but \texttt{filing\_vintage} is unrepresented and \texttt{temporal\_scope}/%
-\texttt{recognition\_policy} are sparse (Table~\ref{tab:stats}): viable
-structured ambiguity for these categories is rare in public filings (Appendix~\ref{app:cost}).
-We therefore treat entity scope ($n{=}94$) and metric definition ($n{=}63$) as the two
-well-powered categories and the other three as exploratory. An item-level audit of the nine
-\texttt{recognition\_policy} instances is a further caution: most are ASC~606 timing
-disaggregations (revenue recognized point-in-time versus over-time), where neither value is
-the total a non-expert would assume, and one pairs total GAAP revenue against an operating
-cash-flow proxy that is not a defensible reading of ``revenue.'' Even our human annotators
-never targeted the category (CategoryHit $0$ on its items). We therefore report the
-recognition-policy blind spot as a preliminary observation on a small, imperfect sample, not
-a headline result, and recommend rebuilding this category with analyst-audited pairs before
-drawing quantitative conclusions.
-\textbf{Model coverage.} We report the OpenAI tier ladder (3 models) and two open
-MoE models at full scale ($n{=}173$); a seven-model, six-vendor panel of current
-frontier models is additionally evaluated in a preliminary pilot ($N{=}50$/mode,
-Table~\ref{tab:main}, panel (b)), which reproduces the central finding but at reduced
-statistical resolution, and a full-scale multi-vendor evaluation remains in progress.
-The human baseline ($N{=}50$, a single yes/no clarification) is a constrained reference
-rather than an upper bound, since models given up to ten rounds can exceed it, and it is
-collected from two annotators on a subset. A larger expert panel remains future work. \textbf{Grader and simulator.} Correctness and
-category-targeting are judged by GPT-4o-mini and the user is simulated by GPT-5. We validate
-these against humans on a stratified, blindly double-annotated sample (five annotators).
-The correctness grader agrees with human consensus at Cohen $\kappa{=}0.85$ (raw agreement
-$0.92$), exceeding inter-annotator agreement ($0.86$), so accuracy figures hold under human
-labels. The CategoryHit classifier initially agreed only weakly ($0.53$). A single-label design
-over-assigned \texttt{temporal\_scope} to compound questions that also name an entity or
-metric. The corrected multi-label \emph{touch} classifier reaches $0.75$ agreement, matching
-inter-annotator agreement ($0.73$), and the CategoryHit@1 values reported here use it. Because
-this shows models mostly do ask on-category, the corrected reading is that the gap lies in
-central targeting and integration rather than detection. A strict central-category variant is
-discriminative but not yet human-validated, so we report it only as a supplementary
-decomposition. Interaction results are also robust to the simulator: on a
-$50$-instance subset, standard +Interact accuracy is $34/28/26\%$ under the LLM, deterministic,
-and $15\%$-noisy simulators. Crucially, the yes/no action grammar does not manufacture the
-weak-model collapse: with a \emph{free-form} simulator that answers open-ended clarifying
-questions from $C$ (for example ``which fiscal year?'') rather than only yes/no, GPT-5-mini
-stays at $0\%$ across all $50$ instances (identical to the yes/no simulator, zero
-wrong-to-correct conversions, three-round budget). Its failure is therefore a
-post-clarification integration failure, not an artifact of the interaction protocol.
-\textbf{Construction circularity.} The constructor, adversarial verifier, and user
-simulator are all GPT-5-family models, and the verifier removes instances the GPT-5 family
-answers correctly without $C$. This depresses GPT-5-family answer-only accuracy ($0.6\%$) by
-construction relative to the non-OpenAI vendors the filter does not target (mean $10.0\%$
-answer-only across six vendors), so cross-vendor answer-only comparisons are not fully
-apples-to-apples and the GPT-5-family floor is a filter-induced lower bound. The elicitation
-gap itself is unaffected: the filter targets answer-only solvability, not interactive
-resolution, and every vendor still resolves far below its oracle ceiling. Verifying a
-subsample with a non-OpenAI adversarial ensemble is a natural robustness check for future work.
-A related construct-validity caveat is that questions are reverse-constructed from filings
-rather than drawn from real user queries, and the ``intended'' interpretation is a
-constructor-assigned hidden context. The benchmark therefore measures a model's ability to
-recover a \emph{specified} interpretation, a necessary and controllable proxy for, but not
-identical to, disambiguating the intent of a real analyst.
-\textbf{Contamination.}
-Instances are freshly constructed from FY2022--2025 structured facts and
-answer-only accuracy is $\approx$0.6\% across all sources, but we do not claim
-absolute contamination safety for the DocFinQA-derived minority.
-\textbf{All instances are ambiguous by construction.} Every one of the 173 items is built to
-require clarification, so a model can succeed by assuming ambiguity is always present.
-FinInteract therefore measures \emph{what} to ask and \emph{how} to integrate the answer, not a
-calibrated \emph{when}-to-ask policy: it does not score false-positive clarification, over-asking
-on already-specified questions, or the correct choice to answer directly when a mild ambiguity
-does not change the value. Adding matched unambiguous and answer-invariant controls is the single
-most important extension for turning the benchmark into a test of calibrated interaction, and we
-accordingly frame our claims around asking-and-integrating rather than when-to-ask.
+We summarize the main limitations here; Appendix~\ref{app:limitations} expands each, including
+the recognition-policy item audit, the grader and simulator validation, and the
+construction-circularity analysis.
+
+\textbf{Scale.} At 173 instances FinInteract is small, a deliberate trade of raw size for
+per-instance construction rigor (every item is adversarially verified; the pipeline extends at
+\$0.31/instance). \textbf{Language balance.} The English split (53) is smaller than the Chinese
+(120), so per-language results should be read with this asymmetry in mind.
+\textbf{Two well-powered categories.} Entity scope ($n{=}94$) and metric definition ($n{=}63$)
+are densely populated; the other three categories are exploratory, and the recognition-policy
+blind spot ($n{=}9$, a partly imperfect sample) is a preliminary observation, not a headline.
+\textbf{Model and human coverage.} The seven-vendor frontier panel and the single-clarification
+human baseline are $N{=}50$ references (a pilot and a constrained baseline, not upper bounds);
+full-scale multi-vendor evaluation is in progress.
+\textbf{Grader and simulator.} Correctness grading, category classification, and the user
+simulator are LLM-based but human-validated (correctness $\kappa{=}0.85$; touch classifier
+$0.75$), and interaction results are robust across deterministic, noisy, and free-form simulators.
+\textbf{Construction circularity and synthetic intent.} GPT-5-family models drive construction
+and simulation, depressing GPT-5-family answer-only accuracy by construction, and questions are
+reverse-constructed, so the benchmark measures recovery of a \emph{specified} interpretation, a
+proxy for a real analyst's intent. \textbf{Contamination.} Instances are freshly constructed from
+FY2022--2025 facts (answer-only $\approx$0.6\%), though we do not claim absolute contamination
+safety for the DocFinQA-derived minority.
+\textbf{All instances are ambiguous by construction.} The benchmark measures \emph{what} to ask
+and \emph{how} to integrate the answer, not a calibrated \emph{when}-to-ask policy; matched
+unambiguous controls are the single most important extension.
 \textbf{Intervention evidence is preliminary and not component-attributed.} The Category-Aware
-ReAct gain ($34\to46\%$) is a single GPT-5 backbone on $N{=}50$ (about six additional items),
-without a significance test, and its matched-baseline subset scores above the full-scale GPT-5
-row, so the effect must be confirmed at full scale with confidence intervals. Just as important,
-the policy bundles three components (ambiguity pre-check, category-conditioned questioning, and
-interpretation-state-gated answering) that we do not ablate: the improvement may stem
-substantially from the state-gated commit, an \emph{integration} fix, rather than from better
-category \emph{elicitation}, so the pilot does not by itself isolate the taxonomy's mechanistic
-role. A generic-structured clarification baseline and a per-component ablation are the needed
-controls. The training-time results are likewise early, resting on a small held-out probe, gains
-dominated by supervised fine-tuning with only a short reinforcement phase, an optimistic
-oracle-retrieval reference, and interaction driven to near-total compliance rather than a learned
-when-to-ask policy.
-\textbf{A single protocol confounds ability with interface adherence.} All vendors share one
-ReAct prompt and yes/no action grammar. GPT-5-mini's $0\%$ is partly a protocol-adherence failure
-(it keeps asking open-ended questions, exhausts the round budget, and rarely commits a final
-answer) rather than proof of zero financial-ambiguity ability. A free-form simulator rules out
-the yes/no grammar as the cause (the collapse persists), but tool schema, few-shot examples,
-constrained decoding, and model-specific adapters all shape protocol compliance, so a fixed
-cross-vendor prompt is a conservative rather than a maximally fair comparison; per-model interface
-tuning is future work.
-\textbf{Scope.} The paper spans a benchmark, the single-gold illusion, the taxonomy, and several
-exploratory studies (representation probing, inference and training interventions, co-evolution,
-and salience). The three main-text findings are the load-bearing contribution and the rest are
-explicitly exploratory and appendix-scoped; the two highest-value additions they point to,
-matched ambiguous/unambiguous evaluation and a component ablation of the intervention, are our
-priority follow-ups.
+ReAct gain ($34\to46\%$, single backbone, $N{=}50$) is not ablated across its three components, so
+it does not isolate the taxonomy's role, and the training-time results are likewise early.
+\textbf{A single protocol confounds ability with interface adherence.} GPT-5-mini's $0\%$ is
+partly protocol non-compliance, so a fixed cross-vendor prompt is a conservative rather than a
+maximally fair comparison.
+\textbf{Scope.} The three main-text findings are the load-bearing contribution; the remaining
+studies are explicitly exploratory, with matched ambiguous/unambiguous evaluation and a
+component ablation of the intervention as the priority follow-ups.
 
 %% ============================================================
 \section{Conclusion}
@@ -2030,6 +1964,127 @@ category co-evolves but of \emph{how much} data it needs, and one well-targeted 
 guarded on held-out validation, is close to the sweet spot.
 
 
+\section{Extended Limitations}
+\label{app:limitations}
+%% ============================================================
+
+This appendix expands each limitation summarized in \S\ref{sec:limitations}.
+
+\textbf{Scale.} At 173 instances FinInteract is small (comparable to
+FinanceBench's 150~\citep{islam2023financebench}); we prioritize per-instance
+construction rigor (every item is adversarially verified and R14-discriminating)
+over raw size, and Appendix~\ref{app:cost} shows the pipeline scales at
+\$0.31/instance.
+
+\textbf{Language balance.} The English split (53) is smaller
+than the Chinese split (120); per-language results (\S\ref{sec:exp}) should be
+read with this asymmetry in mind, and the EN portion is a target for growth.
+
+\textbf{Category coverage and recognition-policy validity.} The taxonomy is intentionally
+five-category, but \texttt{filing\_vintage} is unrepresented and \texttt{temporal\_scope}/%
+\texttt{recognition\_policy} are sparse (Table~\ref{tab:stats}): viable
+structured ambiguity for these categories is rare in public filings (Appendix~\ref{app:cost}).
+We therefore treat entity scope ($n{=}94$) and metric definition ($n{=}63$) as the two
+well-powered categories and the other three as exploratory. An item-level audit of the nine
+\texttt{recognition\_policy} instances is a further caution: most are ASC~606 timing
+disaggregations (revenue recognized point-in-time versus over-time), where neither value is
+the total a non-expert would assume, and one pairs total GAAP revenue against an operating
+cash-flow proxy that is not a defensible reading of ``revenue.'' Even our human annotators
+never targeted the category (CategoryHit $0$ on its items). We therefore report the
+recognition-policy blind spot as a preliminary observation on a small, imperfect sample, not
+a headline result, and recommend rebuilding this category with analyst-audited pairs before
+drawing quantitative conclusions.
+
+\textbf{Model coverage.} We report the OpenAI tier ladder (3 models) and two open
+MoE models at full scale ($n{=}173$); a seven-model, six-vendor panel of current
+frontier models is additionally evaluated in a preliminary pilot ($N{=}50$/mode,
+Table~\ref{tab:main}, panel (b)), which reproduces the central finding but at reduced
+statistical resolution, and a full-scale multi-vendor evaluation remains in progress.
+The human baseline ($N{=}50$, a single yes/no clarification) is a constrained reference
+rather than an upper bound, since models given up to ten rounds can exceed it, and it is
+collected from two annotators on a subset. A larger expert panel remains future work.
+
+\textbf{Grader and simulator.} Correctness and
+category-targeting are judged by GPT-4o-mini and the user is simulated by GPT-5. We validate
+these against humans on a stratified, blindly double-annotated sample (five annotators).
+The correctness grader agrees with human consensus at Cohen $\kappa{=}0.85$ (raw agreement
+$0.92$), exceeding inter-annotator agreement ($0.86$), so accuracy figures hold under human
+labels. The CategoryHit classifier initially agreed only weakly ($0.53$). A single-label design
+over-assigned \texttt{temporal\_scope} to compound questions that also name an entity or
+metric. The corrected multi-label \emph{touch} classifier reaches $0.75$ agreement, matching
+inter-annotator agreement ($0.73$), and the CategoryHit@1 values reported here use it. Because
+this shows models mostly do ask on-category, the corrected reading is that the gap lies in
+central targeting and integration rather than detection. A strict central-category variant is
+discriminative but not yet human-validated, so we report it only as a supplementary
+decomposition. Interaction results are also robust to the simulator: on a
+$50$-instance subset, standard +Interact accuracy is $34/28/26\%$ under the LLM, deterministic,
+and $15\%$-noisy simulators. Crucially, the yes/no action grammar does not manufacture the
+weak-model collapse: with a \emph{free-form} simulator that answers open-ended clarifying
+questions from $C$ (for example ``which fiscal year?'') rather than only yes/no, GPT-5-mini
+stays at $0\%$ across all $50$ instances (identical to the yes/no simulator, zero
+wrong-to-correct conversions, three-round budget). Its failure is therefore a
+post-clarification integration failure, not an artifact of the interaction protocol.
+
+\textbf{Construction circularity and synthetic intent.} The constructor, adversarial verifier, and user
+simulator are all GPT-5-family models, and the verifier removes instances the GPT-5 family
+answers correctly without $C$. This depresses GPT-5-family answer-only accuracy ($0.6\%$) by
+construction relative to the non-OpenAI vendors the filter does not target (mean $10.0\%$
+answer-only across six vendors), so cross-vendor answer-only comparisons are not fully
+apples-to-apples and the GPT-5-family floor is a filter-induced lower bound. The elicitation
+gap itself is unaffected: the filter targets answer-only solvability, not interactive
+resolution, and every vendor still resolves far below its oracle ceiling. Verifying a
+subsample with a non-OpenAI adversarial ensemble is a natural robustness check for future work.
+A related construct-validity caveat is that questions are reverse-constructed from filings
+rather than drawn from real user queries, and the ``intended'' interpretation is a
+constructor-assigned hidden context. The benchmark therefore measures a model's ability to
+recover a \emph{specified} interpretation, a necessary and controllable proxy for, but not
+identical to, disambiguating the intent of a real analyst.
+
+\textbf{Contamination.}
+Instances are freshly constructed from FY2022--2025 structured facts and
+answer-only accuracy is $\approx$0.6\% across all sources, but we do not claim
+absolute contamination safety for the DocFinQA-derived minority.
+
+\textbf{All instances are ambiguous by construction.} Every one of the 173 items is built to
+require clarification, so a model can succeed by assuming ambiguity is always present.
+FinInteract therefore measures \emph{what} to ask and \emph{how} to integrate the answer, not a
+calibrated \emph{when}-to-ask policy: it does not score false-positive clarification, over-asking
+on already-specified questions, or the correct choice to answer directly when a mild ambiguity
+does not change the value. Adding matched unambiguous and answer-invariant controls is the single
+most important extension for turning the benchmark into a test of calibrated interaction, and we
+accordingly frame our claims around asking-and-integrating rather than when-to-ask.
+
+\textbf{Intervention evidence is preliminary and not component-attributed.} The Category-Aware
+ReAct gain ($34\to46\%$) is a single GPT-5 backbone on $N{=}50$ (about six additional items),
+without a significance test, and its matched-baseline subset scores above the full-scale GPT-5
+row, so the effect must be confirmed at full scale with confidence intervals. Just as important,
+the policy bundles three components (ambiguity pre-check, category-conditioned questioning, and
+interpretation-state-gated answering) that we do not ablate: the improvement may stem
+substantially from the state-gated commit, an \emph{integration} fix, rather than from better
+category \emph{elicitation}, so the pilot does not by itself isolate the taxonomy's mechanistic
+role. A generic-structured clarification baseline and a per-component ablation are the needed
+controls. The training-time results are likewise early, resting on a small held-out probe, gains
+dominated by supervised fine-tuning with only a short reinforcement phase, an optimistic
+oracle-retrieval reference, and interaction driven to near-total compliance rather than a learned
+when-to-ask policy.
+
+\textbf{A single protocol confounds ability with interface adherence.} All vendors share one
+ReAct prompt and yes/no action grammar. GPT-5-mini's $0\%$ is partly a protocol-adherence failure
+(it keeps asking open-ended questions, exhausts the round budget, and rarely commits a final
+answer) rather than proof of zero financial-ambiguity ability. A free-form simulator rules out
+the yes/no grammar as the cause (the collapse persists), but tool schema, few-shot examples,
+constrained decoding, and model-specific adapters all shape protocol compliance, so a fixed
+cross-vendor prompt is a conservative rather than a maximally fair comparison; per-model interface
+tuning is future work.
+
+\textbf{Scope.} The paper spans a benchmark, the single-gold illusion, the taxonomy, and several
+exploratory studies (representation probing, inference and training interventions, co-evolution,
+and salience). The three main-text findings are the load-bearing contribution and the rest are
+explicitly exploratory and appendix-scoped; the two highest-value additions they point to,
+matched ambiguous/unambiguous evaluation and a component ablation of the intervention, are our
+priority follow-ups.
+
+%% ============================================================
 \section{Curation Cost to Replicate the Benchmark}
 \label{app:cost}
 %% ============================================================
