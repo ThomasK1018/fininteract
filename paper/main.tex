@@ -56,6 +56,14 @@ Large language model agents are increasingly deployed for financial information 
 \section{Methodology}
 \label{sec:methodology}
 %% ============================================================
+\fininteract operationalizes the formulation in \S\ref{sec:task} as a semi-automated corpus of
+ambiguous financial-QA instances built from public filings. Each instance carries a
+programmatically verifiable answer, a paired default and intended interpretation, and a
+per-category label, produced by an LLM construction pipeline with minimal human annotation and
+validated against domain experts. We present the design goals, the data sources, the curation
+pipeline, and the verification and validation used to grade an agent's resolution against the
+intended interpretation.
+
 \subsection{Design Goals and Principles}
 
 \textbf{Design goals.} \fininteract targets four goals.
@@ -97,160 +105,22 @@ aggregation, and subjective judgment fall outside its scope.
 
 
 
-\subsection{Dataset Construction}
-\label{sec:construction}
-In the curation process, viable structured ambiguity is more available for some categories than others, so that cleanly paired and independently verifiable ambiguity is abundant for entity scope and metric definition (Appendix~\ref{app:cost}). The released corpus reflects this, entity scope
-(54\%) and metric definition (37\%) dominate, with recognition policy (5\%),
-temporal scope (4\%), and filing vintage ($0\%$) sparse. We therefore position
-\fininteract as an \textbf{entity/metric-dominant} financial-ambiguity benchmark
-with exploratory coverage of three sparser categories, confine quantitative per-category
-claims to the two well-powered categories, and report the sparser categories with their
-sample sizes as preliminary signal.
-
-\fininteract is built and evaluated in four stages:
-we \textbf{(1)~construct} ambiguous instances from public filings,
-\textbf{(2)~verify} their quality with sanity checks, an adversarial verifier, and
-expert review, \textbf{(3)~evaluate} agents under a ReAct interaction protocol with
-a user simulator that answers only from the disambiguating context $C$, and
-\textbf{(4)~score and diagnose} with accuracy plus interaction-quality,
-calibration, and efficiency metrics. This section covers stages~1--2, and the experiments
-section (\S\ref{sec:exp}) covers stages~3--4.
-Figure~\ref{fig:framework} illustrates a worked instance and how \fininteract scores
-an agent's two resolution paths.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{workflow_plot.pdf}
-\caption{\textbf{\fininteract rewards actions that resolve the intended interpretation.}
-\textbf{(1)~Benchmark instance:} the question (Meta Platforms' operating income) carries a
-primary ambiguity category (entity scope) and two defensible readings, a default (Family of
-Apps segment, \$62.87B) and an intended (consolidated GAAP, \$46.75B), separated by a hidden
-disambiguating context $C$. \textbf{(2)~Let the agent resolve it:} seeing the question and
-filing passages, the agent either answers without clarifying (Part~A, a plausible but wrong
-interpretation) or asks a clarifying question that a user simulator answers only from $C$
-(Part~B, correct elicitation and answer). \textbf{(3)~\fininteract scores the behavior}
-on three signals: final-answer correctness against the intended interpretation, interaction
-quality (did the agent ask, target the right category, and resolve the user's intent), and
-the single-gold failure a conventional benchmark makes by rewarding the defensible default.}
-\label{fig:framework}
-\end{figure*}
-
 \subsection{Data Sources}
-
-\textbf{English (EN, $\sim$80\% of pool).}
-\textit{DocFinQA}, 780 long-context passages extracted from 10-K and 10-Q
-filings, with verified candidate answers from annotated QA pairs.
-\textit{EDGAR (XBRL-derived)}, 111 passages built from machine-readable XBRL
-facts for S\&P 500 and Russell 1000 companies (FY2024--2025).
-Because instances are newly constructed from structured facts requiring fresh
-ambiguity pairs, memorization risk is substantially reduced relative to
-benchmarks that reuse published QA pairs directly, though we do not claim
-absolute contamination safety.
-
-\textbf{Chinese (ZH, $\sim$20\% of pool).}
-\textit{CNINFO/akshare}, 237 passages derived from A-share annual reports
-(SSE~50 + CSI~300 constituents) via structured financial statement APIs.
-Three passage types: (1) metric definition, \emph{kou-fei} vs.\ \emph{gui-mu}
-(non-recurring-excluded profit vs.\ parent-attributable profit);
-(2) entity scope, \emph{gui-mu} vs.\ \emph{jing-lirun}
-(parent-attributable vs.\ fully consolidated including minority interest);
-(3) temporal scope, year-over-year revenue growth.
-ZH instances are expected to be harder for current models due to sparser
-training data on A-share filings and more complex corporate structure
-nomenclature (e.g., A/H-share distinctions, \emph{jituan} (group) vs.\ \emph{zi-gongsi} (subsidiary) scope).
-The released split (53 EN / 120 ZH) inverts the pool ratio for two reasons: the Chinese
-split was capped at and filled to $123$ constructed instances, whereas the English
-construction, despite the larger passage pool, produced fewer accepted ambiguity pairs per
-passage and did not reach its cap. All EN-versus-ZH comparisons are therefore confounded by
-source and construction yield and should be read as descriptive.
-
-\subsection{Three-Role Construction Pipeline}
-
-Instance construction follows a three-role pipeline (per-passage cost and
-timing in Appendix~\ref{app:cost}).
-
-\paragraph{Step 1: Constructor (GPT-5).}
-A single GPT-5 call generates the full
-$(Q, C, A)$ triple given a filing passage, verified candidate answer, and
-mandatory primary ambiguity category.
-The output JSON includes \texttt{question}, \texttt{context}, \texttt{answer},
-\texttt{default\_answer}, \texttt{intended\_evidence\_span},
-\texttt{default\_evidence\_span}, \texttt{intended\_interpretation},
-\texttt{default\_interpretation}, and \texttt{axes\_exercised}.
-Category-specific instructions are injected per primary category to prevent the
-constructor from drifting toward whichever category is easiest to generate.
-
-\paragraph{Step 2: Pre-verifier sanity checks ($\sim$instant).}
-Fourteen automated code-level rules are applied without any API calls
-(Table~\ref{tab:qc}).
-Any failure immediately rejects the passage, avoiding wasted verifier budget.
-
-\paragraph{Step 3: Adversarial Verifier (10 trials).}
-Ten verifier calls run in parallel (five GPT-5-mini and five GPT-5).
-Each trial asks the model to answer $Q$ \emph{without} context $C$ and
-to state the interpretation it assumed (period, entity, metric, basis).
-An instance is \textbf{rejected} if $\geq 2$ of the 10 trials both
-(a) produce the correct answer $A$ and (b) state an assumed interpretation
-that aligns with the intended interpretation.
-This two-condition criterion prevents false rejections from lucky guesses:
-if a model produces the right number while assuming a different interpretation
-(e.g., the default), the coincidence is not counted against the instance.
-
-
-
-\subsection{Category Diversity Enforcement}
-
-A naive construction loop over-represents categories common in the passage pool.
-We enforce target category shares through four mechanisms:
-(1) a priority function with a 3$\times$ penalty on over-quota categories;
-(2) hard exclusion at 2$\times$ quota;
-(3) rarity-adjusted initial sort (passages sorted by
-$\sum_\text{categories}(\text{target\_share}/\text{pool\_frequency})$); and
-(4) dynamic re-sort every 10 instances.
-
-\subsection{Human Validation Protocol}
-\label{sec:humanval}
-
-Two finance-literate annotators (one bilingual, for the Chinese split)
-independently review instances on an eight-question protocol (H1--H8):
-H1 \emph{Is $Q$ ambiguous without $C$?}
-H2 \emph{Is the default interpretation plausible for a non-expert?}
-H3 \emph{Does $C$ uniquely identify the intended interpretation?}
-H4 \emph{Does $C$ avoid directly stating the answer?}
-H5 \emph{Is $A$ correct under the intended interpretation?}
-H6 \emph{Is $A_d$ correct under the default interpretation?}
-H7 \emph{Is the primary category label correct?}
-H8 \emph{What yes/no question would a financial analyst naturally ask to
-resolve the ambiguity?} (free text, used to compute human CategoryHit).
-Acceptance requires H1--H6 to hold after adjudication by the primary author.
-
-\paragraph{Agreement.} On a stratified 60-instance sample (by language and category),
-per-item raw agreement is $0.82$--$0.97$. Because the labels are heavily skewed
-toward ``yes'' ($>85\%$ per item), Cohen's $\kappa$ is degenerate under the
-Feinstein--Cicchetti prevalence paradox; we therefore report the prevalence-robust
-Gwet's AC1, which is \textbf{$0.85$ on average} (range $0.78$--$0.97$) and
-$1.00$ for the category label (H7), substantial-to-near-perfect agreement. Only one
-instance was rejected by \emph{both} annotators on the same item (consensus
-rejection $1.7\%$); adjudication confirmed it as a category over-reach (a
-revenue-recognition-timing pairing whose plausible default is the firm's total
-revenue, not a disaggregation component). We quarantine it from the recommended public
-release (\texttt{v1.1}, $N{=}172$) but also release the frozen \texttt{v1.0} evaluation
-snapshot ($N{=}173$), which retains it, so every table in this paper reproduces exactly;
-all experiments below use \texttt{v1.0}. The
-instance is unsolved by every model in every \emph{interactive} mode; it is
-answerable only when the resolving context is supplied outright (context-oracle),
-where removing it shifts the ceiling by $<\!0.05$pp ($93$--$95\%$ unchanged), so
-no reported finding depends on it.
-
-\subsection{Dataset Statistics}
 \label{sec:stats}
-
-The frozen evaluation snapshot (\texttt{v1.0}) contains 173 instances
-(Table~\ref{tab:stats} and Figure~\ref{fig:datastats}; the public \texttt{v1.1} release is $N{=}172$, \S\ref{sec:humanval}), drawn from
-61 unique companies and SEC/CSRC filings dated 2022--2025. Every instance passes
-all 14 pre-verifier rules and the 10-trial adversarial verifier (mean blind-solve
-rate $0.7\%$), and is R14-discriminating (intended $\neq$ default answer beyond
-grader tolerance).
+English instances ($\sim$80\% of the passage pool) are built from SEC filings, DocFinQA
+long-context 10-K/10-Q passages with verified QA pairs and XBRL-derived facts for S\&P~500 and
+Russell~1000 companies (FY2024--2025). Chinese instances ($\sim$20\%) are built from A-share
+annual reports (SSE~50 and CSI~300 constituents) via the CNINFO/akshare structured APIs. Because
+instances are newly constructed from structured facts rather than reused published QA pairs,
+memorization risk is substantially reduced, though we do not claim absolute contamination safety.
+The frozen evaluation snapshot (\texttt{v1.0}) has 173 instances (the recommended public release
+\texttt{v1.1} has 172, \S\ref{sec:humanval}) over 61 companies and 2022--2025 filings, with the
+entity/metric-dominant category mix of \S\ref{sec:taxonomy} (full breakdown in
+Table~\ref{tab:stats}). The released split (53~EN / 120~ZH) inverts the pool ratio because the
+Chinese split was filled to its cap while English construction yielded fewer accepted ambiguity
+pairs per passage, so all EN-versus-ZH comparisons are confounded by source and yield and are
+read as descriptive. Per-source passage counts, the Chinese ambiguity nomenclature, and the
+difficulty distribution are in Appendix~\ref{app:construction}.
 
 \begin{table}[t]
 \centering
@@ -283,17 +153,59 @@ Mean blind-solve rate (verifier) & 0.7\% \\
 \end{tabular}}
 \end{table}
 
-\begin{figure}[t]
+\subsection{Curation}
+\label{sec:construction}
+\fininteract is built in two stages, construction then verification, and afterwards evaluated
+(\S\ref{sec:exp}). Figure~\ref{fig:framework} shows a worked instance and how the benchmark scores
+an agent's two resolution paths. Instances come from a \textbf{three-role pipeline}. A
+\textbf{constructor} (GPT-5) generates the full $(Q, C, A)$ triple, together with its default and
+intended interpretations, evidence spans, and category label, from a filing passage and a verified
+candidate answer, using category-specific instructions so it does not drift toward whichever
+category is easiest to generate. \textbf{Fourteen code-level sanity checks} (Table~\ref{tab:qc}, no
+API calls) reject malformed passages instantly. An \textbf{adversarial verifier} then runs ten
+GPT-5 and GPT-5-mini trials that attempt to answer $Q$ \emph{without} the disambiguating context
+$C$, and rejects the instance if at least two trials both produce the intended answer and state the
+intended interpretation, so only genuinely ambiguous items survive (a two-condition test that
+ignores lucky guesses). The output schema, category-injection details, and per-passage cost are in
+Appendix~\ref{app:construction} and Appendix~\ref{app:cost}.
+
+\begin{figure*}[t]
 \centering
-\includegraphics[width=\linewidth]{fig_dataset_stats.png}
-\caption{\textbf{\fininteract distributions.} \emph{(a)}~Primary ambiguity category: the
-corpus is entity/metric-dominant ($54\%$ / $36\%$), with the three subordinate categories
-sparse, mirroring how often each category is the \emph{primary} ambiguity in public
-filings (\S\ref{sec:taxonomy}). \emph{(b)}~Difficulty by disambiguation entropy
-$H_0=\log_2 k$: instances span one to $3.58$ bits, most at one or two bits with a
-substantial multi-category tail at $3.58$ bits (45 instances).}
-\label{fig:datastats}
-\end{figure}
+\includegraphics[width=\textwidth]{workflow_plot.pdf}
+\caption{\textbf{\fininteract rewards actions that resolve the intended interpretation.}
+\textbf{(1)~Benchmark instance:} the question (Meta Platforms' operating income) carries a
+primary ambiguity category (entity scope) and two defensible readings, a default (Family of
+Apps segment, \$62.87B) and an intended (consolidated GAAP, \$46.75B), separated by a hidden
+disambiguating context $C$. \textbf{(2)~Let the agent resolve it:} seeing the question and
+filing passages, the agent either answers without clarifying (Part~A, a plausible but wrong
+interpretation) or asks a clarifying question that a user simulator answers only from $C$
+(Part~B, correct elicitation and answer). \textbf{(3)~\fininteract scores the behavior}
+on three signals: final-answer correctness against the intended interpretation, interaction
+quality (did the agent ask, target the right category, and resolve the user's intent), and
+the single-gold failure a conventional benchmark makes by rewarding the defensible default.}
+\label{fig:framework}
+\end{figure*}
+
+\subsection{Verification and Validation}
+\label{sec:humanval}
+\textbf{Category diversity.} A naive construction loop over-represents categories that are common
+in the passage pool, so curation enforces target category shares through priority penalties and
+hard quota caps on over-represented categories (four mechanisms detailed in
+Appendix~\ref{app:construction}). \textbf{Human validation.} Two finance-literate annotators (one
+bilingual, for the Chinese split) independently review instances on an eight-question protocol
+(H1--H8) checking that $Q$ is ambiguous without $C$, that $C$ uniquely identifies the intended
+reading without stating the answer, that both the intended and default answers are correct, and
+that the primary category label holds, with acceptance requiring the core checks to pass after
+adjudication. Agreement is substantial-to-near-perfect: because ``yes'' labels dominate and make
+Cohen's $\kappa$ degenerate, we report the prevalence-robust Gwet's AC1, which averages $0.85$
+(range $0.78$--$0.97$) and is $1.00$ for the category label. Exactly one instance was
+consensus-rejected as a category over-reach, so we quarantine it from the public \texttt{v1.1}
+release ($N{=}172$) but retain it in the frozen \texttt{v1.0} snapshot ($N{=}173$) used for every
+table in this paper, and since it is unsolved by every model in every interactive mode, no reported
+finding depends on it. The full H1--H8 protocol and per-item agreement are in
+Appendix~\ref{app:construction}.
+
+
 
 
 %% ============================================================
@@ -1865,6 +1777,77 @@ whose candidate passages almost never survive the constructor, are the expensive
 ones to grow.
 
 %% ============================================================
+\section{Construction and Validation Details}
+\label{app:construction}
+%% ============================================================
+
+This appendix expands the data sources, curation pipeline, and validation summarized in
+\S\ref{sec:methodology}.
+
+\paragraph{Data sources.}
+\textbf{English (EN, $\sim$80\% of pool).} \textit{DocFinQA}, 780 long-context passages extracted
+from 10-K and 10-Q filings, with verified candidate answers from annotated QA pairs.
+\textit{EDGAR (XBRL-derived)}, 111 passages built from machine-readable XBRL facts for S\&P~500 and
+Russell~1000 companies (FY2024--2025). \textbf{Chinese (ZH, $\sim$20\% of pool).}
+\textit{CNINFO/akshare}, 237 passages derived from A-share annual reports (SSE~50 + CSI~300) via
+structured financial-statement APIs, in three passage types: (1) metric definition, \emph{kou-fei}
+vs.\ \emph{gui-mu} (non-recurring-excluded profit vs.\ parent-attributable profit); (2) entity
+scope, \emph{gui-mu} vs.\ \emph{jing-lirun} (parent-attributable vs.\ fully consolidated including
+minority interest); (3) temporal scope, year-over-year revenue growth. ZH instances are expected to
+be harder for current models due to sparser training data on A-share filings and more complex
+corporate-structure nomenclature (e.g., A/H-share distinctions, \emph{jituan} (group) vs.\
+\emph{zi-gongsi} (subsidiary) scope).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_dataset_stats.png}
+\caption{\textbf{\fininteract distributions.} \emph{(a)}~Primary ambiguity category: the
+corpus is entity/metric-dominant ($54\%$ / $36\%$), with the three subordinate categories
+sparse, mirroring how often each category is the \emph{primary} ambiguity in public
+filings (\S\ref{sec:taxonomy}). \emph{(b)}~Difficulty by disambiguation entropy
+$H_0=\log_2 k$: instances span one to $3.58$ bits, most at one or two bits with a
+substantial multi-category tail at $3.58$ bits (45 instances).}
+\label{fig:datastats}
+\end{figure}
+
+\paragraph{Three-role construction pipeline.}
+\textbf{Step 1: Constructor (GPT-5).} A single GPT-5 call generates the full $(Q, C, A)$ triple
+given a filing passage, verified candidate answer, and mandatory primary category. The output JSON
+includes \texttt{question}, \texttt{context}, \texttt{answer}, \texttt{default\_answer},
+\texttt{intended\_evidence\_span}, \texttt{default\_evidence\_span}, \texttt{intended\_interpretation},
+\texttt{default\_interpretation}, and \texttt{axes\_exercised}, with category-specific instructions
+injected per primary category. \textbf{Step 2: Pre-verifier sanity checks.} Fourteen automated
+code-level rules (Table~\ref{tab:qc}) are applied without API calls, and any failure immediately
+rejects the passage. \textbf{Step 3: Adversarial verifier.} Ten verifier calls run in parallel
+(five GPT-5-mini and five GPT-5); each answers $Q$ without $C$ and states its assumed
+interpretation, and an instance is rejected if $\geq 2$ of the 10 both produce $A$ and align with
+the intended interpretation. This two-condition criterion prevents false rejections from lucky
+guesses.
+
+\paragraph{Category diversity enforcement.}
+We enforce target category shares through four mechanisms: (1) a priority function with a $3\times$
+penalty on over-quota categories; (2) hard exclusion at $2\times$ quota; (3) a rarity-adjusted
+initial sort (passages sorted by
+$\sum_\text{categories}(\text{target\_share}/\text{pool\_frequency})$); and (4) a dynamic re-sort
+every 10 instances.
+
+\paragraph{Human validation protocol.}
+Two finance-literate annotators (one bilingual, for the Chinese split) independently review
+instances on an eight-question protocol: H1 \emph{Is $Q$ ambiguous without $C$?} H2 \emph{Is the
+default interpretation plausible for a non-expert?} H3 \emph{Does $C$ uniquely identify the intended
+interpretation?} H4 \emph{Does $C$ avoid directly stating the answer?} H5 \emph{Is $A$ correct under
+the intended interpretation?} H6 \emph{Is $A_d$ correct under the default interpretation?} H7
+\emph{Is the primary category label correct?} H8 \emph{What yes/no question would a financial analyst
+naturally ask to resolve the ambiguity?} (free text, used to compute human CategoryHit). Acceptance
+requires H1--H6 to hold after adjudication by the primary author. On a stratified 60-instance sample
+(by language and category), per-item raw agreement is $0.82$--$0.97$. Because the labels are heavily
+skewed toward ``yes'' ($>85\%$ per item), Cohen's $\kappa$ is degenerate under the
+Feinstein--Cicchetti prevalence paradox, so we report Gwet's AC1 ($0.85$ average, range
+$0.78$--$0.97$; $1.00$ for H7). The single consensus-rejected instance (consensus rejection
+$1.7\%$) was a category over-reach, a revenue-recognition-timing pairing whose plausible default is
+the firm's total revenue rather than a disaggregation component. It is answerable only under
+context-oracle, where removing it shifts the ceiling by $<\!0.05$pp ($93$--$95\%$ unchanged).
+
 \section{Construction Quality-Control Rules}
 \label{app:qc}
 %% ============================================================
