@@ -36,7 +36,7 @@
 \maketitle
 
 \begin{abstract}
-Large language model agents are increasingly deployed for financial analysis over regulatory filings, retrieving information that an analyst or investor may further act on. But financial terminology is specific, and a question that looks fully specified may admit multiple defensible readings that yield materially different values, e.g. Meta Platforms' ``operating income'' is \$46.75B consolidated or \$62.87B for the Family of Apps segment, a 34\% gap, but each reading's ground truth is exact and programmatically verifiable. A capable agent should recognize the ambiguity and ask a clarification question instead of committing to a plausible yet unintended reading. However, existing financial benchmarks generally attach only one gold answer per question and cannot distinguish agents which resolve the ambiguity from making an ungrounded guess. We call such blind spot \emph{single-gold illusion}. To address this illusion, we release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances that pairs each question with a \emph{default} and an \emph{intended} interpretation (fixed by a disambiguating context) across a five-category ambiguity taxonomy, and grades whether an agent elicits and then integrates the right clarification. Across a range of proprietary and open models, three results emerge. First, re-grading the \emph{same} outputs against the intended rather than the default interpretation cuts accuracy by up to $3\times$, the single-gold illusion. Second, the failure is interaction, not knowledge: models answer over $90\%$ correctly once the interpretation is resolved but only about $45\%$ under their own clarification, so the bottleneck spans both \emph{eliciting} the clarification and \emph{integrating} it. Third, a per-category skill metric localizes \emph{which} of these abilities fails, across two well-powered categories (entity scope and metric definition) and three exploratory ones.
+Large language model agents are increasingly deployed for financial information retrieval and hence downstream analytics or investment decisions. But financial terminology is specific, and a question without highly specification may admit multiple defensible readings with materially different values, e.g. Meta Platforms' ``operating income'' is \$46.75B consolidated or \$62.87B for the Family of Apps segment, but each reading's ground truth is exact and programmatically verifiable. A capable agent should recognize the ambiguity and ask a clarification question instead of committing to a plausible yet unintended reading. However, existing financial benchmarks generally attach only one gold answer per question, failing to distinguish between agents which resolve the ambiguity from those making ungrounded guesses, which we call blind spot \emph{single-gold illusion}. To address this illusion, we release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances that pairs each question with a \emph{default} and an \emph{intended} interpretation (fixed by a disambiguating context) across a five-category ambiguity taxonomy, and grades whether an agent elicits and then integrates the right clarification. Across a range of proprietary and open models, we observe that re-grading the \emph{same} outputs against the intended answer leads to accuracy drop by more than 3 times, verifying the single-gold illusion. Our fine-grained analysis shows that this failure is interaction as models actually answer with over $90\%$ accuracy once the interpretation is resolved but only about $45\%$ under their own clarification, suggesting that the key bottleneck lies on correct clarification and downstream integration. We further include skill metric that localizes failure modes of different financial ambiguities across two well-powered categories (entity scope and metric definition) and three exploratory ones.
 \end{abstract}
 
 %% ============================================================
@@ -44,32 +44,7 @@ Large language model agents are increasingly deployed for financial analysis ove
 \label{sec:intro}
 %% ============================================================
 
-Large language model agents are increasingly deployed for financial analysis,
-answering questions over regulatory filings and earnings
-reports~\citep{islam2023financebench,chen2021finqa,reddy2024docfinqa} and carrying out
-multi-step research and retrieval over corporate
-disclosures~\citep{bigeard2025financeagent,choi2025finagentbench,krumdick2024bizbench,xie2024finben}.
-In a typical deployment the agent reads a user's question, searches the relevant filings,
-and returns a numeric answer that an analyst or investor may act on.
-
-Financial questions are often deceptively under-specified. Financial terminology is highly
-specific, and a natural-language question that looks complete can map to several defensible
-readings that yield materially different numbers. Asked \emph{``What was Meta Platforms'
-operating income?''} (Figure~\ref{fig:teaser}), an agent must decide whether the user means
-the consolidated GAAP figure (\$46.75B for FY2023) or the Family of Apps segment
-(\$62.87B), a 34\% difference, and each is the correct answer to a \emph{different} reading
-of the same question. A capable agent should recognize the ambiguity and \emph{follow up
-with the user} rather than commit to one plausible but unintended reading. Existing
-financial benchmarks cannot measure this. They pre-disambiguate their questions or hand the
-model the exact evidence and grade only the final
-number~\citep{islam2023financebench,chen2021finqa,reddy2024docfinqa,krumdick2024bizbench,xie2024finben},
-so they cannot distinguish an agent that resolves the ambiguity from one that guesses the
-common reading and happens to match, a blind spot we call the \emph{single-gold illusion}
-(Table~\ref{tab:comparison}). The general ambiguous-QA literature tackles under-specification
-but only on Wikipedia questions, where ground truth is not exactly
-verifiable~\citep{min2020ambigqa,li2025condambigqa,kuhn2022clam}. Finance is a sharper
-instrument: ambiguity is endemic and systematic, misanswers are costly, and ground truth is
-programmatically verifiable against SEC XBRL facts.
+Large language model (LLM) agents are increasingly utilized in financial analysis to answer questions over regulatory filings reports~\citep{islam2023financebench,chen2021finqa,reddy2024docfinqa}, carry out multi-stepresearch and retrieval over corporate disclosures~\citep{bigeard2025financeagent,choi2025finagentbench,krumdick2024bizbench,xie2024finben}. In a typical deployment, the agent reads a user's question, searches through relevant filings and returns the answer for downstream actions. However, financial questions are often deceptively under-specified. Financial terminology is highly specific, and a natural language question may map to several defensible readings for different numbers, e.g. in the question \emph{``What was Meta Platforms' operating income?''} (Figure~\ref{fig:teaser}), an agent must decide whether the user means the consolidated GAAP figure (\$46.75B for FY2023) or the Family of Apps segment (\$62.87B), both being programmatically verifiable against SEC facts. A capable agent should recognize the ambiguity and follow up with the user instead of directly commiting into a plausible but unintended reading. Existing financial benchmarks cannot measure this as they grade only the final answer by assuming the question is disambiguated~\citep{islam2023financebench,chen2021finqa,reddy2024docfinqa,krumdick2024bizbench,xie2024finben}. Without grounding check, they cannot distinguish whether the agent actually resolves the ambiguity or guesses the common reading. We call such blind spot \emph{single-gold illusion} (Table~\ref{tab:comparison}), which is currently underexplored in the financial domain relative to general ambiguous QA literature~\citep{min2020ambigqa,li2025condambigqa,kuhn2022clam}.  
 
 \begin{figure*}[t]
 \centering
@@ -125,29 +100,16 @@ Default span &
 \end{tabular}}
 \end{table}
 
-\paragraph{Research Questions.}
-We organize the study around three questions.
-\textbf{RQ1 (Detection and resolution).} Do frontier models recognize financial-report
-ambiguity, and does interactive clarification improve resolution over autonomous search?
-\textbf{RQ2 (Where the bottleneck lies).} Is the binding constraint knowing \emph{when}
-and on \emph{which} category to ask (elicitation) rather than access to evidence (grounding)?
-\textbf{RQ3 (Intervention).} Can targeted interventions on the ambiguity category, at inference
-time and through training, measurably improve resolution?
+\textbf{Research Questions.} We study financial ambiguity over three research questions: \begin{itemize}[leftmargin=*, topsep=3pt, itemsep=1pt, parsep=0pt]
+    \item \textbf{RQ1 (Detection and resolution).} Do frontier models recognize financial-report ambiguity, and does interactive clarification improve resolution over autonomous search?
+    \item \textbf{RQ2 (Where the bottleneck lies).} Is the binding constraint knowing \emph{when} and on \emph{which} category to ask (elicitation) rather than access to evidence (grounding)?
+    \item \textbf{RQ3 (Intervention).} Can targeted interventions on the ambiguity category, at inference time and through training, measurably improve resolution?
+\end{itemize}
 
-\paragraph{Design considerations.}
-A benchmark that answers these questions must draw \emph{representative} ambiguity from real
-filings, support \emph{fine-grained} per-category diagnosis through paired default and intended
-readings, admit \emph{low-cost, leak-safe} construction that keeps the answer out of the
-disambiguating context, and provide \emph{verifiable}, human-validated ground truth
+\textbf{Design considerations.} A benchmark that answers these questions must draw \emph{representative} ambiguity from real filings, support \emph{fine-grained} per-category diagnosis through paired default and intended readings, admit \emph{low-cost, leak-safe} construction that keeps the answer out of the disambiguating context, and provide \emph{verifiable}, human-validated ground truth
 (\S\ref{sec:task}).
 
-\paragraph{Our Proposal.}
-We release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances
-(53 English / 120 Chinese). Each question $Q$ is paired with a \emph{default}
-interpretation (the reading a non-expert assumes) and an \emph{intended}
-interpretation fixed by a disambiguating context $C$, across a five-category taxonomy
-of financial ambiguity. Grading the \emph{same} model outputs against the default
-versus the intended interpretation exposes the illusion directly, and a per-category
+\textbf{Our Proposal.} We release \fininteract, a bilingual (English/Chinese) benchmark of 173 instances (53 English / 120 Chinese). Each question $Q$ is paired with a \emph{default} interpretation (the reading a non-expert assumes) and an \emph{intended} interpretation fixed by a disambiguating context $C$, across a five-category taxonomy of financial ambiguity. By grading the same model outputs against the default versus intended interpretation, we expose the illusion directly. A per-category
 skill metric then localizes \emph{which} clarification ability a model lacks.
 We evaluate agents under a ReAct protocol where a user simulator answers only from
 the disambiguating context (Figure~\ref{fig:framework}), so the benchmark measures
