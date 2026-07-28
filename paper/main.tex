@@ -49,28 +49,17 @@ Large language model agents are increasingly deployed for financial information 
 \section{Problem Formulation}
 \label{sec:task}
 %% ============================================================
-Given an ambiguous financial question instance, it should contain the ambiguous question over a company filing $Q$, the disambiguating context $C$ which is the minimal set of scope or definitional constraints that collapses $Q$ into the unique intended answer $A$ under intended interpretation $\mathcal{I}_{\text{int}}$. The ambiguous question typically contains correct answer $A_{d}\neq A$ under the default interpretation $\mathcal{I}_{\text{def}}$ which a non-expert would assume when reading $Q$. Specifically, $\mathcal{I}_{\text{int}},\mathcal{I}_{\text{def}}$ are structured records specifying financial ambiguity taxonomy (Sec. \ref{sec:taxonomy}). While both $A$ and $A_{d}$ are defensible from publicly available filings, an agent should be able to identify the ambiguity by reading $Q$ alone without $C$, where this pairing between default and intented interpretation generalizes the target-distractor design from \interactcomp~\cite{interactcomp2026} to the financial domain. 
+\textbf{Definition.} Given an ambiguous financial question instance, it should contain the ambiguous question over a company filing $Q$, the disambiguating context $C$ which is the minimal set of scope or definitional constraints that collapses $Q$ into the unique intended answer $A$ under intended interpretation $\mathcal{I}_{\text{int}}$. The ambiguous question typically contains correct answer $A_{d}\neq A$ under the default interpretation $\mathcal{I}_{\text{def}}$ which a non-expert would assume when reading $Q$. Specifically, $\mathcal{I}_{\text{int}},\mathcal{I}_{\text{def}}$ are structured records specifying financial ambiguity taxonomy (Sec. \ref{sec:taxonomy}). While both $A$ and $A_{d}$ are defensible from publicly available filings, an agent should be able to identify the ambiguity by reading $Q$ alone without $C$, where this pairing between default and intented interpretation generalizes the target-distractor design from \interactcomp~\cite{interactcomp2026} to the financial domain. 
 
-\paragraph{Disambiguation entropy.} We quantify how ambiguous an instance is by its prior
-disambiguation entropy $H_0 = \log_2 k$, where $k$ is the number of plausible interpretations of
-$Q$ before any clarifying interaction, under a uniform prior over readings. A single-category
-question with two plausible readings has $H_0 = 1$ bit, the running example below
-(Table~\ref{tab:example}) has three plausible entity scopes and hence
-$H_0 = \log_2 3 \approx 1.58$ bits, and a two-category question with three and four plausible
-values gives $H_0 = \log_2(3 \times 4) \approx 3.58$ bits. This quantity anchors our supplementary
-efficiency metric \disep (\S\ref{sec:metrics}) and serves as a per-instance difficulty proxy.
+\textbf{Disambiguation entropy.} We quantify how ambiguous an instance is using the prior confidence entropy $H_{0} = \log_{2} k$, where $k$ denotes the number of plausible interpretations of $Q$ without clarifying interaction, e.g. the example in Table~\ref{tab:example} has three plausible interpretations, hence contributing to an entropy of $H_0 = \log_2 3 \approx 1.58$ bits. This further serves as our metric to evaluate difficulty and efficiency in Sec. \ref{sec:metrics}. 
 
 \begin{table}[h]
 \centering
-\caption{Formalization of ambiguous financial question instance. Specifically, we
-The paired default and intended readings are shown; $H_0{=}\log_2 3{\approx}1.58$ reflects
-three plausible entity scopes for this question (consolidated total and two reportable
-segments). Without the disambiguating context $C$, a model's default interpretation
-leads to the wrong answer.}
+\caption{This example of ambiguous financial question contains three plausible entity scopes, i.e. consolidated total and two reportable segments, leading to an entropy of $1.58$ bits. Without the disambiguating context $C$, a model's default interpretation leads to the wrong answer.}
 \label{tab:example}
 \small
 \resizebox{0.9\columnwidth}{!}{%
-\begin{tabular}{p{3.0cm}p{5.0cm}}
+\begin{tabular}{p{2.7cm}p{4.7cm}}
 \toprule
 Field & Value \\
 \midrule
