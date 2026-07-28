@@ -49,16 +49,13 @@ We curate each instance from a three-role pipeline, where a \textbf{constructor}
 \centering
 \includegraphics[width=\textwidth]{workflow_plot_v2.pdf}
 \caption{\textbf{\fininteract rewards actions that resolve the intended interpretation.}
-\textbf{(1)~Benchmark instance:} the question (Meta Platforms' operating income) carries a
-primary ambiguity category (entity scope) and two defensible readings, a default (Family of
-Apps segment, \$62.87B) and an intended (consolidated GAAP, \$46.75B), separated by a hidden
-disambiguating context $C$. \textbf{(2)~Let the agent resolve it:} seeing the question and
-filing passages, the agent either answers without clarifying (Part~A, a plausible but wrong
-interpretation) or asks a clarifying question that a user simulator answers only from $C$
-(Part~B, correct elicitation and answer). \textbf{(3)~\fininteract scores the behavior}
-on three signals: final-answer correctness against the intended interpretation, interaction
-quality (did the agent ask, target the right category, and resolve the user's intent), and
-the single-gold failure a conventional benchmark makes by rewarding the defensible default.}
+\textbf{(1)}~Each instance carries a primary ambiguity category and two defensible readings, a
+default (Family of Apps, \$62.87B) and an intended (consolidated GAAP, \$46.75B), separated by a
+hidden disambiguating context $C$. \textbf{(2)}~The agent either answers without clarifying
+(Part~A, a plausible but wrong reading) or asks a question that a user simulator answers only from
+$C$ (Part~B, correct elicitation). \textbf{(3)}~\fininteract scores three signals: final-answer
+correctness against the intended interpretation, interaction quality (did it ask, target the right
+category, and resolve intent), and the single-gold failure of rewarding the default.}
 \label{fig:framework}
 \end{figure*}
 
