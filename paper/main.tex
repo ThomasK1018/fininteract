@@ -199,31 +199,14 @@ We also note the following limitations of this study: \textbf{1) Scale} where a 
 
 \section{Related Work}
 \label{sec:related}
+We include the most relevant works to \fininteract and defer additional financial and general-domain benchmarks as well as more widespread related work in Appendix~\ref{app:related}.
 %% ============================================================
 
-\textbf{Financial QA benchmarks} such as FinanceBench~\citep{islam2023financebench},
-FinQA~\citep{chen2021finqa}, and DocFinQA~\citep{reddy2024docfinqa}, together with recent agentic
-successors, enforce single-gold, single-turn evaluation and test numerical reasoning or retrieval
-rather than whether a query is under-specified (Table~\ref{tab:comparison}). \fininteract is the
-first to make query ambiguity the central, controlled construct, through paired default/intended
-interpretations and multi-turn interaction in the financial domain.
+\textbf{Financial QA benchmarks} such as FinanceBench~\citep{islam2023financebench}, FinQA~\citep{chen2021finqa}, and DocFinQA~\citep{reddy2024docfinqa}, together with recent agentic successors, enforce single-gold, single-turn evaluation and test numerical reasoning or retrieval without exploring whether a query is under-specified (Table~\ref{tab:comparison}). To our knowledge, \fininteract is the first to make query ambiguity the central, controlled construct, through paired default/intended interpretations and multi-turn interaction in the financial domain.
 
-\textbf{Ambiguous QA and clarifying questions.} In the general domain,
-AmbigQA~\citep{min2020ambigqa}, CLAMBER~\citep{zhang2024clamber}, and
-QuestBench~\citep{li2025questbench} study whether a model identifies under-specification and asks
-the minimal clarifying question, building on a long clarifying-question line in retrieval and
-dialogue. \interactcomp~\citep{interactcomp2026} is our direct methodological ancestor, which we
-extend to finance with a domain-specific ambiguity taxonomy, per-category targeting (AC@1), and
-programmatically verifiable XBRL-grounded evidence pairs.
+\textbf{Ambiguous QA and clarifying questions.} In the general domain, AmbigQA~\citep{min2020ambigqa}, CLAMBER~\citep{zhang2024clamber}, and QuestBench~\citep{li2025questbench} study whether a model identifies under-specification and asks the minimal clarifying question, building on a long clarifying-question line in retrieval and dialogue. \interactcomp~\citep{interactcomp2026} is our direct methodological ancestor, which we extend to finance with a domain-specific ambiguity taxonomy, per-category targeting (AC@1), and programmatically verifiable XBRL-grounded evidence pairs.
 
-\textbf{Multi-turn interaction and selective answering.} A parallel line studies whether more
-conversational turns actually help. Large models often \emph{lose track} over multi-turn
-exchanges~\citep{laban2026llms}, and calibrated systems frequently do better by answering
-\emph{selectively} or abstaining under ambiguity~\citep{cole2023selectively,kuhn2022clam}. Our
-findings echo this in the financial setting, where forcing extra clarification degrades accuracy,
-but \fininteract turns the observation into a controlled, per-category diagnosis of \emph{which}
-clarification an agent should issue and \emph{whether} issuing it resolves the query, rather than
-only measuring whether more turns help.
+\textbf{Multi-turn interaction and selective answering.} A parallel line studies whether more conversational turns actually help. Large models often \emph{lose track} over multi-turn exchanges~\citep{laban2026llms}, and calibrated systems frequently do better by answering \emph{selectively} or abstaining under ambiguity~\citep{cole2023selectively,kuhn2022clam}. Our findings echo this in the financial setting, where forcing extra clarification degrades accuracy, but \fininteract turns the observation into a controlled, per-category diagnosis of \emph{which} clarification an agent should issue and \emph{whether} issuing it resolves the query, instead of only measuring whether more turns help.
 
 \begin{table*}[t]
 \centering
@@ -262,31 +245,11 @@ FinEval~\citep{guo2023fineval}
 \end{tabular}}
 \end{table*}
 
-Additional financial and general-domain benchmarks and the full clarifying-question lineage are
-discussed in Appendix~\ref{app:related}.
-
 \section{Conclusion}
 \label{sec:conclusion}
 %% ============================================================
 
-We introduced \fininteract, the first bilingual benchmark for evaluating
-financial search agents on genuinely ambiguous queries.
-The five-category financial ambiguity taxonomy, paired default/intended
-interpretation design, and adversarial verifier-based construction pipeline
-yield 173 high-quality instances that resist trivial disambiguation.
-One unit organizes the whole story, the ambiguity \emph{category}: it structures the
-taxonomy, is what an agent must elicit and then act on (single-gold grading overstates competence
-up to $3\times$ when models commit to the wrong category-reading), is
-\emph{linearly represented} inside open models yet left unacted-on, and is the
-lever for intervention. Our central finding is that interaction capability, not
-financial knowledge, is the bottleneck, and that this capability has two parts a model
-must both possess, eliciting the right clarification and integrating the answer it receives:
-agents answer $93$--$95\%$ correctly once
-the category is resolved but far less on their own (a mean of $8\%$ across the OpenAI
-ladder, at most $29\%$ among full-scale models), amplifying the stagnation
-\interactcomp identified in the general domain. We turn this diagnosis into a
-category-conditioned training intervention (\S\ref{sec:trainsignal}), and release \fininteract with
-full construction, evaluation, and training code for reproducible follow-on work.
+We introduced \fininteract, the first bilingual benchmark for evaluating financial search agents on genuinely ambiguous queries. The five-category financial ambiguity taxonomy, paired default/intended interpretation design, and adversarial verifier-based construction pipeline yield 173 high-quality instances that resist trivial disambiguation. Our central finding is that it is interaction capability, not financial knowledge, that serves as the bottleneck of existing agent's ability to handle ambiguity in financial QA. This capability contains two parts, including the ability to elicit the right clarification and to update internal belief of the original answer. Specifically, when the ambiguity is fully solved, agents can answer at 93-95\% accuracy, far higher than in normal ambiguous scenarios. This amplifies the stagnation identified in \interactcomp in the general domain, where the more terminology- and domain-specific financial industry requires a more specialized benchmark. For robustness, we further turn this diagnosis into a category-conditioned training intervention in Sec. \ref{sec:trainsignal} to showcase that \fininteract also serves as an informative training signal, and release \fininteract with full construction, evaluation, and training code for reproducible follow-on work.
 
 
 %% ============================================================
