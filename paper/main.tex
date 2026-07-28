@@ -216,6 +216,15 @@ dialogue. \interactcomp~\citep{interactcomp2026} is our direct methodological an
 extend to finance with a domain-specific ambiguity taxonomy, per-category targeting (AC@1), and
 programmatically verifiable XBRL-grounded evidence pairs.
 
+\textbf{Multi-turn interaction and selective answering.} A parallel line studies whether more
+conversational turns actually help. Large models often \emph{lose track} over multi-turn
+exchanges~\citep{laban2026llms}, and calibrated systems frequently do better by answering
+\emph{selectively} or abstaining under ambiguity~\citep{cole2023selectively,kuhn2022clam}. Our
+findings echo this in the financial setting, where forcing extra clarification degrades accuracy,
+but \fininteract turns the observation into a controlled, per-category diagnosis of \emph{which}
+clarification an agent should issue and \emph{whether} issuing it resolves the query, rather than
+only measuring whether more turns help.
+
 \begin{table*}[t]
 \centering
 \caption{Comparison of financial QA benchmarks.
