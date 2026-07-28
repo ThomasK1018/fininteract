@@ -46,13 +46,77 @@ Large language model agents are increasingly deployed for financial information 
 \input{paper/sections/1_introduction}
 
 %% ============================================================
-\section{Task Definition}
+\section{Problem Formulation}
 \label{sec:task}
 %% ============================================================
-
-\subsection{Problem Formulation}
 Given an ambiguous financial question instance, it should contain the ambiguous question over a company filing $Q$, the disambiguating context $C$ which is the minimal set of scope or definitional constraints that collapses $Q$ into the unique intended answer $A$ under intended interpretation $\mathcal{I}_{\text{int}}$. The ambiguous question typically contains correct answer $A_{d}\neq A$ under the default interpretation $\mathcal{I}_{\text{def}}$ which a non-expert would assume when reading $Q$. Specifically, $\mathcal{I}_{\text{int}},\mathcal{I}_{\text{def}}$ are structured records specifying financial ambiguity taxonomy (Sec. \ref{sec:taxonomy}). While both $A$ and $A_{d}$ are defensible from publicly available filings, an agent should be able to identify the ambiguity by reading $Q$ alone without $C$, where this pairing between default and intented interpretation generalizes the target-distractor design from \interactcomp~\cite{interactcomp2026} to the financial domain. 
 
+\begin{table}[h]
+\centering
+\caption{Formalization of ambiguous financial question instance. Specifically, we 
+The paired default and intended readings are shown; $H_0{=}\log_2 3{\approx}1.58$ reflects
+three plausible entity scopes for this question (consolidated total and two reportable
+segments). Without the disambiguating context $C$, a model's default interpretation
+leads to the wrong answer.}
+\label{tab:example}
+\small
+\resizebox{0.9\columnwidth}{!}{%
+\begin{tabular}{p{3.0cm}p{5.0cm}}
+\toprule
+Field & Value \\
+\midrule
+$Q$ &
+  What was Meta Platforms' operating income? \\
+$C$ &
+  Total company (consolidated) results under U.S.\ GAAP for the year
+  ended December 31, 2023. \\
+$A$ (intended) &
+  \$46.75B \emph{[consolidated GAAP]} \\
+$A_d$ (default) &
+  \$62.87B \emph{[Family of Apps segment]} \\
+\midrule
+Ambiguity category & Entity scope \\
+$H_0$ & 1.58 bits \\
+\midrule
+Intended span &
+  ``Income from operations for 2023 was \$46.75 billion\ldots'' \\
+Default span &
+  ``Family of Apps\ldots Income from operations \$62,871\ldots'' \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\textbf{Agent Interaction Model.} We follow \interactcomp's ReAct framework~\citep{yao2023react} where the agent may issue three types of actions, namely \textbf{search}($Q$) to retrieve a passage from the filing corpus, \textbf{interact}($Q$) to present a yes-or-no question to the simulated user who answers based on $C$, and \textbf{answer}($Q$) to submit a final answer. Specifically, we evaluate agents in three primary modes (Table~\ref{tab:modes}) and four
+ablation modes.
+
+\begin{table}[h]
+\centering
+\caption{Evaluation modes.}
+\label{tab:modes}
+\small
+\resizebox{0.9\columnwidth}{!}{%
+\begin{tabular}{lll}
+\toprule
+Mode & Actions & Description \\
+\midrule
+Answer-only & answer & Pure parametric recall \\
+Answer+Search & search, answer & Oracle retrieval augmented \\
+Answer+Search+Interact & search, interact, answer & Standard full interaction \\
+\textbf{Category-Aware ReAct} & state, search, interact, answer & \textbf{Category-conditioned and state-gated} \\
+\midrule
+Always-ask & \multicolumn{2}{l}{Must ask $\geq 1$ question before answering} \\
+Category-oracle & \multicolumn{2}{l}{Told the primary category, not the value} \\
+Template-oracle & \multicolumn{2}{l}{Fixed human-written question per category} \\
+Enumerate & \multicolumn{2}{l}{Lists all interpretations and answers} \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+
+%% ============================================================
+\section{Methodology}
+\label{sec:methodology}
+%% ============================================================
 \subsection{Design Goals and Principles}
 
 \textbf{Design goals.} \fininteract targets four goals.
@@ -92,45 +156,7 @@ already cover. Every question is anchored to a single named issuer and a
 programmatically verifiable value, so open-ended forecasting, multi-company
 aggregation, and subjective judgment fall outside its scope.
 
-\subsection{Agent Interaction Model}
 
-We follow \interactcomp's ReAct framework~\citep{yao2023react}.
-The agent may issue three types of actions:
-\textbf{search}($q$), retrieves a passage from the filing corpus;
-\textbf{interact}($q$), presents a yes/no question to a simulated user who
-answers based on $C$;
-\textbf{answer}($v$), submits a final answer.
-We evaluate agents in three primary modes (Table~\ref{tab:modes}) and four
-ablation modes.
-
-\begin{table}[h]
-\centering
-\caption{Evaluation modes.}
-\label{tab:modes}
-\small
-\resizebox{0.9\columnwidth}{!}{%
-\begin{tabular}{lll}
-\toprule
-Mode & Actions & Description \\
-\midrule
-Answer-only & answer & Pure parametric recall \\
-Answer+Search & search, answer & Oracle retrieval augmented \\
-Answer+Search+Interact & search, interact, answer & Standard full interaction \\
-\textbf{Category-Aware ReAct} & state, search, interact, answer & \textbf{Proposed: category-conditioned + state-gated} \\
-\midrule
-Always-ask & \multicolumn{2}{l}{Must ask $\geq 1$ question before answering} \\
-Category-oracle & \multicolumn{2}{l}{Told the primary category, not the value} \\
-Template-oracle & \multicolumn{2}{l}{Fixed human-written question per category} \\
-Enumerate & \multicolumn{2}{l}{Lists all interpretations and answers} \\
-\bottomrule
-\end{tabular}}
-\end{table}
-
-
-%% ============================================================
-\section{Methodology}
-\label{sec:methodology}
-%% ============================================================
 
 \subsection{Financial Ambiguity Taxonomy}
 \label{sec:taxonomy}

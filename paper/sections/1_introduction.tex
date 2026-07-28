@@ -27,43 +27,7 @@ bottleneck is issuing the right clarification without missing knowledge.}
 \label{fig:teaser}
 \end{figure*}
 
-\begin{table}[h]
-\centering
-\caption{Running example: a \fininteract instance.
-The paired default and intended readings are shown; $H_0{=}\log_2 3{\approx}1.58$ reflects
-three plausible entity scopes for this question (consolidated total and two reportable
-segments). Without the disambiguating context $C$, a model's default interpretation
-leads to the wrong answer.}
-\label{tab:example}
-\small
-\resizebox{0.9\columnwidth}{!}{%
-\begin{tabular}{p{1.8cm}p{5.7cm}}
-\toprule
-Field & Value \\
-\midrule
-$Q$ &
-  What was Meta Platforms' operating income? \\
-$C$ &
-  Total company (consolidated) results under U.S.\ GAAP for the year
-  ended December 31, 2023. \\
-$A$ (intended) &
-  \$46.75B \emph{[consolidated GAAP]} \\
-$A_d$ (default) &
-  \$62.87B \emph{[Family of Apps segment]} \\
-\midrule
-Ambiguity category & Entity scope \\
-$H_0$ & 1.58 bits \\
-\midrule
-Intended span &
-  ``Income from operations for 2023 was \$46.75 billion\ldots'' \\
-Default span &
-  ``Family of Apps\ldots Income from operations \$62,871\ldots'' \\
-\bottomrule
-\end{tabular}}
-\end{table}
-
-Answering these questions requires three design properties. First,
-the benchmark must draw representative ambiguity from real filings. Second, it must expose fine-grained dimensions of ambiguity through paired default and intended readings. Third, benchmark construction should have low cost and is safe from potential leakage to keep answer out of disambiguating context, with verifiable ground truth validated by domain experts. (Sec. \ref{sec:task}).
+Answering these questions requires three design properties. First, the benchmark must draw representative ambiguity from real filings. Second, it must expose fine-grained dimensions of ambiguity through paired default and intended readings. Third, benchmark construction should have low cost and is safe from potential leakage to keep answer out of disambiguating context, with verifiable ground truth validated by domain experts. (Sec. \ref{sec:task}).
 
 We release \fininteract, a bilingual benchmark in English and Chinese containing 173 instances, classified into five financial ambiguity categories. Each question $Q$ is paired with a \emph{default} interpretation recording a possible non-expert assumption and an \emph{intended} interpretation fixed by the disambiguating context. By grading the same model outputs against the default and intended interpretations, we effectively expose this single-gold illusion. \fininteract includes skill metric to localize which clarification ability the model lacks, and evaluates the agents under a ReAct protocol where the user simulator answers only from the disambiguating context (Figure~\ref{fig:framework}) to measure the agent's quality of clarify-then-integrate action. 
 
