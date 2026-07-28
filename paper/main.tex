@@ -14,6 +14,7 @@
 \usepackage{enumitem}
 \usepackage{xspace}
 \usepackage{tikz}
+\usepackage{float}
 \usetikzlibrary{positioning, arrows.meta, calc}
 \pdfinfo{/TemplateVersion (2027.1)}
 \setcounter{secnumdepth}{2}
@@ -62,58 +63,50 @@ Large language model agents are increasingly deployed for financial information 
 \label{sec:exp}
 \label{sec:eval}
 %% ============================================================
-\input{paper/tables/main_table}
 \subsection{Evaluation Setup}
 \textbf{Agent architecture.} We evaluate agents under the ReAct~\cite{yao2023react} framework under seven configurations from Table~\ref{tab:modes}. The \textbf{interaction} action presents a yes-or-no question to the simulated user where the user has to respond ``yes'', ``no'' or ``I don't know''. 
 
 \textbf{Prompting strategy.} \fininteract evaluates interactive agents under different interaction protocol, including answer-only, answer with search, answer with search and interact, and the category conditioned policies. All models run under the same ReAct system prompt. Additional information is in Appendix~\ref{sec:error}. 
 
-\subsubsection{Models}
-We evaluate over a diverse models such as proprietary models including GPT family with GPT-5.6-sol, 5, 4o and 5-mini, Claude-Somnet-5, Gemini-3.5-flash, Grok-4.5, DeepSeek-V4-flash, GLM-5.2 and Kimi-K3, and open source models including Qwen3 family including 4B, 8B, 14B, 32B and two mixture-of-experts models namely Qwen3-30B-A3B and Qwen3.5-35B-A3B. We evaluate the proprietary model via OpenRouter. 
+\textbf{Models.} We evaluate over a diverse models such as proprietary models including GPT family with GPT-5.6-sol, 5, 4o and 5-mini, Claude-Somnet-5, Gemini-3.5-flash, Grok-4.5, DeepSeek-V4-flash, GLM-5.2 and Kimi-K3, and open source models including Qwen3 family including 4B, 8B, 14B, 32B and two mixture-of-experts models namely Qwen3-30B-A3B and Qwen3.5-35B-A3B. We evaluate the proprietary model via OpenRouter. 
 
 \subsection{Overall Performance}
-Table~\ref{tab:main} shows that financial-report ambiguity defeats even frontier models. No model
-exceeds $44\%$ accuracy against the intended interpretation under free interaction
-(Claude-Sonnet-5), the full-scale GPT-5 reaches only $20.2\%$, and the strongest open searcher,
-Qwen3.5-35B-A3B, tops out at $28.9\%$. More strikingly, the \emph{opportunity to interact} rarely
-helps: the interaction lever $\Delta$ (+Interact minus +Search) is flat-or-negative for most
-models, sharply so for the largest open models (Qwen3-32B $-18.8$, Qwen3-30B-A3B $-16.7$) and for
-six of the seven cross-vendor frontier systems (Grok $-8$, GPT-5.6 $-6$, Kimi and DeepSeek $-4$),
-with only GPT-5 ($+13.8$) and Gemini ($+24$, the weakest searcher) turning clarification into a
-clear gain. Crucially, this is not a failure to \emph{ask}: interaction rates are near-total
-(IR $96$--$99\%$ where measured) and targeting is high (AC@1 mostly $0.85$--$0.98$), so models do
-recognize the ambiguity and ask about the right category. The persistent low accuracy therefore
-localizes the failure \emph{after} the question, models elicit the clarification but cannot
-reliably convert the answer they receive into the intended value, exactly the elicitation-and-%
-integration gap our proposed Category-Aware ReAct targets ($+12$ over its matched baseline,
-\S\ref{sec:axisreact}).
+Table~\ref{tab:main} shows that even frontier models are vulnerable to financial report ambiguity. Specifically, we see that no models exceeds 44\% accuracy on the intended interpretation under free interaction mode, consistent across proprietary and open source models. More importantly, we observe that the opportunity to interact does not help to improve accuracy, as the interaction difference $\Delta$ is non-positive for most models, indicating that existing models do not fail in asking correctly, but in converting the clarified intention into the correct answer. This is supported by the high interaction rates with all IRs above 95\% and more importantly, the high AC@1 indicating that the models do recognize what kind of ambiguity it is to ask the correct clarification question. This persistent low accuracy therefore localizes the failure after the question. Specifically, we further conduct ablation studies in the interaction by forcing multiple interaction rounds and directly providing the disambiguating context $C$ as oracle, Table~\ref{tab:ceiling} shows that the models can answer at about 93 - 95\% accuracy under oracle scenario consistently. While the context $C$ does not contain the final answer $A$, this improvement suggests that the gap is not missing knowledge. Forcing more rounds of clarification actually lowers the model accuracy, which may imply agents getting lost in multi-turn conversations~\cite{laban2026llms}.  
+We include additional support regarding the gap between elicitation and integration from Category-Aware ReAct and full finding in Appendix~\ref{sec:axisreact} and~\ref{app:maindetails}. \textbf{Finding 1: Models are capable of observing the ambiguity and answering correctly in oracle-clear intention, but fails to guide itself during intermediate conversion between updated intention and correct answer. }
 
+\begin{table}[H]
+\centering
+\caption{Forcing more clarification does not help with accuracy, but \emph{resolving} the ambiguity lifts every model to 93-95\%. This gap suggests that it is the model's inability to elicit $C$v itself but not missing knowledge or grounding.}
+\label{tab:ceiling}
+\small
+\resizebox{0.9\columnwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+Model & Answer-only & Interact & Forced(4) & \textbf{Oracle} \\
+\midrule
+GPT-5      & 0.6 & 20.2 & 1.5 & \textbf{95.4} \\
+GPT-4o     & 0.6 & 4.6  & 0.0 & \textbf{93.1} \\
+GPT-5-mini & 0.6 & 0.0  & 0.6 & \textbf{95.4} \\
+Qwen3-30B   & 1.2 & 11.6 & -- & \textbf{90.2} \\
+Qwen3.5-35B & 0.6 & 28.9 & -- & \textbf{91.9} \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\input{paper/tables/main_table}
 
 \subsection{Failure of Existing Benchmarks}
 \label{sec:illusion}
 
-A conventional single-gold financial-QA benchmark cannot see the failure \fininteract measures.
-Because such benchmarks attach one gold answer per question, a benchmark built from the same
-filings would almost always encode the \emph{default} reading. Re-grading the \emph{identical}
-model outputs under both conventions makes the consequence explicit (Table~\ref{tab:illusion}): in the retrieval regime where
-prior benchmarks operate, models capture the default far more than the intended answer (GPT-4o is
-graded $37.0\%$ correct against the default but only $12.1\%$ against the intended, so a single-gold
-benchmark would report up to $3\times$ its true competence), and only \emph{interaction} reverses
-this (GPT-5: $20.2$ intended vs.\ $12.1$ default). Five annotators shown $Q$ and the passage but
-not the resolving context $C$ pick the default reading $66\%$ of the time, empirically confirming
-the illusion's premise. The full finding and the human-default study are in Appendix~\ref{app:maindetails}.
+By re-grading models on default readings from existing benchmark and the intended reading \fininteract curates and verifies, we observe that the accuracy differs significantly (Table~\ref{tab:illusion}) with a consistent inflation on the default scenario. This suggests that if existing benchmarks are curated without specific linguistic updates, model performance in financial QA might be conflated. We include details of the findings along with human-annotated study in Appendix~\ref{app:maindetails}. \textbf{Finding 2: Conventional single-gold financial QA benchmarks fail because building benchmarks with only one gold answer would likely encode default reading but not human-preferred intentions.}
 
-\begin{table}[t]
+
+\begin{table}[H]
 \centering
-\caption{The single-gold illusion. The same model outputs, graded against the
-\emph{intended} interpretation (\fininteract) vs.\ the \emph{default} reading
-that a conventional single-gold benchmark would treat as gold. ``$\Delta$'' is
-the inflation a single-gold benchmark would report. In the retrieval regime
-where prior benchmarks operate, models capture the default far more than the
-intended answer; only interaction reverses this.}
+\caption{By comparing the accuracy difference $\Delta$ between answering intended interpretation versus typical reading from single-gold benchmark, model performance in existing benchmarks will be conflated, specifically in the retrieval regime where search function is available. }
 \label{tab:illusion}
 \small
-\resizebox{0.8\columnwidth}{!}{%
+\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{llccc}
 \toprule
 Model & Mode & Intended & Default & $\Delta$ \\
@@ -134,44 +127,8 @@ GPT-5-mini & Answer-only   & 0.6 & 0.0 & $-0.6$ \\
 \end{tabular}}
 \end{table}
 
-\subsection{Latent Capacity: Forced Interaction vs.\ the Oracle Ceiling}
-\label{sec:ceiling}
 
-To locate the bottleneck we bracket free interaction with two ablations: \textbf{forced
-interaction} (the agent must ask four questions before answering) and \textbf{context-oracle} (the
-disambiguating context $C$ is supplied so the ambiguity is pre-resolved, though the model must
-still ground the value). Every model answers $93$--$95\%$ correctly under the oracle (Table~\ref{tab:ceiling}), roughly
-scale-invariant and far above free interaction, so the $\approx$75-point gap is not missing
-knowledge. Yet \emph{forcing} clarification does not close it and often hurts (it lowers GPT-5 from
-$20.2\%$ to $1.5\%$), because models frequently ask on-category but still fail to commit the right
-value. The bottleneck is thus targeted, self-initiated disambiguation \emph{and} integration of the
-answer, not raw capability. The elicitation-gap figure and the full finding are in Appendix~\ref{app:maindetails}.
-
-\begin{table}[t]
-\centering
-\caption{The disambiguation bottleneck. Forcing more clarification does not help
-(and often hurts), but \emph{resolving} the ambiguity lifts every model to
-$93$--$95\%$. The $\approx$75-point gap between the oracle ceiling and free
-interaction is attributable to the model's inability to elicit $C$ itself, not
-to missing knowledge or grounding. ($^\dagger$GPT-5 forced capped at $n{=}65$.
-Open-MoE interact accuracy is now measured over the full retrieval corpus.)}
-\label{tab:ceiling}
-\small
-\resizebox{0.9\columnwidth}{!}{%
-\begin{tabular}{lcccc}
-\toprule
-Model & Answer-only & Interact & Forced(4) & \textbf{Oracle ceiling} \\
-\midrule
-GPT-5      & 0.6 & 20.2 & 1.5$^\dagger$ & \textbf{95.4} \\
-GPT-4o     & 0.6 & 4.6  & 0.0 & \textbf{93.1} \\
-GPT-5-mini & 0.6 & 0.0  & 0.6 & \textbf{95.4} \\
-Qwen3-30B-A3B   & 1.2 & 11.6 & -- & \textbf{90.2} \\
-Qwen3.5-35B-A3B & 0.6 & 28.9 & -- & \textbf{91.9} \\
-\bottomrule
-\end{tabular}}
-\end{table}
-
-\subsection{Per-Category Skills: Which Clarification Abilities Do Models Lack?}
+\subsection{XXX leads to most failures.}
 \label{sec:skills}
 
 Each category names a distinct clarification \emph{skill}, so we decompose per-category
