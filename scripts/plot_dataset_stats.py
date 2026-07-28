@@ -31,7 +31,7 @@ def main(a):
     h0c = collections.Counter(round(x, 2) for x in h0)
 
     plt.rcParams.update({"font.size": 11, "axes.spines.top": False, "axes.spines.right": False})
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8.2, 3.1))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(6.8, 2.57))
 
     # (a) primary-axis share
     counts = [prim.get(ax, 0) for ax in AXIS_ORDER]
@@ -41,7 +41,7 @@ def main(a):
         ax1.text(b.get_x() + b.get_width() / 2, c + 1.2,
                  f"{c}\n{100*c/n:.0f}%", ha="center", va="bottom", fontsize=9, linespacing=0.95)
     ax1.set_xticks(range(len(AXIS_ORDER)))
-    ax1.set_xticklabels(labels, fontsize=8.5)
+    ax1.set_xticklabels(labels, fontsize=9)
     ax1.set_ylabel("Instances")
     ax1.set_ylim(0, max(counts) * 1.28)
     ax1.set_title("(a) Primary ambiguity category", fontsize=11)

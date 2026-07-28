@@ -92,7 +92,7 @@ def main(a):
     open(a.out_json, "w").write(json.dumps(out, indent=2))
 
     plt.rcParams.update({"font.size": 11, "axes.spines.top": False, "axes.spines.right": False})
-    fig, ax = plt.subplots(figsize=(7.4, 3.4))
+    fig, ax = plt.subplots(figsize=(6.8, 3.12))
     x = range(len(MODELS))
     bottom = [0.0] * len(MODELS)
     for c in CATS:
@@ -103,7 +103,7 @@ def main(a):
     ax.set_xticklabels([LABEL[m] for m in MODELS], fontsize=9.5)
     ax.set_ylabel("Percent of instances")
     ax.set_ylim(0, 100)
-    ax.legend(loc="center left", bbox_to_anchor=(1.01, 0.5), fontsize=8.5, frameon=False)
+    ax.legend(loc="center left", bbox_to_anchor=(1.01, 0.5), fontsize=9, frameon=False)
     fig.tight_layout()
     fig.savefig(a.out, dpi=200, bbox_inches="tight")
     print("wrote", a.out, "and", a.out_json)

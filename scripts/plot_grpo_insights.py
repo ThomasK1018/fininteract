@@ -26,7 +26,7 @@ step       = [1, 7, 13, 15]
 reward_mean= [0.55, 1.08, 1.11, 1.08]
 turns_mean = [5.7, 6.1, 8.6, 7.3]
 
-fig, (a1, a2) = plt.subplots(1, 2, figsize=(9.6, 3.6))
+fig, (a1, a2) = plt.subplots(1, 2, figsize=(6.8, 2.55))
 
 x = np.arange(len(stages)); w = 0.27
 a1.bar(x - w, axishit,  w, label="AC@1 (leak-proof)", color="C0")
@@ -34,8 +34,8 @@ a1.bar(x,      interact, w, label="Interaction % (leak-proof)", color="C2")
 a1.bar(x + w, acc,      w, label="Accuracy (leak-confounded)", color="C3", alpha=0.55, hatch="//")
 a1.set_xticks(x); a1.set_xticklabels(stages)
 a1.set_ylabel("%"); a1.set_ylim(0, 105)
-a1.set_title("(a) RLVR ladder: SFT does the heavy lifting")
-a1.legend(fontsize=7, loc="lower right")
+a1.set_title("(a) RLVR ladder")
+a1.legend(fontsize=9, loc="lower right")
 
 l1, = a2.plot(step, reward_mean, "o-", color="C0", lw=1.8, label="reward mean")
 a2.set_xlabel("GRPO step"); a2.set_ylabel("reward mean", color="C0")
@@ -44,8 +44,8 @@ a2b = a2.twinx()
 l2, = a2b.plot(step, turns_mean, "s--", color="C1", lw=1.8, label="clarifying turns")
 a2b.set_ylabel("turns / episode", color="C1"); a2b.tick_params(axis="y", labelcolor="C1")
 a2b.set_ylim(4, 9); a2b.grid(False)
-a2.set_title("(b) True multi-turn GRPO (verl, 4B): reward & asking rise")
-a2.legend([l1, l2], ["reward mean", "clarifying turns"], fontsize=7, loc="lower right")
+a2.set_title("(b) Multi-turn GRPO")
+a2.legend([l1, l2], ["reward mean", "clarifying turns"], fontsize=9, loc="lower right")
 
 fig.tight_layout()
 out = "paper/fig_grpo_insights.png"

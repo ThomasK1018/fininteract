@@ -33,7 +33,7 @@ def main(a):
     angles += angles[:1]
 
     plt.rcParams.update({"font.size": 11})
-    fig, ax = plt.subplots(figsize=(4.6, 4.6), subplot_kw=dict(polar=True))
+    fig, ax = plt.subplots(figsize=(3.25, 3.25), subplot_kw=dict(polar=True))
     for name, vals in SERIES.items():
         v = vals + vals[:1]
         ax.plot(angles, v, "o-", linewidth=2, markersize=4, color=COLORS[name], label=name)
@@ -42,10 +42,10 @@ def main(a):
     ax.set_xticklabels(AXES, fontsize=9.5)
     ax.set_ylim(0, 1.0)
     ax.set_yticks([0.25, 0.5, 0.75, 1.0])
-    ax.set_yticklabels(["", "0.5", "", "1.0"], fontsize=8, color="#555")
+    ax.set_yticklabels(["", "0.5", "", "1.0"], fontsize=9, color="#555")
     ax.set_rlabel_position(45)
     ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.22), ncol=3,
-              fontsize=8, frameon=False, columnspacing=1.0, handletextpad=0.4)
+              fontsize=9, frameon=False, columnspacing=1.0, handletextpad=0.4)
     fig.tight_layout()
     fig.savefig(a.out, dpi=200, bbox_inches="tight")
     print("wrote", a.out)

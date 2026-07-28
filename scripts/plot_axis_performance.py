@@ -97,18 +97,18 @@ def draw(ax, mat, title, vmax, fmt):
                      for j in range(len(MODELS))], dtype=float)
     ax.imshow(np.ma.masked_invalid(grid), cmap=TEAL, vmin=0, vmax=vmax, aspect="auto")
     ax.set_xticks(range(len(AXES)))
-    ax.set_xticklabels(ALABEL, fontsize=8)
+    ax.set_xticklabels(ALABEL, fontsize=9)
     ax.set_yticks(range(len(MODELS)))
-    ax.set_yticklabels(MLABEL, fontsize=8)
+    ax.set_yticklabels(MLABEL, fontsize=9)
     for j in range(len(MODELS)):
         for i, a in enumerate(AXES):
             v = mat[a][j]
             if v is None:
-                ax.text(i, j, "n/a", ha="center", va="center", fontsize=6.5, color="#aaa")
+                ax.text(i, j, "n/a", ha="center", va="center", fontsize=9, color="#aaa")
                 ax.add_patch(plt.Rectangle((i-0.5, j-0.5), 1, 1, color="#eee", zorder=0))
             else:
                 tc = "white" if v > vmax*0.55 else "#222"
-                ax.text(i, j, fmt(v), ha="center", va="center", fontsize=7.5, color=tc)
+                ax.text(i, j, fmt(v), ha="center", va="center", fontsize=9, color=tc)
     ax.set_title(title, fontsize=10)
     ax.set_xticks(np.arange(-.5, len(AXES), 1), minor=True)
     ax.set_yticks(np.arange(-.5, len(MODELS), 1), minor=True)
@@ -125,12 +125,12 @@ def main(a):
     for ax_ in AXES:
         print(f"  {ax_:20s}", ["--" if v is None else f"{v:.0f}" for v in res[ax_]])
 
-    fig, (axL, axR) = plt.subplots(1, 2, figsize=(9.6, 4.3))
+    fig, (axL, axR) = plt.subplots(1, 2, figsize=(6.8, 3.05))
     draw(axL, tgt, "(a) Targeting: AC@1 (touch)", 1.0, lambda v: f"{v:.2f}")
     draw(axR, res, "(b) Resolution: +interact accuracy", 100.0, lambda v: f"{v:.0f}")
     axR.set_yticklabels([])
     fig.text(0.5, 0.965, "Full scale (n=173, top)   |   Proprietary pilot (n=50, bottom)",
-             ha="center", fontsize=8.5, color="#444")
+             ha="center", fontsize=9, color="#444")
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     fig.savefig(a.out, dpi=200, bbox_inches="tight")
     print("wrote", a.out)

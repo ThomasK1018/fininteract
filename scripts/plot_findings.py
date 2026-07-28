@@ -23,19 +23,19 @@ def fig_bottleneck(out):
     interact = [20.2, 4.6, 0.0, 11.6, 28.9]
     oracle = [95.4, 93.1, 95.4, 90.2, 91.9]
     y = np.arange(len(models))[::-1]
-    fig, ax = plt.subplots(figsize=(6.6, 3.1))
+    fig, ax = plt.subplots(figsize=(3.25, 2.6))
     for yi, a, o in zip(y, interact, oracle):
         ax.plot([a, o], [yi, yi], color=GREY, lw=2, zorder=1)
         ax.text((a + o) / 2, yi + 0.16, f"+{o-a:.0f}", ha="center", va="bottom",
-                fontsize=8.5, color="#444")
+                fontsize=9, color="#444")
     ax.scatter(interact, y, s=70, color=ORANGE, zorder=3, label="Free interaction")
     ax.scatter(oracle, y, s=70, color=TEAL, zorder=3, label="Context-oracle ceiling")
     ax.set_yticks(y)
     ax.set_yticklabels(models, fontsize=10)
     ax.set_xlim(-3, 105)
     ax.set_xlabel("Accuracy (\\%)".replace("\\%", "%"))
-    ax.set_title("The elicitation gap: models can answer, but cannot elicit", fontsize=10.5)
-    ax.legend(loc="lower right", fontsize=8.5, frameon=False)
+    ax.set_title("The elicitation gap", fontsize=10.5)
+    ax.legend(loc="lower right", fontsize=9, frameon=False)
     fig.tight_layout(); fig.savefig(out, dpi=200, bbox_inches="tight"); print("wrote", out)
 
 
@@ -50,14 +50,14 @@ def fig_lever(out):
     vals = [d[1] for d in data]
     colors = [TEAL if v > 0 else (GREY if v == 0 else ORANGE) for v in vals]
     y = np.arange(len(names))
-    fig, ax = plt.subplots(figsize=(6.6, 3.8))
+    fig, ax = plt.subplots(figsize=(3.25, 3.7))
     ax.barh(y, vals, color=colors, height=0.66)
     ax.axvline(0, color="#333", lw=0.8)
     for yi, v in zip(y, vals):
         ax.text(v + (0.4 if v >= 0 else -0.4), yi, f"{v:+.0f}", va="center",
-                ha="left" if v >= 0 else "right", fontsize=8)
+                ha="left" if v >= 0 else "right", fontsize=9)
     ax.set_yticks(y); ax.set_yticklabels(names, fontsize=9)
-    ax.set_xlabel("Interaction lever: +Interact minus +Search accuracy (points)")
+    ax.set_xlabel("Interaction lever (points)")
     ax.set_xlim(-21, 29)
     ax.set_title("Interaction helps only 2 of 12 models", fontsize=10.5)
     fig.tight_layout(); fig.savefig(out, dpi=200, bbox_inches="tight"); print("wrote", out)
@@ -68,7 +68,7 @@ def fig_humanllm(out):
     pts = [("GPT-5", 0.86, 20.2, NAVY), ("GPT-4o", 0.94, 4.6, NAVY),
            ("GPT-5-mini", 0.94, 0.0, NAVY), ("Qwen3-30B", 0.90, 11.6, NAVY),
            ("Qwen3.5-35B", 0.81, 28.9, NAVY), ("Human", 0.68, 30.0, ORANGE)]
-    fig, ax = plt.subplots(figsize=(5.4, 3.8))
+    fig, ax = plt.subplots(figsize=(3.25, 2.9))
     for name, ah, acc, col in pts:
         marker = "*" if name == "Human" else "o"
         size = 320 if name == "Human" else 90
@@ -76,8 +76,8 @@ def fig_humanllm(out):
                    edgecolor="white", linewidth=0.8)
         dx = 0.006 if name != "GPT-4o" else -0.006
         ha = "left" if name != "GPT-4o" else "right"
-        ax.annotate(name, (ah, acc), xytext=(ah + dx, acc + 1.1), fontsize=8.5, ha=ha)
-    ax.set_xlabel("Targeting: AC@1 (asks on the right category)")
+        ax.annotate(name, (ah, acc), xytext=(ah + dx, acc + 1.1), fontsize=9, ha=ha)
+    ax.set_xlabel("Targeting: AC@1")
     ax.set_ylabel("Resolution: accuracy (\\%)".replace("\\%", "%"))
     ax.set_title("Asking on target does not imply resolving", fontsize=10.5)
     ax.set_xlim(0.6, 1.0); ax.set_ylim(-2, 34)

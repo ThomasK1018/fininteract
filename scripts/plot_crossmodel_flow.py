@@ -32,7 +32,7 @@ PROBE = [
     ("Qwen3.5-35B-A3B (MoE, 41L)", ROOT / "qwen3.5-35b-a3b/probes_bare.json",             "C3"),
 ]
 
-fig, (a1, a2) = plt.subplots(1, 2, figsize=(9.4, 3.4))
+fig, (a1, a2) = plt.subplots(1, 2, figsize=(6.8, 2.46))
 
 for name, path, c in DEPTH:
     df = json.load(open(path))["depth_flow"]
@@ -42,8 +42,8 @@ for name, path, c in DEPTH:
     a1.axvline(df["peak_separation_layer"] / (len(sep) - 1), color=c, ls=":", lw=1, alpha=0.6)
 a1.set_xlabel("depth (fraction of layers)")
 a1.set_ylabel("ambiguous − disambiguated\n(normalized to peak)")
-a1.set_title("(a) Ambiguity emerges in the final layers")
-a1.legend(fontsize=7, loc="upper left"); a1.axhline(0, color="k", lw=0.5)
+a1.set_title("(a) Ambiguity in final layers")
+a1.legend(fontsize=9, loc="upper left"); a1.axhline(0, color="k", lw=0.5)
 
 baseline = None
 for name, path, c in PROBE:
@@ -57,8 +57,8 @@ for name, path, c in PROBE:
 a2.axhline(baseline, color="gray", ls="--", lw=1, label=f"majority baseline ({baseline:.2f})")
 a2.set_xlabel("depth (fraction of layers)")
 a2.set_ylabel("entity-vs-metric probe accuracy")
-a2.set_title("(b) The ambiguity TYPE is linearly decodable")
-a2.legend(fontsize=7, loc="lower right"); a2.set_ylim(0.5, 0.85)
+a2.set_title("(b) Type linearly decodable")
+a2.legend(fontsize=9, loc="lower right"); a2.set_ylim(0.5, 0.85)
 
 fig.tight_layout()
 out = Path(__file__).resolve().parent.parent / "paper" / "fig_crossmodel_depthflow.png"
