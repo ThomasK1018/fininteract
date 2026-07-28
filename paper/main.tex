@@ -131,7 +131,7 @@ GPT-5-mini & Answer-only   & 0.6 & 0.0 & $-0.6$ \\
 
 \subsection{Recognition Policy Leads to the Most Failures}
 \label{sec:skills}
-We extend the study into each ambiguity group. Table ~\ref{tab:skills} shows that in the high AC@1 shown in Table~\ref{tab:main}, while models are capable of determining ambiguity category in most cases, it consistently fails in the recognition policy group. This motivates us to study this blind spot of existing models by examining the following case study. Given the question ``XXX'', we have the answer ``XXX'', which are two completely different values under different policies. Models fail here as they consistently select XXX given the \textcolor{red}{XXX reason}, ignoring the financial practice of \textcolor{red}{XXX}. This suggests that the domain-specific practice might not align too well with existing model's generalized behavior, hence suggesting the need of specific tuning. We attach details and further case studies in in Appendix~\ref{app:maindetails}.
+We extend the study into each ambiguity group. Table ~\ref{tab:skills} shows that in the high AC@1 shown in Table~\ref{tab:main}, while models are capable of determining ambiguity category in most cases, it consistently fails in the recognition policy group. This motivates us to study this blind spot of existing models by examining the following case study. Given the question ``What were General Electric's revenues?'', the answer is either \$67.95B or \$26.79B, two materially different values under different recognition policies, the former being GAAP revenue that combines over-time service recognition with point-in-time product recognition, and the latter counting only revenue recognized at a point in time for product deliveries. Models fail here as they consistently return a single figure without ever asking which recognition basis is meant, defaulting to a generic assumption that ``revenue'' is one well-defined quantity and ignoring the ASC~606 practice of recognizing revenue at a point in time versus over time. This suggests that the domain-specific practice might not align too well with existing model's generalized behavior, hence suggesting the need of specific tuning. We attach details and further case studies in in Appendix~\ref{app:maindetails}.
 
 \begin{table}[H]
 \centering
@@ -150,6 +150,51 @@ temporal\_scope     &  7 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
 \bottomrule
 \end{tabular}}
 \end{table}
+
+\subsection{The Ambiguity Category Serves as an Actionable Training Signal}
+\label{sec:trainsignal}
+The per-category diagnosis is not only descriptive, the ambiguity category is also a signal a model
+can be trained on. Conditioning fine-tuning on the target category, a category-guided supervised
+seed followed by reinforcement learning on a Qwen3-4B policy, teaches the model to always interact
+and target the correct category. On a held-out split the leak-proof signals jump almost entirely at
+the supervised stage, with targeting AC@1 rising from $25\%$ to $69\%$ and the interaction rate from
+$55\%$ to $100\%$ (Table~\ref{tab:grpo}, Figure~\ref{fig:grpo}a), and a full multi-turn
+reinforcement pass confirms the episode is trainable end to end, raising mean reward $0.55\to1.08$
+while clarifying turns rise $5.7\to8.6$ (Figure~\ref{fig:grpo}b). The gain concentrates on the
+data-abundant categories, so the signal is actionable but data-gated, consistent with the
+recognition-policy blind spot whose nine instances cannot yet teach it. We report this as evidence
+that \fininteract is \emph{trainable} rather than a converged model, with the full ladder and
+caveats in \S\ref{sec:grpo}.
+
+\begin{table}[t]
+\centering
+\caption{RLVR ladder on \fininteract (Qwen3-4B, held-out $n{=}51$). AC@1 and
+interaction are leak-proof signals of learned clarification; accuracy ($^{*}$) is
+partly leaked by oracle retrieval and should not be read as a learning signal.}
+\label{tab:grpo}
+\small
+\resizebox{0.9\columnwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+Stage & AC@1 & Interaction & Accuracy$^{*}$ & Reward \\
+\midrule
+Base (Qwen3-4B)          & 25.0 & 54.9 & 84.3 & 0.96 \\
+\;\;+\,SFT (category-guided) & 68.6 & \textbf{100} & 88.2 & 1.28 \\
+\;\;+\,KTO               & \textbf{70.6} & \textbf{100} & 84.3 & 1.27 \\
+\;\;+\,GRPO              & 66.7 & \textbf{100} & 88.2 & \textbf{1.30} \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_grpo_insights.png}
+\caption{Training on \fininteract. (a) The leak-proof learning signals (AC@1,
+interaction) jump at SFT and saturate; accuracy (hatched) is leak-confounded.
+(b) True multi-turn GRPO on the 4B policy: mean reward and clarifying turns rise
+together over training.}
+\label{fig:grpo}
+\end{figure}
 
 %% ============================================================
 \section{Discussion}
@@ -1046,25 +1091,7 @@ while generating demonstrations (the hint is \emph{not} stored in the trajectory
 lifts the on-category yield to $\sim$79\%, a reusable recipe for any category-structured
 clarification task.
 
-\begin{table}[t]
-\centering
-\caption{RLVR ladder on \fininteract (Qwen3-4B, held-out $n{=}51$). AC@1 and
-interaction are leak-proof signals of learned clarification; accuracy ($^{*}$) is
-partly leaked by oracle retrieval and should not be read as a learning signal.}
-\label{tab:grpo}
-\small
-\resizebox{0.9\columnwidth}{!}{%
-\begin{tabular}{lcccc}
-\toprule
-Stage & AC@1 & Interaction & Accuracy$^{*}$ & Reward \\
-\midrule
-Base (Qwen3-4B)          & 25.0 & 54.9 & 84.3 & 0.96 \\
-\;\;+\,SFT (category-guided) & 68.6 & \textbf{100} & 88.2 & 1.28 \\
-\;\;+\,KTO               & \textbf{70.6} & \textbf{100} & 84.3 & 1.27 \\
-\;\;+\,GRPO              & 66.7 & \textbf{100} & 88.2 & \textbf{1.30} \\
-\bottomrule
-\end{tabular}}
-\end{table}
+
 
 \textbf{SFT does the heavy lifting.} The leak-proof signals jump almost entirely
 at the supervised stage, AC@1 rises $25\to69$ and interaction $55\to100$
@@ -1090,15 +1117,7 @@ not to convergence. We therefore frame this as evidence that \fininteract is
 \emph{trainable}, a category-guided SFT seed instills category-targeted
 clarification, rather than as a state-of-the-art accuracy result.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{fig_grpo_insights.png}
-\caption{Training on \fininteract. (a) The leak-proof learning signals (AC@1,
-interaction) jump at SFT and saturate; accuracy (hatched) is leak-confounded.
-(b) True multi-turn GRPO on the 4B policy: mean reward and clarifying turns rise
-together over training.}
-\label{fig:grpo}
-\end{figure}
+
 
 \subsubsection{When Can the Benchmark Refresh Itself? Three Co-Evolution Probes}
 \label{sec:coevolve}
