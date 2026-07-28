@@ -72,7 +72,7 @@ Large language model agents are increasingly deployed for financial information 
 
 \subsection{Overall Performance}
 \label{sec:ceiling}
-Table~\ref{tab:main} shows that even frontier models are vulnerable to financial report ambiguity. Specifically, we see that no models exceeds 44\% accuracy on the intended interpretation under free interaction mode, consistent across proprietary and open source models. The opportunity to interact does not help to improve accuracy, as the interaction difference $\Delta$ is non-positive for most models, indicating that existing models do not fail in asking correctly, but in converting the clarified intention into the correct answer. This is supported by the high interaction rates with all IRs above 95\% and more importantly, the high AC@1 indicating that the models do recognize what kind of ambiguity it is to ask the correct clarification question. Specifically, we conduct further ablation studies in the interaction by forcing multiple interaction rounds and directly providing the disambiguating context $C$ as oracle, Table~\ref{tab:ceiling} shows that forcing more rounds of clarification actually lowers the model accuracy, which may imply agents getting lost in multi-turn conversations~\cite{laban2026llms}. Moreover, under the oracle scenario, the models can answer at about 93 - 95\% accuracy consistently. As the context $C$ does not contain final answer $A$, the improvement suggests that the gap is not missing knowledge, but the ability to disambiguate appropriately for downstream reasoning. We include additional support from Category-Aware ReAct and full finding in Appendix~\ref{sec:axisreact} and~\ref{app:maindetails}. \textbf{Finding 1: Models are capable of observing the ambiguity and answering correctly in oracle-clear intention, but fails to guide itself during intermediate conversion between updated intention and correct answer. }
+Table~\ref{tab:main} shows that even frontier models are vulnerable to financial report ambiguity. Specifically, we see that no models exceeds 44\% accuracy on the intended interpretation under free interaction mode, consistent across proprietary and open source models. The opportunity to interact does not help to improve accuracy, as the interaction difference $\Delta$ is non-positive for most models, indicating that existing models do not fail in asking correctly, but in converting the clarified intention into the correct answer. This is supported by the high interaction rates with all IRs above 95\% and more importantly, the high AC@1 indicating that the models do recognize what kind of ambiguity it is to ask the correct clarification question. Specifically, we conduct further ablation studies in the interaction by forcing multiple interaction rounds and directly providing the disambiguating context $C$ as oracle, Table~\ref{tab:ceiling} shows that forcing more rounds of clarification actually lowers the model accuracy, which may imply agents getting lost in multi-turn conversations~\cite{laban2026llms}. Moreover, under the oracle scenario, the models can answer at about 93 - 95\% accuracy consistently. As the context $C$ does not contain final answer $A$, the improvement suggests that the gap is not missing knowledge, but the ability to disambiguate appropriately for downstream reasoning. We include the full finding in Appendix~\ref{app:maindetails}. \textbf{Finding 1: Models are capable of observing the ambiguity and answering correctly in oracle-clear intention, but fails to guide itself during intermediate conversion between updated intention and correct answer. }
 
 \begin{table}[H]
 \centering
@@ -239,9 +239,9 @@ safety for the DocFinQA-derived minority.
 \textbf{All instances are ambiguous by construction.} The benchmark measures \emph{what} to ask
 and \emph{how} to integrate the answer, not a calibrated \emph{when}-to-ask policy; matched
 unambiguous controls are the single most important extension.
-\textbf{Intervention evidence is preliminary and not component-attributed.} The Category-Aware
-ReAct gain ($34\to46\%$, single backbone, $N{=}50$) is not ablated across its three components, so
-it does not isolate the taxonomy's role, and the training-time results are likewise early.
+\textbf{Intervention evidence is preliminary.} The category-conditioned training result
+(\S\ref{sec:trainsignal}) is a single backbone on a small held-out split with partly leaked oracle
+retrieval, so it demonstrates trainability rather than a converged, causally-attributed gain.
 \textbf{A single protocol confounds ability with interface adherence.} GPT-5-mini's $0\%$ is
 partly protocol non-compliance, so a fixed cross-vendor prompt is a conservative rather than a
 maximally fair comparison.
@@ -329,10 +329,9 @@ must both possess, eliciting the right clarification and integrating the answer 
 agents answer $93$--$95\%$ correctly once
 the category is resolved but far less on their own (a mean of $8\%$ across the OpenAI
 ladder, at most $29\%$ among full-scale models), amplifying the stagnation
-\interactcomp identified in the general domain. We turn this diagnosis into
-intervention with two category-conditioned methods, at inference (Category-Aware ReAct)
-and at training (category-guided SFT/GRPO), and release \fininteract with full
-construction, evaluation, and training code for reproducible follow-on work.
+\interactcomp identified in the general domain. We turn this diagnosis into a
+category-conditioned training intervention (\S\ref{sec:trainsignal}), and release \fininteract with
+full construction, evaluation, and training code for reproducible follow-on work.
 
 
 %% ============================================================

@@ -3,12 +3,10 @@
 \caption{\textbf{Across scales and vendors, added interaction rarely helps.} Accuracy (\%) against
 the \emph{intended} interpretation is the primary metric (per mode), and $\Delta$ is +Interact
 minus +Search accuracy, the sign of the interaction lever. Panels group \emph{(a)} proprietary and
-\emph{(b)} open-source models, with \emph{(c)} our proposed method and a single-clarification human
-baseline. Full-scale rows are $N{=}173$, and the cross-vendor frontier rows (IR and ECE blank) are
-a preliminary $N{=}50$ pilot. Added interaction is flat-or-negative for most models, with only
-GPT-5 and Gemini gaining from it, while Category-Aware ReAct lifts the GPT-5 backbone by $+12$ over
-its matched baseline. IR, AC@1, and ECE are secondary diagnostics (\S\ref{sec:metrics},
-\S\ref{sec:axisreact}).}
+\emph{(b)} open-source models, with \emph{(c)} a single-clarification human baseline. Full-scale
+rows are $N{=}173$, and the cross-vendor frontier rows (IR and ECE blank) are a preliminary
+$N{=}50$ pilot. Added interaction is flat-or-negative for most models, with only GPT-5 and Gemini
+gaining from it. IR, AC@1, and ECE are secondary diagnostics (\S\ref{sec:metrics}).}
 \label{tab:main}
 \small
 \resizebox{0.7\textwidth}{!}{%
@@ -39,8 +37,7 @@ Qwen3-32B       & 1.2 & 27.2 & 8.4  & $-18.8$ & 61 & .96 & -- \\
 Qwen3-30B-A3B   & 1.2 & 28.3 & 11.6 & $-16.7$ & 72 & .90 & -- \\
 Qwen3.5-35B-A3B & 0.6 & \textbf{35.8} & 28.9 & $-6.9$ & 36 & .81 & -- \\
 \midrule
-\multicolumn{8}{l}{\textit{(c) Proposed method and human baseline ($N{=}50$)}} \\
-Category-Aware ReAct & -- & -- & 46.0 & -- & 100 & -- & .24 \\
+\multicolumn{8}{l}{\textit{(c) Human baseline ($N{=}50$)}} \\
 Human               & -- & -- & \textbf{30.0} & -- & 100 & .72 & -- \\
 \bottomrule
 \end{tabular}}
