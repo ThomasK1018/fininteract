@@ -1,17 +1,14 @@
 \begin{table*}[t]
 \centering
-\caption{\textbf{Across scales and vendors, added interaction rarely helps.} Accuracy (\%),
-graded against the \emph{intended} interpretation, is the primary metric (per mode); $\Delta$
-is +Interact minus +Search accuracy, the sign of the interaction lever. \emph{(a)}~Full-scale
-evaluation ($N{=}173$); \emph{(b)}~a preliminary cross-vendor frontier pilot ($N{=}50$/mode,
-same simulator/grader pipeline, directional); \emph{(c)}~our proposed method and a
-single-clarification human baseline ($N{=}50$). Added interaction is flat-or-negative for most
-models, including the strongest open searchers and six of the seven frontier vendors; only GPT-5
-and Gemini convert it into a clear gain. Our Category-Aware ReAct lifts the GPT-5 backbone by
-$+12$ points over its matched Standard ReAct baseline in the same run. IR (\% of instances that
-ask), AC@1 (targeting quality), and ECE (calibration) are secondary diagnostics,
-undefined when no question is asked; see \S\ref{sec:metrics} and \S\ref{sec:axisreact} for
-definitions and caveats.}
+\caption{\textbf{Across scales and vendors, added interaction rarely helps.} Accuracy (\%) against
+the \emph{intended} interpretation is the primary metric (per mode), and $\Delta$ is +Interact
+minus +Search accuracy, the sign of the interaction lever. Panels group \emph{(a)} proprietary and
+\emph{(b)} open-source models, with \emph{(c)} our proposed method and a single-clarification human
+baseline. Full-scale rows are $N{=}173$, and the cross-vendor frontier rows (IR and ECE blank) are
+a preliminary $N{=}50$ pilot. Added interaction is flat-or-negative for most models, with only
+GPT-5 and Gemini gaining from it, while Category-Aware ReAct lifts the GPT-5 backbone by $+12$ over
+its matched baseline. IR, AC@1, and ECE are secondary diagnostics (\S\ref{sec:metrics},
+\S\ref{sec:axisreact}).}
 \label{tab:main}
 \small
 \resizebox{0.7\textwidth}{!}{%
