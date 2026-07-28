@@ -1,5 +1,19 @@
 \fininteract extends formulation in Sec. \ref{sec:task} as a semi-automated ambiguous financial QA corpus built from public filings. Each carries a programmatically verifiable answer, a paired default and intended interpretation produced by an LLM construction pipeline with minimal human annotation and validated by domain experts. Figure~\ref{fig:framework} shows a worked instance and how the benchmark scores an agent's two resolution paths.
 
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.9\textwidth]{workflow_plot_v2.pdf}
+\caption{\textbf{\fininteract rewards actions that resolve the intended interpretation.}
+\textbf{(1)}~Each instance carries a primary ambiguity category and two defensible readings, a
+default (Family of Apps, \$62.87B) and an intended (consolidated GAAP, \$46.75B), separated by a
+hidden disambiguating context $C$. \textbf{(2)}~The agent either answers without clarifying
+(Part~A, a plausible but wrong reading) or asks a question that a user simulator answers only from
+$C$ (Part~B, correct elicitation). \textbf{(3)}~\fininteract scores three signals: final-answer
+correctness against the intended interpretation, interaction quality (did it ask, target the right
+category, and resolve intent), and the single-gold failure of rewarding the default.}
+\label{fig:framework}
+\end{figure*}
+
 \subsection{Design Goals and Principles}
 \textbf{Design goals.} \fininteract targets four goals: \textbf{(G1) Representative coverage} to draw real ambiguity from public filings. 
 \textbf{(G2) Fine-grained diagnosis} to contain diverse possible readings so that evaluation can localize which clarification ability a model lacks. \textbf{(G3) Low-cost, leak-safe construction} to build and verify the corpus at scale in a semi-automated setting. \textbf{(G4) High, human-validated quality} to validate the instances and judges by domain experts with minimal annotation cost.
@@ -44,20 +58,6 @@ Mean blind-solve rate (verifier) & 0.7\% \\
 \subsection{Curation}
 \label{sec:construction}
 We curate each instance from a three-role pipeline, where a \textbf{constructor} agent using GPT-5 generates the full $(Q, C, A)$ triple together with the default and intended interpretations and category label from a filing passage. Specifically, we include category specific instructions to prevent drifting towards categories that are easy to generate. Next, we conduct a \textbf{sanity check} on code level to reject malformed passages instantly without API calls. Lastly, we employ an \textbf{adversarial verifier} to run multiple trial rounds to answer the question $Q$ without disambiguating context $C$ and reject instance where more than two trials produce the intended answer and interpretation simultaneously. Details regarding the prompt, sanity checking codes, output schema and cost are included in Table~\ref{tab:qc}, Appendix~\ref{app:construction} and Appendix~\ref{app:cost}.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{workflow_plot_v2.pdf}
-\caption{\textbf{\fininteract rewards actions that resolve the intended interpretation.}
-\textbf{(1)}~Each instance carries a primary ambiguity category and two defensible readings, a
-default (Family of Apps, \$62.87B) and an intended (consolidated GAAP, \$46.75B), separated by a
-hidden disambiguating context $C$. \textbf{(2)}~The agent either answers without clarifying
-(Part~A, a plausible but wrong reading) or asks a question that a user simulator answers only from
-$C$ (Part~B, correct elicitation). \textbf{(3)}~\fininteract scores three signals: final-answer
-correctness against the intended interpretation, interaction quality (did it ask, target the right
-category, and resolve intent), and the single-gold failure of rewarding the default.}
-\label{fig:framework}
-\end{figure*}
 
 \subsection{Validation}
 \label{sec:humanval}

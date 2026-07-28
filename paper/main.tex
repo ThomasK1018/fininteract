@@ -57,110 +57,26 @@ Large language model agents are increasingly deployed for financial information 
 \label{sec:methodology}
 %% ============================================================
 \input{paper/sections/3_methodology}
-
 %% ============================================================
 \section{Experiments}
 \label{sec:exp}
 \label{sec:eval}
 %% ============================================================
-
+\input{paper/tables/main_table}
 \subsection{Evaluation Setup}
+\textbf{Agent architecture.} We evaluate agents under the ReAct~\cite{yao2023react} framework under seven configurations from Table~\ref{tab:modes}. The \textbf{interaction} action presents a yes-or-no question to the simulated user where the user has to respond ``yes'', ``no'' or ``I don't know''. 
 
-\subsubsection{Agent Architecture}
-
-We evaluate agents under the ReAct framework in seven configurations
-(Table~\ref{tab:modes}).
-The \textbf{interact} action presents a yes/no question to a simulated user.
-The user simulator (GPT-5 at temperature 1.0) is given the disambiguating
-context $C$ and responds yes, no, or ``I don't know.''
-To test robustness, we evaluate under three simulator variants:
-\textbf{LLM} (primary; GPT-5, $T=1.0$),
-\textbf{Oracle} (deterministic keyword matching against $\mathcal{I}_\text{int}$), and
-\textbf{Noisy} (15\% random answer corruption).
-
-\textbf{On prompting strategy.} Because \fininteract evaluates interactive agents, the
-strategy category we vary is the \emph{interaction protocol} (answer-only, +search,
-+interact, and the category-conditioned policies of \S\ref{sec:error}) rather than the
-prompt format. All models run under the same fixed ReAct system prompt, so classic
-prompt-format ablations such as few-shot or chain-of-thought prompting are orthogonal
-to the interaction capability this benchmark is built to isolate.
+\textbf{Prompting strategy.} \fininteract evaluates interactive agents under different interaction protocol, including answer-only, answer with search, answer with search and interact, and the category conditioned policies. All models run under the same ReAct system prompt. Additional information is in Appendix~\ref{sec:error}. 
 
 \subsubsection{Models}
-
-We evaluate three OpenAI models (GPT-5, GPT-4o, GPT-5-mini) and a Qwen open-weight
-ladder (dense 4B, 8B, 14B, and 32B plus two mixture-of-experts models, Qwen3-30B-A3B
-and Qwen3.5-35B-A3B) at full scale ($N{=}173$) across all three primary modes
-(Table~\ref{tab:main}, panel (a)). To test cross-vendor generality we additionally run a
-seven-model, six-vendor frontier panel (Claude-Sonnet-5, Gemini-3.5-flash, Grok-4.5,
-DeepSeek-V4-flash, GLM-5.2, Kimi-K3, and GPT-5.6-sol) through a unified OpenRouter
-harness at a preliminary $N{=}50$ per mode (Table~\ref{tab:main}, panel (b)).
+We evaluate over a diverse models such as proprietary models including GPT family with GPT-5.6-sol, 5, 4o and 5-mini, Claude-Somnet-5, Gemini-3.5-flash, Grok-4.5, DeepSeek-V4-flash, GLM-5.2 and Kimi-K3, and open source models including Qwen3 family including 4B, 8B, 14B, 32B and two mixture-of-experts models namely Qwen3-30B-A3B and Qwen3.5-35B-A3B. We evaluate the proprietary model via OpenRouter. 
 
 \subsection{Overall Performance}
+Table~\ref{tab:main} shows \textcolor{red}{TBC key message of the main table, e.g. even frontier models are vulnerable to financial report ambiguity, as most of the models encounter a drop in accuracy when given the opportunity to interact and ask for clarification. Specifically, with most of the AC@1 above 80\%, it indicates that most models are aware of the ambiguity, and are willing to ask for clarification in interact model, but the drop in accuracy shows the inability to effectively convert the clarification into the intended answer.}. 
 
-The main text highlights three headline results, one per research question. The
-\emph{single-gold illusion} that motivates the benchmark (\S\ref{sec:illusion}), the
-\emph{elicitation--integration ceiling} that localizes the bottleneck to interacting
-(asking and then using the answer) rather than knowing
-(\textbf{RQ2}, \S\ref{sec:ceiling}), and the \emph{per-category skill dissociation} that
-shows which clarification abilities models lack (\textbf{RQ1}, \S\ref{sec:skills}). The
-full set of per-model findings, the general-domain replication, the human baseline, the
-case studies, the mechanistic probe, and the category-conditioned interventions
-(\textbf{RQ3}) are collected in Appendix~\ref{app:findings}.
 
-\begin{table*}[t]
-\centering
-\caption{\textbf{Across scales and vendors, added interaction rarely helps.} Accuracy (\%),
-graded against the \emph{intended} interpretation, is the primary metric (per mode); $\Delta$
-is +Interact minus +Search accuracy, the sign of the interaction lever. \emph{(a)}~Full-scale
-evaluation ($N{=}173$); \emph{(b)}~a preliminary cross-vendor frontier pilot ($N{=}50$/mode,
-same simulator/grader pipeline, directional); \emph{(c)}~our proposed method and a
-single-clarification human baseline ($N{=}50$). Added interaction is flat-or-negative for most
-models, including the strongest open searchers and six of the seven frontier vendors; only GPT-5
-and Gemini convert it into a clear gain. Our Category-Aware ReAct lifts the GPT-5 backbone by
-$+12$ points over its matched Standard ReAct baseline in the same run. IR (\% of instances that
-ask), AC@1 (targeting quality), and ECE (calibration) are secondary diagnostics,
-undefined when no question is asked; see \S\ref{sec:metrics} and \S\ref{sec:axisreact} for
-definitions and caveats.}
-\label{tab:main}
-\small
-\resizebox{0.8\textwidth}{!}{%
-\begin{tabular}{lccccccc}
-\toprule
-& \multicolumn{2}{c}{Acc (\%)} &
-  \multicolumn{5}{c}{Answer+Search+Interact} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-8}
-Model & Ans-only & +Search & Acc & $\Delta$ & IR & AC@1 & ECE \\
-\midrule
-\multicolumn{8}{l}{\textit{(a) Full-scale evaluation ($N{=}173$): OpenAI + Qwen open-weight ladders}} \\
-GPT-5           & 0.6 & 6.4  & \textbf{20.2} & $+13.8$ & 98.8 & .86 & .53 \\
-GPT-4o          & 0.6 & 12.1 & 4.6  & $-7.5$  & 99.4 & .94 & .82 \\
-GPT-5-mini      & 0.6 & 0.0  & 0.0  & $0.0$   & 96.0 & .94 & .00 \\
-Qwen3-4B        & 0.0 & 8.1  & 12.1 & $+4.0$  & 28 & .85 & -- \\
-Qwen3-8B        & 0.6 & 14.4 & 24.9 & $+10.5$ & 15 & .88 & -- \\
-Qwen3-14B       & 0.0 & 18.5 & 22.5 & $+4.0$  & 36 & .74 & -- \\
-Qwen3-32B       & 1.2 & 27.2 & 8.4  & $-18.8$ & 61 & .96 & -- \\
-Qwen3-30B-A3B   & 1.2 & 28.3 & 11.6 & $-16.7$ & 72 & .90 & -- \\
-Qwen3.5-35B-A3B & 0.6 & \textbf{35.8} & 28.9 & $-6.9$ & 36 & .81 & -- \\
-\midrule
-\multicolumn{8}{l}{\textit{(b) Cross-vendor frontier pilot ($N{=}50$/mode, OpenRouter; directional)}} \\
-Claude-Sonnet-5   & 4.0  & \textbf{46.0} & \textbf{44.0} & $-2$  & -- & .98 & -- \\
-Grok-4.5          & 2.0  & 40.0 & 32.0 & $-8$  & -- & .87 & -- \\
-GLM-5.2           & 12.0 & 40.0 & 40.0 & $0$   & -- & .96 & -- \\
-Kimi-K3           & 16.0 & 38.0 & 34.0 & $-4$  & -- & .98 & -- \\
-GPT-5.6-sol       & 10.0 & 36.0 & 30.0 & $-6$  & -- & .98 & -- \\
-DeepSeek-V4-flash & 12.0 & 28.0 & 24.0 & $-4$  & -- & .96 & -- \\
-Gemini-3.5-flash  & 14.0 & 6.0  & 30.0 & $+24$ & -- & .96 & -- \\
-\midrule
-\multicolumn{8}{l}{\textit{(c) Proposed method and human baseline ($N{=}50$)}} \\
-Category-Aware ReAct & -- & -- & 46.0 & -- & 100 & -- & .24 \\
-Human               & -- & -- & \textbf{30.0} & -- & 100 & .72 & -- \\
-\bottomrule
-\end{tabular}}
-\end{table*}
-
-\subsection{Why Existing Benchmarks Miss This: The Single-Gold Illusion}
+\subsection{Failure of Existing Benchmarks}
 \label{sec:illusion}
-
 Before analyzing model behavior, we establish the core motivation empirically:
 \emph{a conventional single-gold financial-QA benchmark cannot see the failure
 \fininteract measures.} Existing benchmarks (FinanceBench, FinQA, DocFinQA)
@@ -181,7 +97,7 @@ where prior benchmarks operate, models capture the default far more than the
 intended answer; only interaction reverses this.}
 \label{tab:illusion}
 \small
-\resizebox{0.9\columnwidth}{!}{%
+\resizebox{0.8\columnwidth}{!}{%
 \begin{tabular}{llccc}
 \toprule
 Model & Mode & Intended & Default & $\Delta$ \\
