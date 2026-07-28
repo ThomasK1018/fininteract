@@ -91,226 +91,47 @@ integration gap our proposed Category-Aware ReAct targets ($+12$ over its matche
 
 \subsection{Failure of Existing Benchmarks}
 \label{sec:illusion}
-Before analyzing model behavior, we establish the core motivation empirically:
-\emph{a conventional single-gold financial-QA benchmark cannot see the failure
-\fininteract measures.} Existing benchmarks (FinanceBench, FinQA, DocFinQA)
-attach one gold answer per question. Built from the same filings, such a
-benchmark would almost always adopt the \emph{default} reading, the headline
-figure a non-expert assumes, as that gold. Our paired construction lets us
-quantify the consequence directly: every instance carries both an intended and a
-default answer, so we re-grade the \emph{identical} model outputs under both
-conventions (Table~\ref{tab:illusion}).
 
-\begin{table}[t]
-\centering
-\caption{The single-gold illusion. The same model outputs, graded against the
-\emph{intended} interpretation (\fininteract) vs.\ the \emph{default} reading
-that a conventional single-gold benchmark would treat as gold. ``$\Delta$'' is
-the inflation a single-gold benchmark would report. In the retrieval regime
-where prior benchmarks operate, models capture the default far more than the
-intended answer; only interaction reverses this.}
-\label{tab:illusion}
-\small
-\resizebox{0.8\columnwidth}{!}{%
-\begin{tabular}{llccc}
-\toprule
-Model & Mode & Intended & Default & $\Delta$ \\
-      &      & (true Acc) & (single-gold) & \\
-\midrule
-GPT-5  & Answer-only   & 0.6  & 2.3  & +1.7 \\
-       & Answer+Search & 6.4  & 10.4 & +4.0 \\
-       & +Interact     & \textbf{20.2} & 12.1 & $-8.1$ \\
-\midrule
-GPT-4o & Answer-only   & 0.6  & 0.6  & 0.0 \\
-       & Answer+Search & 12.1 & \textbf{37.0} & \textbf{+24.9} \\
-       & +Interact     & 4.6  & 6.4  & +1.8 \\
-\midrule
-GPT-5-mini & Answer-only   & 0.6 & 0.0 & $-0.6$ \\
-           & Answer+Search & 0.0 & 0.0 & 0.0 \\
-           & +Interact     & 0.0 & 0.0 & 0.0 \\
-\bottomrule
-\end{tabular}}
-\end{table}
-
-\textbf{Finding 1: A single-gold convention over-states competence by up to
-$3\times$, and the gap is the benchmark's reason to exist.} In the
-retrieval-augmented regime where current single-gold benchmarks operate, the
-larger models return the \emph{default} reading more often than the intended one:
-GPT-4o is graded $37.0\%$ correct against the default but only $12.1\%$ against
-the intended answer, a single-gold benchmark would report $3.1\times$ its true
-competence. The model is not reasoning to the right answer; it is confidently
-producing a well-grounded answer to the \emph{wrong reading of the question},
-which a single-gold benchmark rewards and therefore cannot detect. (GPT-5-mini is
-the instructive exception: it captures \emph{neither} reading because it asks
-rather than commits, so single-gold grading does not flatter it, but
-nor does it answer.) Critically,
-interaction is the \emph{only} mode where intended accuracy exceeds
-default-capture (GPT-5: $20.2$ vs.\ $12.1$): asking is what converts a
-default-anchored guess into the correct intended answer. This is precisely the
-capability single-gold benchmarks are structurally blind to, and what
-\fininteract is built to measure.
-
-\textbf{Human validation of the default.} The single-gold argument assumes a conventional
-benchmark builder, seeing only the question and passage, would record the \emph{default}
-reading as gold. We test this directly: five annotators, shown $Q$ and the passage but not
-the resolving context $C$, independently record the answer they would treat as gold. They
-converge strongly ($93\%$ of items unanimous; mean inter-annotator agreement $0.98$) and
-select the \emph{default} reading $66\%$ of the time versus the intended reading $34\%$, with
-fewer than $8\%$ reporting that they noticed a second defensible answer. A single-gold
-benchmark built from these filings would therefore encode the default, empirically confirming
-the illusion's premise rather than assuming it.
+A conventional single-gold financial-QA benchmark cannot see the failure \fininteract measures.
+Because such benchmarks attach one gold answer per question, a benchmark built from the same
+filings would almost always encode the \emph{default} reading. Re-grading the \emph{identical}
+model outputs under both conventions makes the consequence explicit: in the retrieval regime where
+prior benchmarks operate, models capture the default far more than the intended answer (GPT-4o is
+graded $37.0\%$ correct against the default but only $12.1\%$ against the intended, so a single-gold
+benchmark would report up to $3\times$ its true competence), and only \emph{interaction} reverses
+this (GPT-5: $20.2$ intended vs.\ $12.1$ default). Five annotators shown $Q$ and the passage but
+not the resolving context $C$ pick the default reading $66\%$ of the time, empirically confirming
+the illusion's premise. The per-model breakdown, the full finding, and the human-default study are
+in Appendix~\ref{app:maindetails}.
 
 \subsection{Latent Capacity: Forced Interaction vs.\ the Oracle Ceiling}
 \label{sec:ceiling}
 
-To locate the bottleneck we bracket interactive accuracy with two ablations
-(Table~\ref{tab:ceiling} and Figure~\ref{fig:bottleneck}). \textbf{Forced interaction} requires the agent to ask
-$n{=}4$ clarifying questions before answering. \textbf{Context-oracle} hands the
-model the disambiguating context $C$ (which fixes the intended interpretation)
-together with a passage containing \emph{both} the intended and the default
-evidence spans, then asks it to answer, the ambiguity is pre-resolved but the
-model must still ground the correct value.
-
-\begin{table}[t]
-\centering
-\caption{The disambiguation bottleneck. Forcing more clarification does not help
-(and often hurts), but \emph{resolving} the ambiguity lifts every model to
-$93$--$95\%$. The $\approx$75-point gap between the oracle ceiling and free
-interaction is attributable to the model's inability to elicit $C$ itself, not
-to missing knowledge or grounding. ($^\dagger$GPT-5 forced capped at $n{=}65$.
-Open-MoE interact accuracy is now measured over the full retrieval corpus.)}
-\label{tab:ceiling}
-\small
-\resizebox{0.9\columnwidth}{!}{%
-\begin{tabular}{lcccc}
-\toprule
-Model & Answer-only & Interact & Forced(4) & \textbf{Oracle ceiling} \\
-\midrule
-GPT-5      & 0.6 & 20.2 & 1.5$^\dagger$ & \textbf{95.4} \\
-GPT-4o     & 0.6 & 4.6  & 0.0 & \textbf{93.1} \\
-GPT-5-mini & 0.6 & 0.0  & 0.6 & \textbf{95.4} \\
-Qwen3-30B-A3B   & 1.2 & 11.6 & -- & \textbf{90.2} \\
-Qwen3.5-35B-A3B & 0.6 & 28.9 & -- & \textbf{91.9} \\
-\bottomrule
-\end{tabular}}
-\end{table}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{fig_bottleneck.png}
-\caption{\textbf{The elicitation gap.} Free-interaction accuracy (orange) versus the
-context-oracle ceiling (teal) per model. Once the ambiguity is resolved every model
-answers $90$--$95\%$ correctly, so the $63$--$95$ point gap is the cost of the model
-failing to \emph{elicit} the disambiguation itself, not missing knowledge.}
-\label{fig:bottleneck}
-\end{figure}
-
-\textbf{Finding 2: Models can answer once the ambiguity is resolved, they
-cannot resolve it themselves.} The context-oracle ceiling is $93$--$95\%$ for all
-three models, including GPT-5-mini, which scores $0\%$ under free interaction.
-Latent answering capacity is therefore near-ceiling and roughly scale-invariant;
-what varies, and what \fininteract measures, is whether a model can \emph{resolve}
-the ambiguity end to end, eliciting the disambiguating context and then integrating
-it into a committed answer. Crucially, \emph{forcing} clarification
-does not recover this capacity: requiring four asks leaves GPT-4o and GPT-5-mini
-near $0\%$ ($0.0\%$ and $0.6\%$) and \emph{lowers} GPT-5 from $20.2\%$ to $1.5\%$, because forced asks
-consume the round budget on low-value questions without converging on a committed
-answer. This already points past pure elicitation: models frequently ask on-category
-yet still fail to commit the right value (the dominant error mode, \S\ref{sec:error}),
-so the bottleneck is targeted, self-initiated disambiguation \emph{and} the integration
-of the resulting answer, which neither scale nor brute-force asking supplies.
+To locate the bottleneck we bracket free interaction with two ablations: \textbf{forced
+interaction} (the agent must ask four questions before answering) and \textbf{context-oracle} (the
+disambiguating context $C$ is supplied so the ambiguity is pre-resolved, though the model must
+still ground the value). Every model answers $93$--$95\%$ correctly under the oracle, roughly
+scale-invariant and far above free interaction, so the $\approx$75-point gap is not missing
+knowledge. Yet \emph{forcing} clarification does not close it and often hurts (it lowers GPT-5 from
+$20.2\%$ to $1.5\%$), because models frequently ask on-category but still fail to commit the right
+value. The bottleneck is thus targeted, self-initiated disambiguation \emph{and} integration of the
+answer, not raw capability. The ceiling table, the elicitation-gap figure, and the full finding are
+in Appendix~\ref{app:maindetails}.
 
 \subsection{Per-Category Skills: Which Clarification Abilities Do Models Lack?}
 \label{sec:skills}
 
-The five categories are not just data strata; each names a distinct \emph{skill}, the
-ability to recognize that a question is under-specified \emph{along that category} and
-ask the question that resolves it. We make this measurable by decomposing each
-model's per-category \texttt{+interact} competence into three components:
-\textbf{Recognition} (interaction rate, does it ask when it should?),
-\textbf{Targeting} (AC@1, does it ask about the \emph{right} category?), and
-\textbf{Resolution} (accuracy, does asking yield the intended answer?). A model
-``has'' a category skill only when all three are high; a low value localizes the
-failure to not-asking, asking-wrong, or asking-right-but-still-wrong.
-Table~\ref{tab:skills} reports Targeting, the decisive component, and
-Figure~\ref{fig:radar} shows the same profile as a capability radar.
-
-\begin{table}[t]
-\centering
-\caption{Per-category \textbf{Targeting} skill (AC@1, \emph{touch} form) in \texttt{+interact},
-recomputed with the corrected classifier (\S\ref{sec:metrics}). Recognition policy is a robust
-blind spot (no model ever asks), temporal scope is fully solved, and entity and metric are
-touched almost always but rarely made the \emph{central} concern (central-form AC@1
-$\leq0.16$, see text). The two sparse categories ($n{\le}9$) are preliminary.}
-\label{tab:skills}
-\small
-\resizebox{0.9\columnwidth}{!}{%
-\begin{tabular}{lrccccc}
-\toprule
-Category & $n$ & GPT-5 & GPT-4o & {\footnotesize GPT-5-m} & {\footnotesize Q3-30B} & {\footnotesize Q3.5-35B} \\
-\midrule
-entity\_scope       & 94 & .89 & 1.00 & .99 & .93 & .85 \\
-metric\_definition  & 63 & .92 & .97 & 1.00 & .96 & .87 \\
-recognition\_policy &  9 & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} \\
-temporal\_scope     &  7 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
-\bottomrule
-\end{tabular}}
-\end{table}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.72\linewidth]{fig_radar.png}
-\caption{\textbf{Per-category clarification-capability profile} (touch AC@1 from
-Table~\ref{tab:skills}). Every model saturates entity, metric, and temporal targeting
-but collapses to zero on \texttt{recognition\_policy}, a blind spot shared across the
-closed frontier and the strongest open model.}
-\label{fig:radar}
-\end{figure}
-
-\textbf{Finding 3: Ambiguity clarification is a per-category skill with a sharp touch
-versus central-targeting dissociation.} Under the corrected classifier the pattern is
-precise. \texttt{recognition\_policy} is a robust blind spot. No model ever asks about it,
-in either the touch or the central form (AC@1 $=0$), so models essentially never
-question whether a figure is recognized point-in-time or over time. \texttt{temporal\_scope}
-is fully solved. Models both touch it and make it the central concern (central AC@1
-$=1.0$). Entity and metric occupy a revealing middle. Models almost always \emph{touch} them
-(touch AC@1 $0.85$--$1.0$) yet rarely make them the \emph{central} point of the question
-(central AC@1 $\leq0.16$), defaulting instead to period confirmation. For these two categories
-the failure is not neglect but imprecision, the model names the entity or metric in passing
-while centering the question elsewhere. Resolution follows the same shape across all five models
-(GPT-5 resolves $57\%$ of temporal but $\leq23\%$ of entity and metric,
-Figure~\ref{fig:axisperf}). The gap is not uniform incompetence
-but missing specific targeting, which is precisely the intervention target
-(\S\ref{sec:grpo}).
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{fig_axisperf.png}
-\caption{\textbf{Per-model, per-category performance.} \emph{(a)}~Targeting (AC@1
-touch) versus \emph{(b)}~Resolution (\texttt{+interact} accuracy) for every model and
-ambiguity category. The top five rows are the full-scale panel ($n{=}173$, all categories) and
-the bottom seven are the proprietary pilot ($n{=}50$), for which only entity and metric
-carry enough instances ($n{=}29$ and $19$), with recognition, temporal, and filing at
-$n\leq1$ and shown n/a. \texttt{filing\_vintage} is empty at full scale too ($n{=}0$).
-Every model targets entity and metric almost perfectly, the proprietary models resolve
-them better than the older OpenAI ladder, and no model targets recognition policy.}
-\label{fig:axisperf}
-\end{figure}
-
-\textbf{Per-model, per-category case analysis.} Placing targeting and resolution side by
-side for every model and category (Figure~\ref{fig:axisperf}) surfaces three patterns.
-First, resolution does \emph{not} track targeting: GPT-4o and GPT-5-mini touch the
-correct category on entity and metric almost as often as any model (AC@1 $0.94$--$1.0$)
-yet resolve those categories at $0$--$5\%$, so a high AC@1 is no guarantee of a correct
-answer. Second, the model ranking \emph{reorders} across categories. Among the full-scale
-models Qwen3.5-35B-A3B leads on the two abundant categories (entity $40\%$, metric $32\%$)
-while GPT-5 leads on temporal ($57\%$). Third, the seven proprietary models resolve
-entity and metric substantially better than the older OpenAI ladder (entity
-$21$--$48\%$, metric $26$--$42\%$, versus GPT-5's $23$ and $13\%$), yet they inherit the
-\emph{same} recognition blind spot, with touch AC@1 $0$ on every recognition instance
-they saw. \texttt{filing\_vintage} is untestable everywhere ($n{=}0$). A single
-aggregate interaction score therefore conceals which category a given model can actually
-resolve, which is why we report per category.
+Each category names a distinct clarification \emph{skill}, so we decompose per-category
+\texttt{+interact} competence into Recognition (does the model ask?), Targeting (AC@1, does it ask
+about the right category?), and Resolution (does asking yield the intended answer?). The profile is
+sharply dissociated: \texttt{recognition\_policy} is a robust blind spot that no model ever targets
+(AC@1 $=0$), \texttt{temporal\_scope} is fully solved, and entity and metric are almost always
+\emph{touched} (AC@1 $0.85$--$1.0$) yet rarely made the question's \emph{central} concern (central
+AC@1 $\leq0.16$). Crucially, resolution does not track targeting: GPT-4o and GPT-5-mini touch entity
+and metric almost perfectly yet resolve them at $0$--$5\%$, so a high AC@1 is no guarantee of a
+correct answer, and model rankings reorder across categories. A single aggregate score therefore
+conceals which category a model can actually resolve. The per-category tables, the capability radar,
+the per-model matrix, and the full analysis are in Appendix~\ref{app:maindetails}.
 
 %% ============================================================
 \section{Discussion and Research Opportunities}
@@ -558,6 +379,232 @@ decreases with redundant asks. We restrict it to the asked-and-correct case to a
 incentive of an all-instances variant, which would award its maximum to a confident \emph{zero-ask}
 answer, rewarding the very behavior the benchmark penalizes. \disep is a diagnostic of
 clarification efficiency, never the ranking metric.
+
+%% ============================================================
+\section{Detailed Results for the Core Findings}
+\label{app:maindetails}
+%% ============================================================
+
+This appendix gives the full tables, figures, and findings summarized in \S\ref{sec:illusion},
+\S\ref{sec:ceiling}, and \S\ref{sec:skills}.
+
+\subsection{The Single-Gold Illusion}
+Before analyzing model behavior, we establish the core motivation empirically:
+\emph{a conventional single-gold financial-QA benchmark cannot see the failure
+\fininteract measures.} Existing benchmarks (FinanceBench, FinQA, DocFinQA)
+attach one gold answer per question. Built from the same filings, such a
+benchmark would almost always adopt the \emph{default} reading, the headline
+figure a non-expert assumes, as that gold. Our paired construction lets us
+quantify the consequence directly: every instance carries both an intended and a
+default answer, so we re-grade the \emph{identical} model outputs under both
+conventions (Table~\ref{tab:illusion}).
+
+\begin{table}[t]
+\centering
+\caption{The single-gold illusion. The same model outputs, graded against the
+\emph{intended} interpretation (\fininteract) vs.\ the \emph{default} reading
+that a conventional single-gold benchmark would treat as gold. ``$\Delta$'' is
+the inflation a single-gold benchmark would report. In the retrieval regime
+where prior benchmarks operate, models capture the default far more than the
+intended answer; only interaction reverses this.}
+\label{tab:illusion}
+\small
+\resizebox{0.8\columnwidth}{!}{%
+\begin{tabular}{llccc}
+\toprule
+Model & Mode & Intended & Default & $\Delta$ \\
+      &      & (true Acc) & (single-gold) & \\
+\midrule
+GPT-5  & Answer-only   & 0.6  & 2.3  & +1.7 \\
+       & Answer+Search & 6.4  & 10.4 & +4.0 \\
+       & +Interact     & \textbf{20.2} & 12.1 & $-8.1$ \\
+\midrule
+GPT-4o & Answer-only   & 0.6  & 0.6  & 0.0 \\
+       & Answer+Search & 12.1 & \textbf{37.0} & \textbf{+24.9} \\
+       & +Interact     & 4.6  & 6.4  & +1.8 \\
+\midrule
+GPT-5-mini & Answer-only   & 0.6 & 0.0 & $-0.6$ \\
+           & Answer+Search & 0.0 & 0.0 & 0.0 \\
+           & +Interact     & 0.0 & 0.0 & 0.0 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\textbf{Finding 1: A single-gold convention over-states competence by up to
+$3\times$, and the gap is the benchmark's reason to exist.} In the
+retrieval-augmented regime where current single-gold benchmarks operate, the
+larger models return the \emph{default} reading more often than the intended one:
+GPT-4o is graded $37.0\%$ correct against the default but only $12.1\%$ against
+the intended answer, a single-gold benchmark would report $3.1\times$ its true
+competence. The model is not reasoning to the right answer; it is confidently
+producing a well-grounded answer to the \emph{wrong reading of the question},
+which a single-gold benchmark rewards and therefore cannot detect. (GPT-5-mini is
+the instructive exception: it captures \emph{neither} reading because it asks
+rather than commits, so single-gold grading does not flatter it, but
+nor does it answer.) Critically,
+interaction is the \emph{only} mode where intended accuracy exceeds
+default-capture (GPT-5: $20.2$ vs.\ $12.1$): asking is what converts a
+default-anchored guess into the correct intended answer. This is precisely the
+capability single-gold benchmarks are structurally blind to, and what
+\fininteract is built to measure.
+
+\textbf{Human validation of the default.} The single-gold argument assumes a conventional
+benchmark builder, seeing only the question and passage, would record the \emph{default}
+reading as gold. We test this directly: five annotators, shown $Q$ and the passage but not
+the resolving context $C$, independently record the answer they would treat as gold. They
+converge strongly ($93\%$ of items unanimous; mean inter-annotator agreement $0.98$) and
+select the \emph{default} reading $66\%$ of the time versus the intended reading $34\%$, with
+fewer than $8\%$ reporting that they noticed a second defensible answer. A single-gold
+benchmark built from these filings would therefore encode the default, empirically confirming
+the illusion's premise rather than assuming it.
+
+\subsection{Latent Capacity and the Oracle Ceiling}
+To locate the bottleneck we bracket interactive accuracy with two ablations
+(Table~\ref{tab:ceiling} and Figure~\ref{fig:bottleneck}). \textbf{Forced interaction} requires the agent to ask
+$n{=}4$ clarifying questions before answering. \textbf{Context-oracle} hands the
+model the disambiguating context $C$ (which fixes the intended interpretation)
+together with a passage containing \emph{both} the intended and the default
+evidence spans, then asks it to answer, the ambiguity is pre-resolved but the
+model must still ground the correct value.
+
+\begin{table}[t]
+\centering
+\caption{The disambiguation bottleneck. Forcing more clarification does not help
+(and often hurts), but \emph{resolving} the ambiguity lifts every model to
+$93$--$95\%$. The $\approx$75-point gap between the oracle ceiling and free
+interaction is attributable to the model's inability to elicit $C$ itself, not
+to missing knowledge or grounding. ($^\dagger$GPT-5 forced capped at $n{=}65$.
+Open-MoE interact accuracy is now measured over the full retrieval corpus.)}
+\label{tab:ceiling}
+\small
+\resizebox{0.9\columnwidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+Model & Answer-only & Interact & Forced(4) & \textbf{Oracle ceiling} \\
+\midrule
+GPT-5      & 0.6 & 20.2 & 1.5$^\dagger$ & \textbf{95.4} \\
+GPT-4o     & 0.6 & 4.6  & 0.0 & \textbf{93.1} \\
+GPT-5-mini & 0.6 & 0.0  & 0.6 & \textbf{95.4} \\
+Qwen3-30B-A3B   & 1.2 & 11.6 & -- & \textbf{90.2} \\
+Qwen3.5-35B-A3B & 0.6 & 28.9 & -- & \textbf{91.9} \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_bottleneck.png}
+\caption{\textbf{The elicitation gap.} Free-interaction accuracy (orange) versus the
+context-oracle ceiling (teal) per model. Once the ambiguity is resolved every model
+answers $90$--$95\%$ correctly, so the $63$--$95$ point gap is the cost of the model
+failing to \emph{elicit} the disambiguation itself, not missing knowledge.}
+\label{fig:bottleneck}
+\end{figure}
+
+\textbf{Finding 2: Models can answer once the ambiguity is resolved, they
+cannot resolve it themselves.} The context-oracle ceiling is $93$--$95\%$ for all
+three models, including GPT-5-mini, which scores $0\%$ under free interaction.
+Latent answering capacity is therefore near-ceiling and roughly scale-invariant;
+what varies, and what \fininteract measures, is whether a model can \emph{resolve}
+the ambiguity end to end, eliciting the disambiguating context and then integrating
+it into a committed answer. Crucially, \emph{forcing} clarification
+does not recover this capacity: requiring four asks leaves GPT-4o and GPT-5-mini
+near $0\%$ ($0.0\%$ and $0.6\%$) and \emph{lowers} GPT-5 from $20.2\%$ to $1.5\%$, because forced asks
+consume the round budget on low-value questions without converging on a committed
+answer. This already points past pure elicitation: models frequently ask on-category
+yet still fail to commit the right value (the dominant error mode, \S\ref{sec:error}),
+so the bottleneck is targeted, self-initiated disambiguation \emph{and} the integration
+of the resulting answer, which neither scale nor brute-force asking supplies.
+
+\subsection{Per-Category Skills}
+The five categories are not just data strata; each names a distinct \emph{skill}, the
+ability to recognize that a question is under-specified \emph{along that category} and
+ask the question that resolves it. We make this measurable by decomposing each
+model's per-category \texttt{+interact} competence into three components:
+\textbf{Recognition} (interaction rate, does it ask when it should?),
+\textbf{Targeting} (AC@1, does it ask about the \emph{right} category?), and
+\textbf{Resolution} (accuracy, does asking yield the intended answer?). A model
+``has'' a category skill only when all three are high; a low value localizes the
+failure to not-asking, asking-wrong, or asking-right-but-still-wrong.
+Table~\ref{tab:skills} reports Targeting, the decisive component, and
+Figure~\ref{fig:radar} shows the same profile as a capability radar.
+
+\begin{table}[t]
+\centering
+\caption{Per-category \textbf{Targeting} skill (AC@1, \emph{touch} form) in \texttt{+interact},
+recomputed with the corrected classifier (\S\ref{sec:metrics}). Recognition policy is a robust
+blind spot (no model ever asks), temporal scope is fully solved, and entity and metric are
+touched almost always but rarely made the \emph{central} concern (central-form AC@1
+$\leq0.16$, see text). The two sparse categories ($n{\le}9$) are preliminary.}
+\label{tab:skills}
+\small
+\resizebox{0.9\columnwidth}{!}{%
+\begin{tabular}{lrccccc}
+\toprule
+Category & $n$ & GPT-5 & GPT-4o & {\footnotesize GPT-5-m} & {\footnotesize Q3-30B} & {\footnotesize Q3.5-35B} \\
+\midrule
+entity\_scope       & 94 & .89 & 1.00 & .99 & .93 & .85 \\
+metric\_definition  & 63 & .92 & .97 & 1.00 & .96 & .87 \\
+recognition\_policy &  9 & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} \\
+temporal\_scope     &  7 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.72\linewidth]{fig_radar.png}
+\caption{\textbf{Per-category clarification-capability profile} (touch AC@1 from
+Table~\ref{tab:skills}). Every model saturates entity, metric, and temporal targeting
+but collapses to zero on \texttt{recognition\_policy}, a blind spot shared across the
+closed frontier and the strongest open model.}
+\label{fig:radar}
+\end{figure}
+
+\textbf{Finding 3: Ambiguity clarification is a per-category skill with a sharp touch
+versus central-targeting dissociation.} Under the corrected classifier the pattern is
+precise. \texttt{recognition\_policy} is a robust blind spot. No model ever asks about it,
+in either the touch or the central form (AC@1 $=0$), so models essentially never
+question whether a figure is recognized point-in-time or over time. \texttt{temporal\_scope}
+is fully solved. Models both touch it and make it the central concern (central AC@1
+$=1.0$). Entity and metric occupy a revealing middle. Models almost always \emph{touch} them
+(touch AC@1 $0.85$--$1.0$) yet rarely make them the \emph{central} point of the question
+(central AC@1 $\leq0.16$), defaulting instead to period confirmation. For these two categories
+the failure is not neglect but imprecision, the model names the entity or metric in passing
+while centering the question elsewhere. Resolution follows the same shape across all five models
+(GPT-5 resolves $57\%$ of temporal but $\leq23\%$ of entity and metric,
+Figure~\ref{fig:axisperf}). The gap is not uniform incompetence
+but missing specific targeting, which is precisely the intervention target
+(\S\ref{sec:grpo}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig_axisperf.png}
+\caption{\textbf{Per-model, per-category performance.} \emph{(a)}~Targeting (AC@1
+touch) versus \emph{(b)}~Resolution (\texttt{+interact} accuracy) for every model and
+ambiguity category. The top five rows are the full-scale panel ($n{=}173$, all categories) and
+the bottom seven are the proprietary pilot ($n{=}50$), for which only entity and metric
+carry enough instances ($n{=}29$ and $19$), with recognition, temporal, and filing at
+$n\leq1$ and shown n/a. \texttt{filing\_vintage} is empty at full scale too ($n{=}0$).
+Every model targets entity and metric almost perfectly, the proprietary models resolve
+them better than the older OpenAI ladder, and no model targets recognition policy.}
+\label{fig:axisperf}
+\end{figure}
+
+\textbf{Per-model, per-category case analysis.} Placing targeting and resolution side by
+side for every model and category (Figure~\ref{fig:axisperf}) surfaces three patterns.
+First, resolution does \emph{not} track targeting: GPT-4o and GPT-5-mini touch the
+correct category on entity and metric almost as often as any model (AC@1 $0.94$--$1.0$)
+yet resolve those categories at $0$--$5\%$, so a high AC@1 is no guarantee of a correct
+answer. Second, the model ranking \emph{reorders} across categories. Among the full-scale
+models Qwen3.5-35B-A3B leads on the two abundant categories (entity $40\%$, metric $32\%$)
+while GPT-5 leads on temporal ($57\%$). Third, the seven proprietary models resolve
+entity and metric substantially better than the older OpenAI ladder (entity
+$21$--$48\%$, metric $26$--$42\%$, versus GPT-5's $23$ and $13\%$), yet they inherit the
+\emph{same} recognition blind spot, with touch AC@1 $0$ on every recognition instance
+they saw. \texttt{filing\_vintage} is untestable everywhere ($n{=}0$). A single
+aggregate interaction score therefore conceals which category a given model can actually
+resolve, which is why we report per category.
 
 %% ============================================================
 \section{Additional Findings and Analyses}
