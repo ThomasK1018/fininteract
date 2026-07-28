@@ -14,7 +14,6 @@ Table~\ref{tab:main} shows that even frontier models are vulnerable to financial
 \caption{Forcing more clarification does not help with accuracy, but \emph{resolving} the ambiguity lifts every model to 93-95\%. This gap suggests that it is the model's inability to elicit $C$v itself but not missing knowledge or grounding.}
 \label{tab:ceiling}
 \small
-\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
 Model & Answer-only & Interact & Forced(4) & \textbf{Oracle} \\
@@ -25,7 +24,7 @@ GPT-5-mini & 0.6 & 0.0  & 0.6 & \textbf{95.4} \\
 Qwen3-30B   & 1.2 & 11.6 & -- & \textbf{90.2} \\
 Qwen3.5-35B & 0.6 & 28.9 & -- & \textbf{91.9} \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 \input{paper/tables/main_table}
@@ -41,7 +40,6 @@ By re-grading models on default readings from existing benchmark and the intende
 \caption{By comparing the accuracy difference $\Delta$ between answering intended interpretation versus typical reading from single-gold benchmark, model performance in existing benchmarks will be conflated, specifically in the retrieval regime where search function is available. }
 \label{tab:illusion}
 \small
-\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{llccc}
 \toprule
 Model & Mode & Intended & Default & $\Delta$ \\
@@ -59,7 +57,7 @@ GPT-5-mini & Answer-only   & 0.6 & 0.0 & $-0.6$ \\
            & Answer+Search & 0.0 & 0.0 & 0.0 \\
            & +Interact     & 0.0 & 0.0 & 0.0 \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 
@@ -72,7 +70,6 @@ We extend the study into each ambiguity group. Table ~\ref{tab:skills} shows tha
 \caption{We observe that recognition policy seems to be a blind spot of existing models as they can never detect and seek clarification from it, compared to the rest categories where the model is aware of the ambiguity.}
 \label{tab:skills}
 \small
-\resizebox{0.95\columnwidth}{!}{%
 \begin{tabular}{lrccccc}
 \toprule
 Category & $n$ & GPT-5 & GPT-4o & {\footnotesize GPT-5-m} & {\footnotesize Q3-30B} & {\footnotesize Q3.5-35B} \\
@@ -82,7 +79,7 @@ metric\_definition  & 63 & .92 & .97 & 1.00 & .96 & .87 \\
 recognition\_policy &  9 & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} \\
 temporal\_scope     &  7 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 \subsection{The Ambiguity Category Serves as an Actionable Training Signal}
@@ -95,7 +92,6 @@ data-abundant categories, so the signal is actionable but still blinded in recog
 \caption{RLVR ladder on \fininteract using Qwen3-4B with held-out $n{=}51$ showing that we can train policy to clarify ambiguity using leak-proof AC@1 and interaction.}
 \label{tab:grpo}
 \small
-\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lcccc}
 \toprule
 Stage & AC@1 & Interaction & Accuracy$^{*}$ & Reward \\
@@ -105,7 +101,7 @@ Base (Qwen3-4B)          & 25.0 & 54.9 & 84.3 & 0.96 \\
 \;\;+\,KTO               & \textbf{70.6} & \textbf{100} & 84.3 & 1.27 \\
 \;\;+\,GRPO              & 66.7 & \textbf{100} & 88.2 & \textbf{1.30} \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 \begin{figure*}[t]

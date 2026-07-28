@@ -4,7 +4,6 @@ Given an ambiguous financial question instance (example in Table~\ref{tab:exampl
 \caption{This example of ambiguous financial question contains three plausible entity scopes, i.e. consolidated total and two reportable segments, leading to an entropy of $1.58$ bits. Without the disambiguating context $C$, a model's default interpretation leads to the wrong answer.}
 \label{tab:example}
 \small
-\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{p{2.7cm}p{4.7cm}}
 \toprule
 Field & Value \\
@@ -27,7 +26,7 @@ Intended span &
 Default span &
   ``Family of Apps\ldots Income from operations \$62,871\ldots'' \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 \textbf{Financial ambiguity taxonomy.}
@@ -40,7 +39,6 @@ accounting and disclosure practice (Table~\ref{tab:axes}). Each instance should 
 \caption{Five-category financial ambiguity taxonomy.}
 \label{tab:axes}
 \small
-\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{p{2.0cm}p{5.5cm}}
 \toprule
 Category & Definition \\
@@ -67,7 +65,7 @@ Category & Definition \\
   Ambiguity over accounting policy: revenue recognized point-in-time
   vs. over time; gross vs. net revenue; capitalized vs. expensed R\&D. \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 \textbf{Disambiguation entropy.} We quantify how ambiguous an instance is using the prior confidence entropy $H_{0} = \log_{2} k$, where $k$ denotes the number of plausible interpretations of $Q$ without clarifying interaction, e.g. the example in Table~\ref{tab:example} has three plausible interpretations, hence contributing to an entropy of $H_0 = \log_2 3 \approx 1.58$ bits. This further serves as our metric to evaluate difficulty and efficiency in Sec. \ref{sec:metrics}. While both $A$ and $A_{d}$ are defensible from publicly available filings, an agent should be able to identify the ambiguity by reading $Q$ alone without $C$, where this pairing between default and intended interpretation generalizes the target-distractor design from \interactcomp~\cite{interactcomp2026} to the financial domain. 
@@ -81,7 +79,6 @@ Appendix~\ref{sec:axisreact}.
 \caption{Evaluation modes.}
 \label{tab:modes}
 \small
-\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lll}
 \toprule
 Mode & Actions & Description \\
@@ -95,5 +92,5 @@ Category-oracle & \multicolumn{2}{l}{Told the primary category, not the value} \
 Template-oracle & \multicolumn{2}{l}{Fixed human-written question per category} \\
 Enumerate & \multicolumn{2}{l}{Lists all interpretations and answers} \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}

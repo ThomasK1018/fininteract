@@ -212,7 +212,6 @@ producing a valid but non-target reading. \emph{Ask}: fraction that asks when
 permitted. gpt-5-mini interact omitted (it asks ${<}1\%$).}
 \label{tab:general}
 \small
-\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{llcccc}
 \toprule
 Model & Mode & Intended & Any-valid & Def.-cap & Ask \\
@@ -231,7 +230,7 @@ Model & Mode & Intended & Any-valid & Def.-cap & Ask \\
  & Answer-only & 36.0 & 77.0 & 62.5 & 0 \\
  & Oracle      & 62.0 & 73.5 & 27.5 & 0 \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 \textbf{Finding 4: the single-gold illusion is domain-general.} Running the
@@ -423,7 +422,6 @@ stays $0$ at every scale, including the same 32B that targets entity well. Recog
 underpowered ($n{\le}9$ asked-on) but flat throughout.}
 \label{tab:scaledissoc}
 \small
-\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lccc}
 \toprule
 Category & 4B & 14B & 32B \\
@@ -432,7 +430,7 @@ entity\_scope       & .00 & .00 & \textbf{.68} \\
 metric\_definition  & .05 & .00 & .17 \\
 recognition\_policy & \textbf{.00} & \textbf{.00} & \textbf{.00} \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 \textbf{Finding 12: the categories are different \emph{kinds} of skill, some
@@ -602,7 +600,6 @@ Each type is diagnosable from existing metrics without additional annotation.
 \caption{Error taxonomy E1--E7 with diagnostic signals and improvement directions.}
 \label{tab:errors}
 \small
-\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{p{0.8cm}p{3.2cm}p{3.5cm}}
 \toprule
 Type & Description & Improvement direction \\
@@ -622,7 +619,7 @@ E6 & \textbf{Evidence grounding}: template-oracle correct, agent wrong
 E7 & \textbf{Over-interaction}: correct but low DisE$^+$
    & Penalize via DisE$^+$/AC@1 efficiency signal \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 \subsubsection{Diagnostic Mapping from Evaluation Signals}
@@ -798,7 +795,6 @@ closes on both \emph{abundant} categories and fails only on the \emph{scarce} on
 asking \emph{helps accuracy} flips on whether the base could already answer.}
 \label{tab:coevolve}
 \small
-\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lccc}
 \toprule
  & \texttt{entity} & \texttt{metric} & \texttt{recognition} \\
@@ -810,7 +806,7 @@ Targeting, base $\to$ evolved        & $.00\to\textbf{.68}$ & $.00\to\textbf{.58
 Interaction rate                     & $40\to100$ & $50\to100$ & $67\to100$ \\
 De-leaked accuracy                   & $32.5\to22.5$ & $15\to\textbf{60}$ & $11\to11$ \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 All three rounds run end-to-end: the Constructor$\to$Verifier pipeline yields hard
@@ -906,7 +902,6 @@ $^\ddagger$recognition is \emph{unreliable} rather than a clean fail: held-out h
 AC@1 ranges $0$--$0.44$ across training runs on the scarce $n{=}9$ probe.}
 \label{tab:learnability}
 \small
-\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lrrccc}
 \toprule
 Category & Primary & Salience & Slope & Decode & Co-evolve \\
@@ -917,7 +912,7 @@ temporal\_scope     & 150 & 0.15 & sat.    & 0.92 & solved \\
 filing\_vintage     & 264 & 0.33 & --      & --   & untestable \\
 recognition\_policy &  30 & \textbf{0.04} & $+0.00$ & \textbf{0.93} & weak$^{\ddagger}$ \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 \textbf{Finding 16: co-evolvability is gated by source \emph{abundance}, driven by
@@ -983,7 +978,6 @@ This appendix expands the related work summarized in \S\ref{sec:related}.
 \checkmark = supported; -- = not applicable or not evaluated.}
 \label{tab:comparison}
 \small
-\resizebox{0.9\textwidth}{!}{%
 \begin{tabular}{lccccccc}
 \toprule
 Benchmark & Scale & Ambiguity & Interaction & Multi-turn & Bilingual
@@ -1011,7 +1005,7 @@ FinEval~\citep{guo2023fineval}
 \fininteract (ours)
   & 173 & \checkmark & \checkmark & \checkmark & EN+ZH & LLM+human & EDGAR+CNINFO \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table*}
 
 \paragraph{Financial QA Benchmarks.}
@@ -1269,7 +1263,6 @@ is one GPT-5 constructor call plus ten verifier trials (five GPT-5, five
 GPT-5-mini) with GPT-4o-mini grading.}
 \label{tab:cost}
 \small
-\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{lr}
 \toprule
 Quantity & Value \\
@@ -1283,7 +1276,7 @@ Cost per viable passage (full pipeline)         & \$0.155 \\
 Blended cost per candidate passage              & \$0.035 \\
 \textbf{Cost per accepted instance}             & \textbf{\$0.31} \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 \paragraph{Projected cost to scale.} At the measured blended rate, producing $N$
@@ -1381,7 +1374,6 @@ The pre-verifier applies fourteen automated code-level rules before any API call
 \caption{Pre-verifier sanity checks (14 rules).}
 \label{tab:qc}
 \small
-\resizebox{0.9\columnwidth}{!}{%
 \begin{tabular}{cl}
 \toprule
 Rule & Description \\
@@ -1401,7 +1393,7 @@ R12 & Both evidence spans non-empty \\
 R13 & Evidence spans must be meaningfully distinct ($\leq$85\% overlap) \\
 R14 & Intended and default \emph{answers} differ beyond grader tolerance \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 
