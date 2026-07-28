@@ -128,19 +128,24 @@ GPT-5-mini & Answer-only   & 0.6 & 0.0 & $-0.6$ \\
 \end{table}
 
 
-\subsection{XXX leads to most failures.}
+\subsection{Recognition Policy Leads to the Most Failures}
 \label{sec:skills}
 
-Each category names a distinct clarification \emph{skill}, so we decompose per-category
-\texttt{+interact} competence into Recognition (does the model ask?), Targeting (AC@1, does it ask
-about the right category?), and Resolution (does asking yield the intended answer?). The profile is
-sharply dissociated (Table~\ref{tab:skills}): \texttt{recognition\_policy} is a robust blind spot that no model ever targets
-(AC@1 $=0$), \texttt{temporal\_scope} is fully solved, and entity and metric are almost always
-\emph{touched} (AC@1 $0.85$--$1.0$) yet rarely made the question's \emph{central} concern (central
-AC@1 $\leq0.16$). Crucially, resolution does not track targeting: GPT-4o and GPT-5-mini touch entity
-and metric almost perfectly yet resolve them at $0$--$5\%$, so a high AC@1 is no guarantee of a
-correct answer, and model rankings reorder across categories. A single aggregate score therefore
-conceals which category a model can actually resolve. The capability radar, the per-model matrix, and the full analysis are in Appendix~\ref{app:maindetails}.
+Not all ambiguity categories are equally hard, and one, \texttt{recognition\_policy}, drives the
+sharpest failure. Decomposing per-category \texttt{+interact} competence into whether a model asks
+(Recognition), asks about the right category (Targeting, AC@1), and resolves the intended answer
+(Resolution), \texttt{recognition\_policy} is the clear outlier in Table~\ref{tab:skills}: every
+model scores AC@1 $=0$ on it, so \emph{no} model ever asks which recognition basis is meant, while
+the remaining categories are targeted almost perfectly. It is therefore a genuine blind spot
+rather than a merely harder skill.
+
+We examine this with a case study. Asked \emph{``What were Tesla's revenues?''}, the answer is
+\$97.69B under GAAP accrual recognition but only \$14.92B under a cash-basis proxy, a $6.5\times$
+difference driven entirely by the recognition basis. We find that models fail here because they
+never surface the recognition basis as a source of ambiguity: when given the chance to clarify,
+their question reverts to the more salient period or entity dimension, so the recognition
+ambiguity is never raised and the default figure is reported as fact. The capability radar, the
+per-model matrix, and further case studies are in Appendix~\ref{app:maindetails}.
 
 \begin{table}[t]
 \centering
