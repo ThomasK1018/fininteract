@@ -49,119 +49,7 @@ Large language model agents are increasingly deployed for financial information 
 \section{Problem Formulation}
 \label{sec:task}
 %% ============================================================
-\textbf{Definition.} Given an ambiguous financial question instance, it should contain the ambiguous question over a company filing $Q$, the disambiguating context $C$ which is the minimal set of scope or definitional constraints that collapses $Q$ into the unique intended answer $A$ under intended interpretation $\mathcal{I}_{\text{int}}$. The ambiguous question typically contains correct answer $A_{d}\neq A$ under the default interpretation $\mathcal{I}_{\text{def}}$ which a non-expert would assume when reading $Q$. Specifically, $\mathcal{I}_{\text{int}},\mathcal{I}_{\text{def}}$ are structured records specifying the financial ambiguity taxonomy defined below. While both $A$ and $A_{d}$ are defensible from publicly available filings, an agent should be able to identify the ambiguity by reading $Q$ alone without $C$, where this pairing between default and intented interpretation generalizes the target-distractor design from \interactcomp~\cite{interactcomp2026} to the financial domain. 
-
-\textbf{Financial ambiguity taxonomy.}
-\label{sec:taxonomy}
-We define five categories of financial ambiguity, each grounded in standard
-accounting and disclosure practice (Table~\ref{tab:axes}).
-
-\begin{table}[h]
-\centering
-\caption{Five-category financial ambiguity taxonomy.}
-\label{tab:axes}
-\small
-\resizebox{0.9\columnwidth}{!}{%
-\begin{tabular}{p{2.0cm}p{5.5cm}}
-\toprule
-Category & Definition \\
-\midrule
-\textbf{Temporal scope} &
-  Ambiguity over which time period is intended: fiscal year ending
-  September vs. calendar year; Q3 results vs. full year; TTM vs.
-  point-in-time. \\
-\addlinespace
-\textbf{Metric definition} &
-  Ambiguity over accounting basis: GAAP net income vs. non-GAAP adjusted
-  income; organic revenue vs. as-reported; operating EBITDA vs. net income. \\
-\addlinespace
-\textbf{Entity scope} &
-  Ambiguity over consolidation level: segment vs. consolidated total;
-  parent-attributable vs. full consolidated; Class A vs. Class B shares;
-  A-shares vs. H-shares. \\
-\addlinespace
-\textbf{Filing vintage} &
-  Ambiguity over filing version: original 10-K vs. amended 10-K/A;
-  as-reported vs. restated; preliminary earnings release vs. final filing. \\
-\addlinespace
-\textbf{Recognition policy} &
-  Ambiguity over accounting policy: revenue recognized point-in-time
-  vs. over time; gross vs. net revenue; capitalized vs. expensed R\&D. \\
-\bottomrule
-\end{tabular}}
-\end{table}
-
-Each instance exercises one primary category (mandatory) and optionally one or
-two secondary categories where the passage genuinely supports additional ambiguity.
-Viable structured ambiguity is far more available for some categories than others:
-cleanly paired, independently verifiable ambiguity is abundant for entity scope
-and metric definition but rare for the other three in public filings
-(Appendix~\ref{app:cost}). The released corpus reflects this, entity scope
-(54\%) and metric definition (37\%) dominate, with recognition policy (5\%),
-temporal scope (4\%), and filing vintage ($0\%$) sparse. We therefore position
-\fininteract as an \textbf{entity/metric-dominant} financial-ambiguity benchmark
-with exploratory coverage of three sparser categories, confine quantitative per-category
-claims to the two well-powered categories, and report the sparser categories with their
-sample sizes as preliminary signal.
-
-\textbf{Disambiguation entropy.} We quantify how ambiguous an instance is using the prior confidence entropy $H_{0} = \log_{2} k$, where $k$ denotes the number of plausible interpretations of $Q$ without clarifying interaction, e.g. the example in Table~\ref{tab:example} has three plausible interpretations, hence contributing to an entropy of $H_0 = \log_2 3 \approx 1.58$ bits. This further serves as our metric to evaluate difficulty and efficiency in Sec. \ref{sec:metrics}. 
-
-\begin{table}[h]
-\centering
-\caption{This example of ambiguous financial question contains three plausible entity scopes, i.e. consolidated total and two reportable segments, leading to an entropy of $1.58$ bits. Without the disambiguating context $C$, a model's default interpretation leads to the wrong answer.}
-\label{tab:example}
-\small
-\resizebox{0.9\columnwidth}{!}{%
-\begin{tabular}{p{2.7cm}p{4.7cm}}
-\toprule
-Field & Value \\
-\midrule
-$Q$ &
-  What was Meta Platforms' operating income? \\
-$C$ &
-  Total company (consolidated) results under U.S.\ GAAP for the year
-  ended December 31, 2023. \\
-$A$ (intended) &
-  \$46.75B \emph{[consolidated GAAP]} \\
-$A_d$ (default) &
-  \$62.87B \emph{[Family of Apps segment]} \\
-\midrule
-Ambiguity category & Entity scope \\
-$H_0$ & 1.58 bits \\
-\midrule
-Intended span &
-  ``Income from operations for 2023 was \$46.75 billion\ldots'' \\
-Default span &
-  ``Family of Apps\ldots Income from operations \$62,871\ldots'' \\
-\bottomrule
-\end{tabular}}
-\end{table}
-
-\textbf{Agent Interaction Model.} We follow \interactcomp's ReAct framework~\citep{yao2023react} where the agent may issue three types of actions, namely \textbf{search}($Q$) to retrieve a passage from the filing corpus, \textbf{interact}($Q$) to present a yes-or-no question to the simulated user who answers based on $C$, and \textbf{answer}($Q$) to submit a final answer. Specifically, we evaluate agents in three primary modes (Table~\ref{tab:modes}) and four
-ablation modes.
-
-\begin{table}[h]
-\centering
-\caption{Evaluation modes.}
-\label{tab:modes}
-\small
-\resizebox{0.9\columnwidth}{!}{%
-\begin{tabular}{lll}
-\toprule
-Mode & Actions & Description \\
-\midrule
-Answer-only & answer & Pure parametric recall \\
-Answer+Search & search, answer & Oracle retrieval augmented \\
-Answer+Search+Interact & search, interact, answer & Standard full interaction \\
-\textbf{Category-Aware ReAct} & state, search, interact, answer & \textbf{Category-conditioned and state-gated} \\
-\midrule
-Always-ask & \multicolumn{2}{l}{Must ask $\geq 1$ question before answering} \\
-Category-oracle & \multicolumn{2}{l}{Told the primary category, not the value} \\
-Template-oracle & \multicolumn{2}{l}{Fixed human-written question per category} \\
-Enumerate & \multicolumn{2}{l}{Lists all interpretations and answers} \\
-\bottomrule
-\end{tabular}}
-\end{table}
+\input{paper/sections/2_problem}
 
 
 %% ============================================================
@@ -211,6 +99,13 @@ aggregation, and subjective judgment fall outside its scope.
 
 \subsection{Dataset Construction}
 \label{sec:construction}
+In the curation process, viable structured ambiguity is more available for some categories than others, so that cleanly paired and independently verifiable ambiguity is abundant for entity scope and metric definition (Appendix~\ref{app:cost}). The released corpus reflects this, entity scope
+(54\%) and metric definition (37\%) dominate, with recognition policy (5\%),
+temporal scope (4\%), and filing vintage ($0\%$) sparse. We therefore position
+\fininteract as an \textbf{entity/metric-dominant} financial-ambiguity benchmark
+with exploratory coverage of three sparser categories, confine quantitative per-category
+claims to the two well-powered categories, and report the sparser categories with their
+sample sizes as preliminary signal.
 
 \fininteract is built and evaluated in four stages:
 we \textbf{(1)~construct} ambiguous instances from public filings,
