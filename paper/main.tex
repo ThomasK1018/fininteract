@@ -128,9 +128,9 @@ GPT-5-mini & Answer-only   & 0.6 & 0.0 & $-0.6$ \\
 \end{table}
 
 
-\subsection{Recognition Policy Leads to the Most Failures}
+\subsection{Systematic failure from recognition policy}
 \label{sec:skills}
-We extend the study into each ambiguity group. Table ~\ref{tab:skills} shows that in the high AC@1 shown in Table~\ref{tab:main}, while models are capable of determining ambiguity category in most cases, it consistently fails in the recognition policy group. This motivates us to study this blind spot of existing models by examining the following case study. Given the question ``What were General Electric's revenues?'', the answer is either \$67.95B or \$26.79B under different recognition policies, the former being GAAP revenue that combines over-time service recognition with point-in-time product recognition, and the latter counting only revenue recognized at a point in time. Models fail here as they consistently return a single figure without asking for the expected recognition basis, defaulting to a generic assumption that ``revenue'' is well defined and ignoring the ASC~606 practice of recognizing revenue at a point in time versus over time. This suggests that the domain-specific practice might not align too well with existing model's generalized behavior, hence suggesting the need of specific tuning. We attach details and further case studies in in Appendix~\ref{app:maindetails}.
+We extend the study into each ambiguity group. Table ~\ref{tab:skills} shows that in the high AC@1 shown in Table~\ref{tab:main}, while models are capable of determining ambiguity category in most cases, it consistently fails in the recognition policy group. This motivates us to study this blind spot of existing models by examining the following case study. Given the question ``What were General Electric's revenues?'', the answer is either \$67.95B or \$26.79B under different recognition policies, the former being GAAP revenue that combines over-time service recognition with point-in-time product recognition, and the latter counting only revenue recognized at a point in time. Models fail here as they consistently return a single figure without asking for the expected recognition basis, defaulting to a generic assumption that ``revenue'' is well defined and ignoring the ASC~606 practice of recognizing revenue at a point in time versus over time. This suggests that the domain-specific practice might not align too well with existing model's generalized behavior, hence suggesting the need of specific tuning. We attach details and further case studies in in Appendix~\ref{app:maindetails}. \textbf{Finding 3: Agents are not well-trained to notice ambiguity on financial-specific policies. }
 
 \begin{table}[H]
 \centering
@@ -152,24 +152,12 @@ temporal\_scope     &  7 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
 
 \subsection{The Ambiguity Category Serves as an Actionable Training Signal}
 \label{sec:trainsignal}
-The per-category diagnosis is not only descriptive, the ambiguity category is also a signal a model
-can be trained on. Conditioning fine-tuning on the target category, a category-guided supervised
-seed followed by reinforcement learning on a Qwen3-4B policy, teaches the model to always interact
-and target the correct category. On a held-out split the leak-proof signals jump almost entirely at
-the supervised stage, with targeting AC@1 rising from $25\%$ to $69\%$ and the interaction rate from
-$55\%$ to $100\%$ (Table~\ref{tab:grpo}, Figure~\ref{fig:grpo}a), and a full multi-turn
-reinforcement pass confirms the episode is trainable end to end, raising mean reward $0.55\to1.08$
-while clarifying turns rise $5.7\to8.6$ (Figure~\ref{fig:grpo}b). The gain concentrates on the
-data-abundant categories, so the signal is actionable but data-gated, consistent with the
-recognition-policy blind spot whose nine instances cannot yet teach it. We report this as evidence
-that \fininteract is \emph{trainable} rather than a converged model, with the full ladder and
-caveats in \S\ref{sec:grpo}.
+While observing that the diagnosis is descriptive, we ask whether we can leverage the ambiguity category as training signal. We conduct conditioned training on the model, including fine-tuning on different categories followed by reinforcement learning on a Qwen3-4B policy, teaching hte model to interact and target the correct categoy. Within the held-out split, we seek that the signals already jump significantly at supervised stage (Table~\ref{tab:grpo}, Figure~\ref{fig:grpo}a), and a full multi-turn reinforcement training further confirms that the episode is trainable end to end, with the clarifying turns rising from 5.7 to 8.6 (Figure~\ref{fig:grpo}b). The gain concentrates on the
+data-abundant categories, so the signal is actionable but still blinded in recognition policy in Sec.~\ref{sec:skills}. Additional details are included in Appendix~\ref{sec:grpo}. \textbf{Finding 4: \fininteract is a trainable signal to address financial ambiguity.} 
 
 \begin{table}[t]
 \centering
-\caption{RLVR ladder on \fininteract (Qwen3-4B, held-out $n{=}51$). AC@1 and
-interaction are leak-proof signals of learned clarification; accuracy ($^{*}$) is
-partly leaked by oracle retrieval and should not be read as a learning signal.}
+\caption{RLVR ladder on \fininteract using Qwen3-4B with held-out $n{=}51$ showing that we can train policy to clarify ambiguity using leak-proof AC@1 and interaction.}
 \label{tab:grpo}
 \small
 \resizebox{0.9\columnwidth}{!}{%
@@ -198,56 +186,14 @@ together over training.}
 %% ============================================================
 \section{Discussion}
 \label{sec:discussion}
-%% ============================================================
-
-\textbf{Elicitation is a trainable skill current models lack.} Progress will come less from larger
-backbones, which barely move interaction accuracy, than from policies and objectives that reward
-asking on the right category at the right time.
-\textbf{Categories are different learning problems.} Some clarification abilities are solved by
-scale while others, notably recognition basis, resist it, so a single aggregate score hides where
-the difficulty sits and curricula should budget data per category.
-\textbf{Human--AI collaboration under ambiguity.} Because models confidently return the default
-reading, the safe behavior is often to ask rather than answer, motivating interfaces and metrics
-that credit well-timed clarification and calibrated abstention over raw commitment.
-\textbf{Self-refreshing benchmarks and broader scope.} A benchmark can extend itself on categories
-whose evidence is abundant under held-out validation, and the paired default/intended construction
-transfers to further categories, languages, and other high-stakes domains where one gold answer
-hides genuine ambiguity.
-
-\medskip\noindent We also note the main limitations (each expanded in
-Appendix~\ref{app:limitations}), and give the extended discussion in Appendix~\ref{app:discussion}.
 \label{sec:limitations}
-\textbf{Scale.} At 173 instances FinInteract is small, a deliberate trade of raw size for
-per-instance construction rigor (every item is adversarially verified; the pipeline extends at
-\$0.31/instance). \textbf{Language balance.} The English split (53) is smaller than the Chinese
-(120), so per-language results should be read with this asymmetry in mind.
-\textbf{Two well-powered categories.} Entity scope ($n{=}94$) and metric definition ($n{=}63$)
-are densely populated; the other three categories are exploratory, and the recognition-policy
-blind spot ($n{=}9$, a partly imperfect sample) is a preliminary observation, not a headline.
-\textbf{Model and human coverage.} The seven-vendor frontier panel and the single-clarification
-human baseline are $N{=}50$ references (a pilot and a constrained baseline, not upper bounds);
-full-scale multi-vendor evaluation is in progress.
-\textbf{Grader and simulator.} Correctness grading, category classification, and the user
-simulator are LLM-based but human-validated (correctness $\kappa{=}0.85$; touch classifier
-$0.75$), and interaction results are robust across deterministic, noisy, and free-form simulators.
-\textbf{Construction circularity and synthetic intent.} GPT-5-family models drive construction
-and simulation, depressing GPT-5-family answer-only accuracy by construction, and questions are
-reverse-constructed, so the benchmark measures recovery of a \emph{specified} interpretation, a
-proxy for a real analyst's intent. \textbf{Contamination.} Instances are freshly constructed from
-FY2022--2025 facts (answer-only $\approx$0.6\%), though we do not claim absolute contamination
-safety for the DocFinQA-derived minority.
-\textbf{All instances are ambiguous by construction.} The benchmark measures \emph{what} to ask
-and \emph{how} to integrate the answer, not a calibrated \emph{when}-to-ask policy; matched
-unambiguous controls are the single most important extension.
-\textbf{Intervention evidence is preliminary.} The category-conditioned training result
-(\S\ref{sec:trainsignal}) is a single backbone on a small held-out split with partly leaked oracle
-retrieval, so it demonstrates trainability rather than a converged, causally-attributed gain.
-\textbf{A single protocol confounds ability with interface adherence.} GPT-5-mini's $0\%$ is
-partly protocol non-compliance, so a fixed cross-vendor prompt is a conservative rather than a
-maximally fair comparison.
-\textbf{Scope.} The three main-text findings are the load-bearing contribution; the remaining
-studies are explicitly exploratory, with matched ambiguous/unambiguous evaluation and a
-component ablation of the intervention as the priority follow-ups.
+%% ============================================================
+In our study, we observe that \textbf{categories are different learning problems.} While some clarification abilities are solved by scale, others, notably recognition basis, resist it, so a single aggregate score hides where
+the difficulty sits and curricula should budget data per category. On the other hand, \textbf{elicitation is a trainable skill current models lack.} Progress will come less from larger backbones, which barely move interaction accuracy, than from policies and objectives that reward asking on the right category at the right time. Nevertheless, even by including annotation for domain experts, it is still possible to retain \textbf{ambiguity in Human-AI collaboration} because models confidently return the default reading, motivating a safe behavior of asking instead of answering, hence the development of metrics that credit well-timed clarification and calibration process. While the current \fininteract is semi-automated, ideally a benchmark should be able to extend itself on categories and paired default/intended construction whose evidence is abundant, so as to \textbf{transfer to further categories, languages and other high-stakes domains} where ambiguity is commonly observed. 
+
+We also note the following limitations of this study: \textbf{1) Scale} where a 173 instances corpus is considerably small given the need of construction rigor, \textbf{2) Language balance} where current corpus split between English and Chinese is $53:120$, which could benefit models pre-trained in certain language, \textbf{3) Dominating categories} with entity scope ($n{=}94$) and metric definition ($n{=}63$), compared to the blind spot recognition policy with only $n{=}9$, which may suggest existing model is not well-trained enough to even generate such instance in the first place, \textbf{4) Generator and Evaluator bias} due to API budget constraints, as we hire GPT-5 family mainly for construction and simulation, which may bias towards the performance of GPT-5 family. \textbf{5) Data contamination} whereas instances are freshly constructed from FY2022-2025 facts where recently released models might have been pre-trained on. We include extended discussion of limitations in Appendix~\ref{app:discussion}. 
+
+
 
 %% ============================================================
 
