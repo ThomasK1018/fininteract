@@ -64,4 +64,52 @@ the single-gold failure a conventional benchmark makes by rewarding the defensib
 
 \subsection{Validation}
 \label{sec:humanval}
-We employ finance-literate annotators, including Chartered Financial Analyst (CFA) charterholders and licensees from Hong Kong Securities and Futures Commission (SFC), to review instances to check whether 1) question $Q$ is ambiguous and 2) disambiguating context $C$ uniquely identifies the intended reading without stating the answer and 3) both intended and default answers are correct. We record a substantial agreement with an average 0.85 Gwet's AC1 \textcolor{red}{add citation} indicating \textcolor{red}{what does this indicator tell?}. The full protocol and annotation details are in Appendix~\ref{app:construction}.
+We employ finance-literate annotators, including Chartered Financial Analyst (CFA) charterholders and licensees from Hong Kong Securities and Futures Commission (SFC), to review instances to check whether 1) question $Q$ is ambiguous and 2) disambiguating context $C$ uniquely identifies the intended reading without stating the answer and 3) both intended and default answers are correct. We record a substantial agreement with an average 0.85 Gwet's AC1~\citep{gwet2008}, indicating strong chance-corrected consensus that, unlike Cohen's $\kappa$, stays reliable under the heavy skew toward ``yes'' labels. The full protocol and annotation details are in Appendix~\ref{app:construction}.
+
+\subsection{Metrics}
+\label{sec:metrics}
+
+We deliberately lead with metrics that are standard in the ambiguous-QA and
+interactive-retrieval literature (accuracy, calibration, interaction counts),
+so that \fininteract is directly comparable to prior benchmarks rather than
+self-referential. A single bespoke efficiency score is reported only as a
+supplementary diagnostic.
+
+\textbf{Accuracy (\%)} (primary) is the fraction of instances whose final
+answer matches the \emph{intended} interpretation, graded by GPT-4o-mini with
+financial-domain tolerance ($\pm$1\% numeric, entity/ticker equivalence,
+currency normalization; fiscal-year mismatch = wrong). This is the metric on
+which models are ranked, mirroring \interactcomp, BrowseComp, and FinanceBench.
+
+\textbf{Default-capture rate (\%)} is the fraction whose final answer instead
+matches the \emph{default} interpretation. It measures how often a model
+confidently returns the naive reading, and lets us reconstruct what a
+conventional single-gold benchmark would have scored (\S\ref{sec:illusion}).
+
+\textbf{Interaction diagnostics} (secondary, descriptive): \emph{IR}
+(interaction rate, \% of instances with $\geq 1$ ask), \emph{Round} (mean
+turns), and \emph{CategoryHit}, for each interact action GPT-4o-mini classifies
+whether the clarifying question targets a true ambiguity category for that instance;
+we report CategoryHit@1, AnyCategoryHit, WrongCategoryRate, and GenericAskRate. Because
+clarifications are often compound (one question can name an entity, a period, and a metric
+at once), we report CategoryHit@1 in two forms: a lenient \emph{touch} form (the question names
+any true category) and a strict \emph{central} form (the single most-central category is a true
+category). The touch form is validated against human annotators (\S\ref{sec:humanval}). These
+metrics characterize \emph{how} a model interacts and do not rank models.
+
+\textbf{Calibration}: 5-bin Expected Calibration Error (ECE) between stated
+confidence and correctness, capturing overconfidence on ambiguous queries.
+
+\textbf{\disep (supplementary).} As a single number folding accuracy and
+clarification cost together we report the efficiency of \emph{successful}
+clarification,
+\[
+  \text{DisE}^+ = \mathbf{1}[\text{correct}] \times
+  \mathbf{1}[n_\text{asks}{>}0] \times \frac{H_0}{n_\text{asks}},
+\]
+which is positive only when the agent asked at least one question and then
+answered correctly, and decreases with redundant asks. We restrict it to the
+asked-and-correct case precisely to avoid the perverse incentive of an
+all-instances variant, which would award its maximum to a confident
+\emph{zero-ask} answer, rewarding the very behavior the benchmark penalizes.
+DisE$^+$ is a diagnostic of clarification efficiency, never the ranking metric.
