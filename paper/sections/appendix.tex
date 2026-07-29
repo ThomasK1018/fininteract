@@ -98,7 +98,7 @@ model must still ground the correct value.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{fig_bottleneck.png}
+\includegraphics[width=\linewidth]{fig_bottleneck.pdf}
 \caption{\textbf{The elicitation gap.} Free-interaction accuracy (orange) versus the
 context-oracle ceiling (teal) per model. Once the ambiguity is resolved every model
 answers $90$--$95\%$ correctly, so the $63$--$95$ point gap is the cost of the model
@@ -138,7 +138,7 @@ Figure~\ref{fig:radar} shows the same profile as a capability radar.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{fig_radar.png}
+\includegraphics[width=\linewidth]{fig_radar.pdf}
 \caption{\textbf{Per-category clarification-capability profile} (touch AC@1 from
 Table~\ref{tab:skills}). Every model saturates entity, metric, and temporal targeting
 but collapses to zero on \texttt{recognition\_policy}, a blind spot shared across the
@@ -164,7 +164,7 @@ but missing specific targeting, which is precisely the intervention target
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{fig_axisperf.png}
+\includegraphics[width=\textwidth]{fig_axisperf.pdf}
 \caption{\textbf{Per-model, per-category performance.} \emph{(a)}~Targeting (AC@1
 touch) versus \emph{(b)}~Resolution (\texttt{+interact} accuracy) for every model and
 ambiguity category. The top five rows are the full-scale panel ($n{=}173$, all categories) and
@@ -283,7 +283,7 @@ ten (Figure~\ref{fig:lever}).
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{fig_lever.png}
+\includegraphics[width=\linewidth]{fig_lever.pdf}
 \caption{\textbf{Interaction is a capability, not a free lever.} Added-interaction
 minus plain-search accuracy across the twelve full-scale and cross-vendor models.
 Interaction improves accuracy for only GPT-5 and Gemini and is flat or negative for
@@ -400,7 +400,7 @@ language-asymmetry caveat in \S\ref{sec:limitations} with a mechanism.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{fig_humanllm.png}
+\includegraphics[width=\linewidth]{fig_humanllm.pdf}
 \caption{\textbf{Targeting does not imply resolution.} Accuracy against AC@1
 (touch) in the interact regime, for the five full-scale models and the human baseline
 (star). The relationship is inverted: models that ask on the correct category most often
@@ -538,7 +538,7 @@ split (peaks $0.71$/$0.74$ vs.\ baseline $0.60$).
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=\textwidth]{fig_crossmodel_depthflow.png}
+  \includegraphics[width=\textwidth]{fig_crossmodel_depthflow.pdf}
   \caption{Four-model depth profile of the ambiguity signal (Qwen3 4B$\rightarrow$35B, dense and
   MoE). (a) Ambiguous$-$disambiguated separation rises to a peak in the final layers of every
   model (dotted verticals mark per-model peaks; normalized for depth and magnitude). (b) The
@@ -641,7 +641,7 @@ failure attribution without additional annotation:
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{fig_errordist.png}
+\includegraphics[width=\textwidth]{fig_errordist.pdf}
 \caption{\textbf{Error-type distribution} in \texttt{+interact}, attributing every
 instance to the taxonomy of Table~\ref{tab:errors} with the corrected category classifier.
 \emph{E5 misintegration} (the agent asks, touches the correct category, yet answers wrong)
@@ -932,7 +932,7 @@ cannot represent, but the one that is always someone else's more-obvious questio
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{fig_multiround.png}
+\includegraphics[width=\textwidth]{fig_multiround.pdf}
 \caption{Multi-round co-evolution with a validation guard. \emph{Left}: validation
 AC@1 (selection metric) per round. \emph{Right}: held-out \emph{human}-probe
 AC@1 (never used for selection). Entity learns targeting from a single $30$-instance
@@ -1315,7 +1315,7 @@ corporate-structure nomenclature (e.g., A/H-share distinctions, \emph{jituan} (g
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{fig_dataset_stats.png}
+\includegraphics[width=\textwidth]{fig_dataset_stats.pdf}
 \caption{\textbf{\fininteract distributions.} \emph{(a)}~Primary ambiguity category: the
 corpus is entity/metric-dominant ($54\%$ / $36\%$), with the three subordinate categories
 sparse, mirroring how often each category is the \emph{primary} ambiguity in public

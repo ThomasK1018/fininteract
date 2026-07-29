@@ -4,6 +4,8 @@ human transfer. Elo curves are produced separately by coevolve_elo.py."""
 import json
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+matplotlib.rcParams["pdf.fonttype"] = 42
+matplotlib.rcParams["ps.fonttype"] = 42
 
 RUNS = [("entity",         "entity  w1 (single-round)", "#1f77b4", "-o"),
         ("entity_w3",      "entity  w3 (accumulate)",   "#2b6cb0", "--s"),
@@ -30,5 +32,5 @@ ax2.set_title("TEST human-probe AC@1", fontsize=11)
 ax2.set_xlabel("solver checkpoint S_i"); ax2.set_ylabel("human-probe AC@1")
 ax2.set_ylim(0, 1); ax2.set_xticks([1, 2, 3]); ax2.legend(fontsize=9); ax2.grid(alpha=0.3)
 
-plt.tight_layout(); plt.savefig("data/results/multiround_v2_axishit.png", dpi=130)
+plt.tight_layout(); plt.savefig("data/results/multiround_v2_axishit.png", dpi=130); plt.savefig("data/results/multiround_v2_axishit.pdf")
 print("wrote data/results/multiround_v2_axishit.png")

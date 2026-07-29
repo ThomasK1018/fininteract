@@ -20,6 +20,8 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+matplotlib.rcParams["pdf.fonttype"] = 42
+matplotlib.rcParams["ps.fonttype"] = 42
 from matplotlib.colors import LinearSegmentedColormap
 
 AXES = ["entity_scope", "metric_definition", "recognition_policy", "temporal_scope", "filing_vintage"]
@@ -132,7 +134,7 @@ def main(a):
     fig.text(0.5, 0.965, "Full scale (n=173, top)   |   Proprietary pilot (n=50, bottom)",
              ha="center", fontsize=9, color="#444")
     fig.tight_layout(rect=[0, 0, 1, 0.95])
-    fig.savefig(a.out, dpi=200, bbox_inches="tight")
+    fig.savefig(a.out, dpi=200, bbox_inches="tight"); fig.savefig(str(a.out).replace(".png", ".pdf"), bbox_inches="tight")
     print("wrote", a.out)
 
 

@@ -14,6 +14,8 @@ import json, collections, argparse
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+matplotlib.rcParams["pdf.fonttype"] = 42
+matplotlib.rcParams["ps.fonttype"] = 42
 
 AXIS_ORDER = ["entity_scope", "metric_definition", "recognition_policy",
               "temporal_scope", "filing_vintage"]
@@ -58,7 +60,7 @@ def main(a):
     ax2.set_title("(b) Difficulty distribution", fontsize=11)
 
     fig.tight_layout()
-    fig.savefig(a.out, dpi=200, bbox_inches="tight")
+    fig.savefig(a.out, dpi=200, bbox_inches="tight"); fig.savefig(str(a.out).replace(".png", ".pdf"), bbox_inches="tight")
     print(f"n={n}  axes={dict(prim)}  H0={dict(h0c)}")
     print("wrote", a.out)
 

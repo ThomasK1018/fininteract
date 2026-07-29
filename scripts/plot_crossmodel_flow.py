@@ -14,6 +14,8 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+matplotlib.rcParams["pdf.fonttype"] = 42
+matplotlib.rcParams["ps.fonttype"] = 42
 
 plt.rcParams.update({"figure.dpi": 160, "font.size": 10, "axes.grid": True, "grid.alpha": 0.3})
 
@@ -62,4 +64,4 @@ a2.legend(fontsize=9, loc="lower right"); a2.set_ylim(0.5, 0.85)
 
 fig.tight_layout()
 out = Path(__file__).resolve().parent.parent / "paper" / "fig_crossmodel_depthflow.png"
-fig.savefig(out, bbox_inches="tight"); print("wrote", out)
+fig.savefig(out, bbox_inches="tight"); fig.savefig(str(out).replace(".png", ".pdf"), bbox_inches="tight"); print("wrote", out)

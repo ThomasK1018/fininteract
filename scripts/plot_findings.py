@@ -12,6 +12,8 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+matplotlib.rcParams["pdf.fonttype"] = 42
+matplotlib.rcParams["ps.fonttype"] = 42
 
 NAVY, TEAL, ORANGE, GREY = "#1f3a5f", "#2a9d8f", "#e76f51", "#8a8f98"
 plt.rcParams.update({"font.size": 11, "axes.spines.top": False, "axes.spines.right": False})
@@ -36,7 +38,7 @@ def fig_bottleneck(out):
     ax.set_xlabel("Accuracy (\\%)".replace("\\%", "%"))
     ax.set_title("The elicitation gap", fontsize=10.5)
     ax.legend(loc="lower right", fontsize=9, frameon=False)
-    fig.tight_layout(); fig.savefig(out, dpi=200, bbox_inches="tight"); print("wrote", out)
+    fig.tight_layout(); fig.savefig(out, dpi=200, bbox_inches="tight"); fig.savefig(str(out).replace(".png", ".pdf"), bbox_inches="tight"); print("wrote", out)
 
 
 def fig_lever(out):
@@ -60,7 +62,7 @@ def fig_lever(out):
     ax.set_xlabel("Interaction lever (points)")
     ax.set_xlim(-21, 29)
     ax.set_title("Interaction helps only 2 of 12 models", fontsize=10.5)
-    fig.tight_layout(); fig.savefig(out, dpi=200, bbox_inches="tight"); print("wrote", out)
+    fig.tight_layout(); fig.savefig(out, dpi=200, bbox_inches="tight"); fig.savefig(str(out).replace(".png", ".pdf"), bbox_inches="tight"); print("wrote", out)
 
 
 def fig_humanllm(out):
@@ -81,7 +83,7 @@ def fig_humanllm(out):
     ax.set_ylabel("Resolution: accuracy (\\%)".replace("\\%", "%"))
     ax.set_title("Asking on target does not imply resolving", fontsize=10.5)
     ax.set_xlim(0.6, 1.0); ax.set_ylim(-2, 34)
-    fig.tight_layout(); fig.savefig(out, dpi=200, bbox_inches="tight"); print("wrote", out)
+    fig.tight_layout(); fig.savefig(out, dpi=200, bbox_inches="tight"); fig.savefig(str(out).replace(".png", ".pdf"), bbox_inches="tight"); print("wrote", out)
 
 
 def main(a):

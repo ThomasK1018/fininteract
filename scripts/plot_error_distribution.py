@@ -23,6 +23,8 @@ from openai import OpenAI
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+matplotlib.rcParams["pdf.fonttype"] = 42
+matplotlib.rcParams["ps.fonttype"] = 42
 
 MODELS = ["gpt-5", "gpt-4o", "gpt-5-mini", "qwen3-30b-a3b", "qwen3p5-35b-a3b"]
 LABEL = {"gpt-5": "GPT-5", "gpt-4o": "GPT-4o", "gpt-5-mini": "GPT-5-mini",
@@ -105,7 +107,7 @@ def main(a):
     ax.set_ylim(0, 100)
     ax.legend(loc="center left", bbox_to_anchor=(1.01, 0.5), fontsize=9, frameon=False)
     fig.tight_layout()
-    fig.savefig(a.out, dpi=200, bbox_inches="tight")
+    fig.savefig(a.out, dpi=200, bbox_inches="tight"); fig.savefig(str(a.out).replace(".png", ".pdf"), bbox_inches="tight")
     print("wrote", a.out, "and", a.out_json)
     for m in MODELS:
         print(f"{LABEL[m]:12s}", {c: f"{out[m][c]:.2f}" for c in CATS})

@@ -16,6 +16,8 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+matplotlib.rcParams["pdf.fonttype"] = 42
+matplotlib.rcParams["ps.fonttype"] = 42
 
 AXES = ["Entity\nscope", "Metric\ndefinition", "Recognition\npolicy", "Temporal\nscope"]
 # touch AxisHit@1 per axis, from Table tab:skills
@@ -47,7 +49,7 @@ def main(a):
     ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.22), ncol=3,
               fontsize=9, frameon=False, columnspacing=1.0, handletextpad=0.4)
     fig.tight_layout()
-    fig.savefig(a.out, dpi=200, bbox_inches="tight")
+    fig.savefig(a.out, dpi=200, bbox_inches="tight"); fig.savefig(str(a.out).replace(".png", ".pdf"), bbox_inches="tight")
     print("wrote", a.out)
 
 
