@@ -1,3 +1,4 @@
+\newlength{\midgap}\setlength{\midgap}{0.02\textwidth}% <-- gap between the two panels; adjust here
 \begin{table*}[t]
 \centering
 \caption{\textbf{(a)}~Main results, reporting accuracy (\%) against the \emph{intended}
@@ -44,7 +45,7 @@ Qwen3.5-35B & 0.6 & \textbf{35.8} & 28.9 & -6.9 & 36 & .81 & -- \\
 Human           & -- & -- & \textbf{30.0} & -- & 100 & .72 & -- \\
 \bottomrule
 \end{tabular}}
-\end{minipage}
+\end{minipage}\hspace{\midgap}%
 \begin{minipage}[t]{0.40\textwidth}
 \centering
 \textbf{(b) Single-gold illusion}\par\smallskip
@@ -54,15 +55,15 @@ Human           & -- & -- & \textbf{30.0} & -- & 100 & .72 & -- \\
 Model & Mode & Intended & Default & $\Delta$ \\
       &      & (true Acc) & (single-gold) & \\
 \midrule
-GPT-5  & A   & 0.6  & 2.3  & +1.7 \\
+\multirow{3}{1cm}{GPT-5}  & A   & 0.6  & 2.3  & +1.7 \\
        & A+S & 6.4  & 10.4 & +4.0 \\
        & A+S+I & \textbf{20.2} & 12.1 & $-8.1$ \\
 \midrule
-GPT-4o & A & 0.6  & 0.6  & 0.0 \\
+\multirow{3}{1cm}{GPT-4o} & A & 0.6  & 0.6  & 0.0 \\
        & A+S & 12.1 & \textbf{37.0} & \textbf{+24.9} \\
        & A+S+I & 4.6  & 6.4  & +1.8 \\
 \midrule
-GPT-5-mini & A & 0.6 & 0.0 & $-0.6$ \\
+\multirow{3}{1cm}{GPT-5-mini} & A & 0.6 & 0.0 & $-0.6$ \\
            & A+S & 0.0 & 0.0 & 0.0 \\
            & A+S+I & 0.0 & 0.0 & 0.0 \\
 \bottomrule
