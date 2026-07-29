@@ -79,18 +79,19 @@ Appendix~\ref{sec:axisreact}.
 \caption{Evaluation modes.}
 \label{tab:modes}
 \small
-\begin{tabular}{lll}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{ll}
 \toprule
-Mode & Actions & Description \\
+Mode & Description \\
 \midrule
-Answer-only & answer & Pure parametric recall \\
-Answer+Search & search, answer & Oracle retrieval augmented \\
-Answer+Search+Interact & search, interact, answer & Standard full interaction \\
+Answer-only & Pure parametric recall \\
+Answer+Search & Oracle retrieval augmented \\
+Answer+Search+Interact & Standard full interaction \\
 \midrule
-Always-ask & \multicolumn{2}{l}{Must ask $\geq 1$ question before answering} \\
-Category-oracle & \multicolumn{2}{l}{Told the primary category, not the value} \\
-Template-oracle & \multicolumn{2}{l}{Fixed human-written question per category} \\
-Enumerate & \multicolumn{2}{l}{Lists all interpretations and answers} \\
+Always-ask & Must ask $\geq 1$ question before answering \\
+Category-oracle & Told the primary category, not the value \\
+Template-oracle & Fixed human-written question per category \\
+Enumerate & Lists all interpretations and answers \\
 \bottomrule
 \end{tabular}
 \end{table}
