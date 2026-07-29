@@ -1,11 +1,11 @@
-\subsection{Evaluation Setup}
+\subsection{Evaluation setup}
 \textbf{Agent architecture.} We evaluate agents under the ReAct~\cite{yao2023react} framework under seven configurations from Table~\ref{tab:modes}. The \textbf{interaction} action presents a yes-or-no question to the simulated user where the user has to respond ``yes'', ``no'' or ``I don't know''. 
 
 \textbf{Prompting strategy.} \fininteract evaluates interactive agents under different interaction protocol, including answer-only, answer with search, answer with search and interact, and the category conditioned policies. All models run under the same ReAct system prompt. Additional information is in Appendix~\ref{sec:error}. 
 
 \textbf{Models.} We evaluate over a diverse models such as proprietary models including GPT family with GPT-5.6-sol, 5, 4o and 5-mini, Claude-Somnet-5, Gemini-3.5-flash, Grok-4.5, DeepSeek-V4-flash, GLM-5.2 and Kimi-K3, and open source models including Qwen3 family including 4B, 8B, 14B, 32B and two mixture-of-experts models namely Qwen3-30B-A3B and Qwen3.5-35B-A3B. We evaluate the proprietary model via OpenRouter. 
 
-\subsection{Overall Performance}
+\subsection{Overall performance}
 \label{sec:ceiling}
 Table~\ref{tab:main} shows that even frontier models are vulnerable to financial report ambiguity. Specifically, we see that no models exceeds 44\% accuracy on the intended interpretation under free interaction mode, consistent across proprietary and open source models. The opportunity to interact does not help to improve accuracy, as the interaction difference $\Delta$ is non-positive for most models, indicating that existing models do not fail in asking correctly, but in converting the clarified intention into the correct answer. This is supported by the 95\% interaction rates and high AC@1 indicating that the models do recognize what kind of ambiguity it is to ask the correct clarification question. Specifically, we conduct further ablation studies in the interaction by forcing multiple interaction rounds and directly providing the disambiguating context $C$ as oracle, Table~\ref{tab:ceiling} shows that forcing more rounds of clarification actually lowers the model accuracy, which may imply agents getting lost in multi-turn conversations~\cite{laban2026llms}. Moreover, under the oracle scenario, the models can answer at about 93 - 95\% accuracy consistently. As the context $C$ does not contain final answer $A$, the improvement suggests that the gap is not missing knowledge, but the ability to disambiguate appropriately for downstream reasoning. We include the full finding in Appendix~\ref{app:maindetails}. \textbf{Finding 1: Models are capable of observing the ambiguity and answering correctly in oracle-clear intention, but fails to guide itself during intermediate conversion between updated intention and correct answer. }
 
@@ -29,7 +29,7 @@ Qwen3.5-35B & 0.6 & 28.9 & -- & \textbf{91.9} \\
 
 \input{paper/tables/main_table}
 
-\subsection{Failure of Existing Benchmarks}
+\subsection{Failure of existing benchmarks}
 \label{sec:illusion}
 
 By re-grading models on default readings from existing benchmark and the intended reading \fininteract curates and verifies, we observe that the accuracy differs significantly (Table~\ref{tab:illusion}) with a consistent inflation on the default scenario. This suggests that if existing benchmarks are curated without specific linguistic updates, model performance in financial QA might be conflated. We include details of the findings along with human-annotated study in Appendix~\ref{app:maindetails}. \textbf{Finding 2: Conventional single-gold financial QA benchmarks fail because building benchmarks with only one gold answer would likely encode default reading but not human-preferred intentions.}

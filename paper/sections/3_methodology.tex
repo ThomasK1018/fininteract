@@ -14,13 +14,13 @@ category, and resolve intent), and the single-gold failure of rewarding the defa
 \label{fig:framework}
 \end{figure*}
 
-\subsection{Design Goals and Principles}
+\subsection{Design goals and principles}
 \textbf{Design goals.} \fininteract targets four goals: \textbf{(G1) Representative coverage} to draw real ambiguity from public filings. 
 \textbf{(G2) Fine-grained diagnosis} to contain diverse possible readings so that evaluation can localize which clarification ability a model lacks. \textbf{(G3) Low-cost, leak-safe construction} to build and verify the corpus at scale in a semi-automated setting. \textbf{(G4) High, human-validated quality} to validate the instances and judges by domain experts with minimal annotation cost.
 
 \textbf{Design principles.} To satisfy the four goals, we build \fininteract under four principles: \textbf{1): Easy to verify, Ambiguous to resolve} to create programmatically verifiable ground truth using SEC XBRL facts and CNINFO-structured data but the question cannot be correctly resolved without disambiguating context $C$, \textbf{2): No yes/no questions} so that the agent has to deliver a grounded reasoning support, \textbf{3): Includes company name} to ensure no ambiguity in entity, i.e. capitalized proper noun for English and CJK company name for Chinese, and \textbf{4): Answer is not in disambiguating context $C$} so the agent cannot take shortcut by copying directly from the context.  
 
-\subsection{Data Sources}
+\subsection{Data sources}
 \label{sec:stats}
 We build the instances from official filings. For English instances which take about 80\% of the passage pool, we build them from SEC filings, DocFinQA long-context 10-K/10-Q passages with verified QA pairs and XBRL-derived facts for S\&P~500 and Russell~1000 companies within the financial year of 2024 to 2025. For Chinese instances, we build them from A-share annual reports of SSE~50 and CSI~3000 constituents using CNINFO and akshare structured APIS. We avoid reusing published QA pairs directly to reduce memorization risk, though we do not claim absolute contamination safety. The current evaluation corpus contains 173 instances over 61 companies within 2022 to 2025 filings, labelled with ambiguous taxonomy from Sec. \ref{sec:task}, with detail breakdown in Table~\ref{tab:stats}. Specific details regarding passage counts and difficulty distribution are included in Appendix~\ref{app:construction}.
 
