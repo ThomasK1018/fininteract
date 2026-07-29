@@ -32,16 +32,23 @@ def _excluded(path: str) -> bool:
     return base in EXCLUDE_NAMES or path.endswith(EXCLUDE_SUFFIX)
 
 
-def split_pdf(inp: str, split_page: int, main_out: str, suppl_out: str) -> str:
+def split_pdf(inp: str, split_page: int, main_out: str, suppl_out: str,
+              suppl_start: int = None) -> str:
     reader = PdfReader(inp)
     n = len(reader.pages)
     if not (1 <= split_page < n):
         sys.exit(f"--split-page must be between 1 and {n - 1} (the PDF has {n} pages)")
+    # by default the supplement begins on the page after the main cutoff; pass
+    # --suppl-start to overlap (e.g. when references/appendix share the cutoff page)
+    if suppl_start is None:
+        suppl_start = split_page + 1
+    if not (1 <= suppl_start <= n):
+        sys.exit(f"--suppl-start must be between 1 and {n} (the PDF has {n} pages)")
 
     main_w, suppl_w = PdfWriter(), PdfWriter()
-    for i in range(split_page):          # pages 1 .. split_page
+    for i in range(split_page):              # pages 1 .. split_page
         main_w.add_page(reader.pages[i])
-    for i in range(split_page, n):       # pages split_page+1 .. n
+    for i in range(suppl_start - 1, n):      # pages suppl_start .. n
         suppl_w.add_page(reader.pages[i])
 
     for path, writer in ((main_out, main_w), (suppl_out, suppl_w)):
@@ -51,7 +58,7 @@ def split_pdf(inp: str, split_page: int, main_out: str, suppl_out: str) -> str:
 
     print(f"input : {inp} ({n} pages)")
     print(f"  main  -> {main_out}   (pages 1-{split_page}, {split_page} pages)")
-    print(f"  suppl -> {suppl_out}   (pages {split_page + 1}-{n}, {n - split_page} pages)")
+    print(f"  suppl -> {suppl_out}   (pages {suppl_start}-{n}, {n - suppl_start + 1} pages)")
     return suppl_out
 
 
@@ -89,6 +96,9 @@ def main() -> None:
     ap.add_argument("--input", default="paper/main.pdf", help="compiled paper PDF")
     ap.add_argument("--split-page", type=int, default=8,
                     help="last page of the main submission (default: 8 = 7 content + 1 references)")
+    ap.add_argument("--suppl-start", type=int, default=None,
+                    help="first page of the supplement (default: split-page+1; set equal to "
+                         "split-page to overlap when a page is shared with the main body)")
     ap.add_argument("--main-out", default="submission/main_paper.pdf")
     ap.add_argument("--suppl-out", default="submission/supplementary.pdf")
     ap.add_argument("--bundle-zip", help="if set, zip the supplementary PDF with the --bundle-path items")
@@ -96,7 +106,7 @@ def main() -> None:
                     help="files/dirs to include alongside the supplementary PDF in the bundle zip")
     a = ap.parse_args()
 
-    suppl = split_pdf(a.input, a.split_page, a.main_out, a.suppl_out)
+    suppl = split_pdf(a.input, a.split_page, a.main_out, a.suppl_out, a.suppl_start)
     if a.bundle_zip:
         bundle_zip(a.bundle_zip, suppl, a.bundle_path)
 
