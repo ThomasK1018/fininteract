@@ -25,7 +25,7 @@ matplotlib.rcParams["ps.fonttype"] = 42
 from matplotlib.colors import LinearSegmentedColormap
 
 AXES = ["entity_scope", "metric_definition", "recognition_policy", "temporal_scope", "filing_vintage"]
-ALABEL = ["Entity", "Metric", "Recognition", "Temporal", "Filing\nvintage"]
+ALABEL = ["Entity", "Metric", "Recog.", "Temp.", "Filing"]
 
 FULL = ["gpt-5", "gpt-4o", "gpt-5-mini", "qwen3-30b-a3b", "qwen3p5-35b-a3b"]
 FULL_L = ["GPT-5", "GPT-4o", "GPT-5-mini", "Qwen3-30B", "Qwen3.5-35B"]
