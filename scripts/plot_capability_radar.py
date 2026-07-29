@@ -16,6 +16,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.transforms import ScaledTranslation
 matplotlib.rcParams["pdf.fonttype"] = 42
 matplotlib.rcParams["ps.fonttype"] = 42
 
@@ -42,6 +43,10 @@ def main(a):
         ax.fill(angles, v, color=COLORS[name], alpha=0.10)
     ax.set_xticks(angles[:-1])
     ax.set_xticklabels(AXES, fontsize=9.5)
+    # nudge the bottom "Temporal scope" label ~4pt higher (toward the plot)
+    temporal = ax.get_xticklabels()[3]
+    temporal.set_transform(temporal.get_transform()
+                           + ScaledTranslation(0, 4 / 72, fig.dpi_scale_trans))
     ax.set_ylim(0, 1.0)
     ax.set_yticks([0.25, 0.5, 0.75, 1.0])
     ax.set_yticklabels(["", "0.5", "", "1.0"], fontsize=9, color="#555")
