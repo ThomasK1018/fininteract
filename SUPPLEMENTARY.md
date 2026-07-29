@@ -1,7 +1,7 @@
 # FinInteract — Supplementary Code and Data
 
-This package accompanies the paper *FinInteract: A Fine-Grained Financial Ambiguity
-Benchmark*. It contains the frozen benchmark, the full construction and evaluation
+This package accompanies the paper *FinInteract: Benchmarking Clarification and Intent
+Integration in Ambiguous Financial Question Answering*. It contains the frozen benchmark, the full construction and evaluation
 pipeline, the analysis and plotting scripts, and the raw evaluation outputs needed to
 regenerate the tables and figures in the paper.
 
