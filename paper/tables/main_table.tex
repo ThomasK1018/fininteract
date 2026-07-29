@@ -1,13 +1,12 @@
-\newlength{\midgap}\setlength{\midgap}{0.02\textwidth}% <-- gap between the two panels; adjust here
+\newlength{\midgap}\setlength{\midgap}{-0.02\textwidth}% <-- gap between the two panels; adjust here
 \begin{table*}[t]
 \centering
 \caption{\textbf{(a)}~Main results, reporting accuracy (\%) against the \emph{intended}
 interpretation per mode, with $\Delta$ the +Interact minus +Search difference (full-scale rows are
 $N{=}173$ and the cross-vendor frontier rows, IR and ECE blank, are a preliminary $N{=}50$ pilot).
-\textbf{(b)}~The single-gold illusion, re-grading the same outputs against the intended versus the
-default reading a conventional benchmark would treat as gold. \textbf{(c)}~Per-category targeting
-(touch AC@1), where recognition policy is a shared blind spot ($=0$ for every model). Category
-sizes: entity 94, metric 63, recognition 9, temporal 7.}
+\textbf{(b)}~Re-grading the same outputs against the intended versus the default reading a conventional benchmark would treat as gold (Same abbreviation as Table~\ref{tab:modes}). \textbf{(c)}~Per-category targeting
+(AC@1), where recognition policy is a shared blind spot ($=0$ for every model). Category
+sizes: entity (Ent.) 94, metric (Met.) 63, recognition (Rec.) 9, temporal (Tmp.) 7.}
 \label{tab:main}
 %
 \begin{minipage}[t]{0.57\textwidth}
@@ -46,7 +45,7 @@ Human           & -- & -- & \textbf{30.0} & -- & 100 & .72 & -- \\
 \bottomrule
 \end{tabular}}
 \end{minipage}\hspace{\midgap}%
-\begin{minipage}[t]{0.40\textwidth}
+\begin{minipage}[t]{0.45\textwidth}
 \centering
 \textbf{(b) Single-gold illusion}\par\smallskip
 {\small
