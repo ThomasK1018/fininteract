@@ -1,14 +1,18 @@
 \begin{table*}[t]
 \centering
-\caption{Adding interaction rarely helps across most models, often degrading accuracy. We report
-accuracy (\%) against the \emph{intended} interpretation (per mode), with $\Delta$ denoting the
-accuracy difference from adding interaction. Panels group \emph{(a)} proprietary and \emph{(b)}
-open-source models, with \emph{(c)} a single-clarification human baseline. Full-scale rows are
-$N{=}173$, and the cross-vendor frontier rows (IR and ECE blank) are a preliminary $N{=}50$ pilot.
-Added interaction is flat-or-negative for most models, with only GPT-5 and Gemini gaining from it.
-IR, AC@1, and ECE are secondary diagnostics (\S\ref{sec:metrics}).}
+\caption{\textbf{(a)}~Main results, reporting accuracy (\%) against the \emph{intended}
+interpretation per mode, with $\Delta$ the +Interact minus +Search difference (full-scale rows are
+$N{=}173$ and the cross-vendor frontier rows, IR and ECE blank, are a preliminary $N{=}50$ pilot).
+\textbf{(b)}~The single-gold illusion, re-grading the same outputs against the intended versus the
+default reading a conventional benchmark would treat as gold. \textbf{(c)}~Per-category targeting
+(touch AC@1), where recognition policy is a shared blind spot ($=0$ for every model). Category
+sizes: entity 94, metric 63, recognition 9, temporal 7.}
 \label{tab:main}
-\small
+%
+\begin{minipage}[t]{0.57\textwidth}
+\centering
+\textbf{(a) Main results}\par\smallskip
+{\small\setlength{\tabcolsep}{2.5pt}
 \begin{tabular}{lccccccc}
 \toprule
 & \multicolumn{2}{c}{Acc (\%)} &
@@ -16,7 +20,7 @@ IR, AC@1, and ECE are secondary diagnostics (\S\ref{sec:metrics}).}
 \cmidrule(lr){2-3}\cmidrule(lr){4-8}
 Model & Ans-only & +Search & Acc & $\Delta$ & IR & AC@1 & ECE \\
 \midrule
-\multicolumn{8}{l}{\textit{(a) Proprietary models}} \\
+\multicolumn{8}{l}{\textit{Proprietary models}} \\
 GPT-5.6-sol       & 10.0 & 36.0 & 30.0 & $-6$  & -- & .98 & -- \\
 GPT-5           & 0.6 & 6.4  & \textbf{20.2} & $+13.8$ & 98.8 & .86 & .53 \\
 GPT-4o          & 0.6 & 12.1 & 4.6  & $-7.5$  & 99.4 & .94 & .82 \\
@@ -28,7 +32,7 @@ Kimi-K3           & 16.0 & 38.0 & 34.0 & $-4$  & -- & .98 & -- \\
 DeepSeek-V4-flash & 12.0 & 28.0 & 24.0 & $-4$  & -- & .96 & -- \\
 Gemini-3.5-flash  & 14.0 & 6.0  & 30.0 & $+24$ & -- & .96 & -- \\
 \midrule
-\multicolumn{8}{l}{\textit{(b) Open source models}} \\
+\multicolumn{8}{l}{\textit{Open source models}} \\
 Qwen3-4B        & 0.0 & 8.1  & 12.1 & $+4.0$  & 28 & .85 & -- \\
 Qwen3-8B        & 0.6 & 14.4 & 24.9 & $+10.5$ & 15 & .88 & -- \\
 Qwen3-14B       & 0.0 & 18.5 & 22.5 & $+4.0$  & 36 & .74 & -- \\
@@ -36,8 +40,48 @@ Qwen3-32B       & 1.2 & 27.2 & 8.4  & $-18.8$ & 61 & .96 & -- \\
 Qwen3-30B-A3B   & 1.2 & 28.3 & 11.6 & $-16.7$ & 72 & .90 & -- \\
 Qwen3.5-35B-A3B & 0.6 & \textbf{35.8} & 28.9 & $-6.9$ & 36 & .81 & -- \\
 \midrule
-\multicolumn{8}{l}{\textit{(c) Human baseline ($N{=}50$)}} \\
-Human               & -- & -- & \textbf{30.0} & -- & 100 & .72 & -- \\
+\multicolumn{8}{l}{\textit{Human baseline ($N{=}50$)}} \\
+Human           & -- & -- & \textbf{30.0} & -- & 100 & .72 & -- \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.40\textwidth}
+\centering
+\textbf{(b) Single-gold illusion}\par\smallskip
+{\small
+\begin{tabular}{llccc}
+\toprule
+Model & Mode & Intended & Default & $\Delta$ \\
+      &      & (true Acc) & (single-gold) & \\
+\midrule
+GPT-5  & A   & 0.6  & 2.3  & +1.7 \\
+       & A+S & 6.4  & 10.4 & +4.0 \\
+       & A+S+I & \textbf{20.2} & 12.1 & $-8.1$ \\
+\midrule
+GPT-4o & A & 0.6  & 0.6  & 0.0 \\
+       & A+S & 12.1 & \textbf{37.0} & \textbf{+24.9} \\
+       & A+S+I & 4.6  & 6.4  & +1.8 \\
+\midrule
+GPT-5-mini & A & 0.6 & 0.0 & $-0.6$ \\
+           & A+S & 0.0 & 0.0 & 0.0 \\
+           & A+S+I & 0.0 & 0.0 & 0.0 \\
+\bottomrule
+\end{tabular}}
+\label{tab:illusion}
+\par\bigskip
+\textbf{(c) Per-category targeting (AC@1)}\par\smallskip
+{\small
+\begin{tabular}{lcccc}
+\toprule
+Model & Ent. & Met. & Rec. & Tmp. \\
+\midrule
+GPT-5    & .89 & .92 & \textbf{.00} & 1.00 \\
+GPT-4o   & 1.00 & .97 & \textbf{.00} & 1.00 \\
+GPT-5-m  & .99 & 1.00 & \textbf{.00} & 1.00 \\
+Q3-30B   & .93 & .96 & \textbf{.00} & 1.00 \\
+Q3.5-35B & .85 & .87 & \textbf{.00} & 1.00 \\
+\bottomrule
+\end{tabular}}
+\label{tab:skills}
+\end{minipage}
 \end{table*}

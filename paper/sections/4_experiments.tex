@@ -35,52 +35,10 @@ Qwen3.5-35B & 0.6 & 28.9 & -- & \textbf{91.9} \\
 By re-grading models on default readings from existing benchmark and the intended reading \fininteract curates and verifies, we observe that the accuracy differs significantly (Table~\ref{tab:illusion}) with a consistent inflation on the default scenario. This suggests that if existing benchmarks are curated without specific linguistic updates, model performance in financial QA might be conflated. We include details of the findings along with human-annotated study in Appendix~\ref{app:maindetails}. \textbf{Finding 2: Conventional single-gold financial QA benchmarks fail because building benchmarks with only one gold answer would likely encode default reading but not human-preferred intentions.}
 
 
-\begin{table}[t]
-\centering
-\caption{By comparing the accuracy difference $\Delta$ between answering intended interpretation versus typical reading from single-gold benchmark (same abbreviation as in Table~\ref{tab:modes}), model performance in existing benchmarks will be conflated, specifically in the retrieval regime where search function is available. }
-\label{tab:illusion}
-\small
-\begin{tabular}{llccc}
-\toprule
-Model & Mode & Intended & Default & $\Delta$ \\
-      &      & (true Acc) & (single-gold) & \\
-\midrule
-GPT-5  & A   & 0.6  & 2.3  & +1.7 \\
-       & A+S & 6.4  & 10.4 & +4.0 \\
-       & A+S+I & \textbf{20.2} & 12.1 & $-8.1$ \\
-\midrule
-GPT-4o & A & 0.6  & 0.6  & 0.0 \\
-       & A+S & 12.1 & \textbf{37.0} & \textbf{+24.9} \\
-       & A+S+I & 4.6  & 6.4  & +1.8 \\
-\midrule
-GPT-5-mini & A & 0.6 & 0.0 & $-0.6$ \\
-           & A+S & 0.0 & 0.0 & 0.0 \\
-           & A+S+I & 0.0 & 0.0 & 0.0 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 
 \subsection{Systematic failure from recognition policy}
 \label{sec:skills}
 We extend the study into each ambiguity group. Table ~\ref{tab:skills} shows that in the high AC@1 shown in Table~\ref{tab:main}, while models are capable of determining ambiguity category in most cases, it consistently fails in the recognition policy group. This motivates us to study this blind spot of existing models by examining the following case study. Given the question ``What were General Electric's revenues?'', the answer is either \$67.95B or \$26.79B under different recognition policies, the former being GAAP revenue that combines over-time service recognition with point-in-time product recognition, and the latter counting only revenue recognized at a point in time. Models fail here as they consistently return a single figure without asking for the expected recognition basis, defaulting to a generic assumption that ``revenue'' is well defined and ignoring the ASC~606 practice of recognizing revenue at a point in time versus over time. This suggests that the domain-specific practice might not align too well with existing model's generalized behavior, hence suggesting the need of specific tuning. We attach details and further case studies in in Appendix~\ref{app:maindetails}. \textbf{Finding 3: Agents are not well-trained to notice ambiguity on financial-specific policies. }
-
-\begin{table}[t]
-\centering
-\caption{We observe that recognition policy seems to be a blind spot of existing models as they can never detect and seek clarification from it, compared to the rest categories where the model is aware of the ambiguity.}
-\label{tab:skills}
-\small
-\begin{tabular}{lrccccc}
-\toprule
-Category & $n$ & GPT-5 & GPT-4o & {\footnotesize GPT-5-m} & {\footnotesize Q3-30B} & {\footnotesize Q3.5-35B} \\
-\midrule
-entity\_scope       & 94 & .89 & 1.00 & .99 & .93 & .85 \\
-metric\_definition  & 63 & .92 & .97 & 1.00 & .96 & .87 \\
-recognition\_policy &  9 & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} & \textbf{.00} \\
-temporal\_scope     &  7 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \subsection{The Ambiguity Category Serves as an Actionable Training Signal}
 \label{sec:trainsignal}
