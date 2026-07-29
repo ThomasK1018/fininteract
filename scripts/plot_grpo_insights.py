@@ -13,7 +13,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-plt.rcParams.update({"figure.dpi": 160, "font.size": 10, "axes.grid": True, "grid.alpha": 0.3})
+plt.rcParams.update({"figure.dpi": 160, "font.size": 10, "axes.grid": True, "grid.alpha": 0.3,
+                     "pdf.fonttype": 42, "ps.fonttype": 42})  # embed TrueType (no Type-3 fonts)
 
 # --- Panel (a): RLVR ladder (RESULTS_REPORT.md, n=51) ---
 stages = ["base", "SFT", "KTO", "GRPO"]
@@ -48,8 +49,8 @@ a2.set_title("(b) Multi-turn GRPO")
 a2.legend([l1, l2], ["reward mean", "clarifying turns"], fontsize=9, loc="lower right")
 
 fig.tight_layout()
-out = "paper/fig_grpo_insights.png"
-fig.savefig(out, bbox_inches="tight"); print("wrote", out)
+for out in ("paper/fig_grpo_insights.pdf", "paper/fig_grpo_insights.png"):
+    fig.savefig(out, bbox_inches="tight"); print("wrote", out)
 
 # --- printed insights ---
 print("\n=== TRAINING INSIGHTS (from reported aggregates) ===")
