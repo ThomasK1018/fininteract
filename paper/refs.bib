@@ -1,8 +1,11 @@
-@inproceedings{islam2023financebench,
-  title={{FinanceBench}: A New Benchmark for Financial Question Answering},
-  author={Islam, Pranab and Kannappan, Anand and Kiela, Douwe and Qian, Ruby and Scherrer, Nino and Vidgen, Bertie},
-  booktitle={arXiv:2311.11944},
-  year={2023}
+@misc{islam2023financebench,
+      title={FinanceBench: A New Benchmark for Financial Question Answering}, 
+      author={Pranab Islam and Anand Kannappan and Douwe Kiela and Rebecca Qian and Nino Scherrer and Bertie Vidgen},
+      year={2023},
+      eprint={2311.11944},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2311.11944}, 
 }
 
 @inproceedings{
@@ -15,173 +18,407 @@ url={https://openreview.net/forum?id=VKGTGGcwl6}
 }
 
 @inproceedings{chen2021finqa,
-  title={{FinQA}: A Dataset of Numerical Reasoning over Financial Data},
-  author={Chen, Zhiyu and Chen, Wenhu and Smiley, Charese and Shah, Sameena and Borova, Iana and Langdon, Dylan and Moussa, Reema and Beane, Matt and Huang, Ting-Hao and Routledge, Bryan and Wang, William Yang},
-  booktitle={Proceedings of EMNLP},
-  year={2021}
+    title = "{F}in{QA}: A Dataset of Numerical Reasoning over Financial Data",
+    author = "Chen, Zhiyu  and
+      Chen, Wenhu  and
+      Smiley, Charese  and
+      Shah, Sameena  and
+      Borova, Iana  and
+      Langdon, Dylan  and
+      Moussa, Reema  and
+      Beane, Matt  and
+      Huang, Ting-Hao  and
+      Routledge, Bryan  and
+      Wang, William Yang",
+    editor = "Moens, Marie-Francine  and
+      Huang, Xuanjing  and
+      Specia, Lucia  and
+      Yih, Scott Wen-tau",
+    booktitle = "Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2021",
+    address = "Online and Punta Cana, Dominican Republic",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.emnlp-main.300/",
+    doi = "10.18653/v1/2021.emnlp-main.300",
+    pages = "3697--3711",
+    abstract = "The sheer volume of financial statements makes it difficult for humans to access and analyze a business{'}s financials. Robust numerical reasoning likewise faces unique challenges in this domain. In this work, we focus on answering deep questions over financial data, aiming to automate the analysis of a large corpus of financial documents. In contrast to existing tasks on general domain, the finance domain includes complex numerical reasoning and understanding of heterogeneous representations. To facilitate analytical progress, we propose a new large-scale dataset, FinQA, with Question-Answering pairs over Financial reports, written by financial experts. We also annotate the gold reasoning programs to ensure full explainability. We further introduce baselines and conduct comprehensive experiments in our dataset. The results demonstrate that popular, large, pre-trained models fall far short of expert humans in acquiring finance knowledge and in complex multi-step numerical reasoning on that knowledge. Our dataset {--} the first of its kind {--} should therefore enable significant, new community research into complex application domains. The dataset and code are publicly available at \url{https://github.com/czyssrs/FinQA}."
 }
 
+
 @inproceedings{reddy2024docfinqa,
-  title={{DocFinQA}: A Long-Context Financial Reasoning Dataset},
-  author={Reddy, Varshini and Balaguer, Rik and Bhatt, Ganesh and Bhatt, Mihir and Jiang, Bowen and Kuo, Fei and Lee, Ching-Yun and Madabushi, Harish Tayyar and Mazumder, Rajiv and Mihindukulasooriya, Nandana and Morales, Pedro and Picco, Guilherme},
-  booktitle={Proceedings of ACL},
-  year={2024}
+    title = "{D}oc{F}in{QA}: A Long-Context Financial Reasoning Dataset",
+    author = "Reddy, Varshini  and
+      Koncel-Kedziorski, Rik  and
+      Lai, Viet Dac  and
+      Krumdick, Michael  and
+      Lovering, Charles  and
+      Tanner, Chris",
+    editor = "Ku, Lun-Wei  and
+      Martins, Andre  and
+      Srikumar, Vivek",
+    booktitle = "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 2: Short Papers)",
+    month = aug,
+    year = "2024",
+    address = "Bangkok, Thailand",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.acl-short.42/",
+    doi = "10.18653/v1/2024.acl-short.42",
+    pages = "445--458",
+    abstract = "For large language models (LLMs) to be effective in the financial domain {--} where each decision can have a significant impact {--} it is necessary to investigate realistic tasks and data. Financial professionals often interact with documents spanning hundreds of pages, but most financial research datasets only deal with short excerpts from these documents. To address this, we introduce a long-document financial QA task. We augment 7,437 questions from the existing FinQA dataset with full-document context, extending the average context length from under 700 words in FinQA to 123k words in DocFinQA. We conduct extensive experiments over retrieval-based QA pipelines and long-context language models. Based on our experiments, DocFinQA proves a significant challenge for even state-of-the-art systems. We also provide a case study on a subset of the longest documents in DocFinQA and find that models particularly struggle with these documents. Addressing these challenges may have a wide-reaching impact across applications where specificity and long-range contexts are critical, like gene sequences and legal document contract analysis. DocFinQA dataset is publicly accessible."
 }
 
 @inproceedings{krumdick2024bizbench,
-  title={{BizBench}: A Quantitative Reasoning Benchmark for Business and Finance},
-  author={Krumdick, Michael and Lorber, Jenna and Tsui, Christopher and Vithala, Varshini and Bhatt, Mihir and Kuo, Fei and Madabushi, Harish Tayyar and Mazumder, Rajiv},
-  booktitle={Proceedings of ACL},
-  year={2024}
+    title = "{B}iz{B}ench: A Quantitative Reasoning Benchmark for Business and Finance",
+    author = "Krumdick, Michael  and
+      Koncel-Kedziorski, Rik  and
+      Lai, Viet Dac  and
+      Reddy, Varshini  and
+      Lovering, Charles  and
+      Tanner, Chris",
+    editor = "Ku, Lun-Wei  and
+      Martins, Andre  and
+      Srikumar, Vivek",
+    booktitle = "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = aug,
+    year = "2024",
+    address = "Bangkok, Thailand",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.acl-long.452/",
+    doi = "10.18653/v1/2024.acl-long.452",
+    pages = "8309--8332",
+    abstract = "Answering questions within business and finance requires reasoning, precision, and a wide-breadth of technical knowledge. Together, these requirements make this domain difficult for large language models (LLMs). We introduce BizBench, a benchmark for evaluating models' ability to reason about realistic financial problems. BizBench comprises eight quantitative reasoning tasks, focusing on question-answering (QA) over financial data via program synthesis. We include three financially-themed code-generation tasks from newly collected and augmented QA data. Additionally, we isolate the reasoning capabilities required for financial QA: reading comprehension of financial text and tables for extracting intermediate values, and understanding financial concepts and formulas needed to calculate complex solutions. Collectively, these tasks evaluate a model{'}s financial background knowledge, ability to parse financial documents, and capacity to solve problems with code. We conduct an in-depth evaluation of open-source and commercial LLMs, comparing and contrasting the behavior of code-focused and language-focused models. We demonstrate that the current bottleneck in performance is due to LLMs' limited business and financial understanding, highlighting the value of a challenging benchmark for quantitative reasoning within this domain."
 }
 
 @inproceedings{xie2024finben,
-  title={{FinBen}: A Holistic Financial Benchmark for Large Language Models},
-  author={Xie, Qianqian and Han, Weiguang and Zhang, Zhengyu and Lai, Ruoyu and Peng, Min and Lopez-Lira, Alejandro and Huang, Jimin},
-  booktitle={Proceedings of NeurIPS Datasets and Benchmarks Track},
-  year={2024}
+author = {Xie, Qianqian and Han, Weiguang and Chen, Zhengyu and Xiang, Ruoyu and Zhang, Xiao and He, Yueru and Xiao, Mengxi and Li, Dong and Dai, Yongfu and Feng, Duanyu and Xu, Yijing and Kang, Haoqiang and Kuang, Ziyan and Yuan, Chenhan and Yang, Kailai and Luo, Zheheng and Zhang, Tianlin and Liu, Zhiwei and Xiong, Guojun and Deng, Zhiyang and Jiang, Yuechen and Yao, Zhiyuan and Li, Haohang and Yu, Yangyang and Hu, Gang and Huang, Jiajia and Liu, Xiao-Yang and Lopez-Lira, Alejandro and Wang, Benyou and Lai, Yanzhao and Wang, Hao and Peng, Min and Ananiadou, Sophia and Huang, Jimin},
+title = {FinBen: a holistic financial benchmark for large language models},
+year = {2024},
+isbn = {9798331314385},
+publisher = {Curran Associates Inc.},
+address = {Red Hook, NY, USA},
+abstract = {LLMs have transformed NLP and shown promise in various fields, yet their potential in finance is underexplored due to a lack of comprehensive benchmarks, the rapid development of LLMs, and the complexity of financial tasks. In this paper, we introduce FinBen, the first extensive open-source evaluation benchmark, including 42 datasets spanning 24 financial tasks, covering eight critical aspects: information extraction (IE), textual analysis, question answering (QA), text generation, risk management, forecasting, decision-making, and bilingual (English and Spanish). FinBen offers several key innovations: a broader range of tasks and datasets, the first evaluation of stock trading, novel agent and Retrieval-Augmented Generation (RAG) evaluation, and two novel datasets for regulations and stock trading. Our evaluation of 21 representative LLMs, including GPT-4, ChatGPT, and the latest Gemini, reveals several key findings: While LLMs excel in IE and textual analysis, they struggle with advanced reasoning and complex tasks like text generation and forecasting. GPT-4 excels in IE and stock trading, while Gemini is better at text generation and forecasting. Instruction-tuned LLMs improve textual analysis but offer limited benefits for complex tasks such as QA. FinBen has been used to host the first financial LLMs shared task at the FinNLP-AgentScen workshop during IJCAI-2024, attracting 12 teams. Their novel solutions outperformed GPT-4, showcasing FinBen's potential to drive innovations in financial LLMs. All datasets and code are publicly available for the research community, with results shared and updated regularly on the Open Financial LLM Leaderboard.},
+booktitle = {Proceedings of the 38th International Conference on Neural Information Processing Systems},
+articleno = {3033},
+numpages = {28},
+location = {Vancouver, BC, Canada},
+series = {NIPS '24}
 }
 
+
+
 @inproceedings{min2020ambigqa,
-  title={{AmbigQA}: Answering Ambiguous Open-domain Questions},
-  author={Min, Sewon and Michael, Julian and Hajishirzi, Hannaneh and Zettlemoyer, Luke},
-  booktitle={Proceedings of EMNLP},
-  year={2020}
+    title = "{A}mbig{QA}: Answering Ambiguous Open-domain Questions",
+    author = "Min, Sewon  and
+      Michael, Julian  and
+      Hajishirzi, Hannaneh  and
+      Zettlemoyer, Luke",
+    editor = "Webber, Bonnie  and
+      Cohn, Trevor  and
+      He, Yulan  and
+      Liu, Yang",
+    booktitle = "Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP)",
+    month = nov,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2020.emnlp-main.466/",
+    doi = "10.18653/v1/2020.emnlp-main.466",
+    pages = "5783--5797",
+    abstract = "Ambiguity is inherent to open-domain question answering; especially when exploring new topics, it can be difficult to ask questions that have a single, unambiguous answer. In this paper, we introduce AmbigQA, a new open-domain question answering task which involves finding every plausible answer, and then rewriting the question for each one to resolve the ambiguity. To study this task, we construct AmbigNQ, a dataset covering 14,042 questions from NQ-open, an existing open-domain QA benchmark. We find that over half of the questions in NQ-open are ambiguous, with diverse sources of ambiguity such as event and entity references. We also present strong baseline models for AmbigQA which we show benefit from weakly supervised learning that incorporates NQ-open, strongly suggesting our new task and data will support significant future research effort. Our data and baselines are available at \url{https://nlp.cs.washington.edu/ambigqa}."
 }
 
 @inproceedings{stelmakh2022asqa,
-  title={{ASQA}: Factoid Questions Meet Long-Form Answers},
-  author={Stelmakh, Ivan and Liang, Yi and Dziri, Nouha and Peng, Nanyun and Chang, Kai-Wei},
-  booktitle={Proceedings of EMNLP},
-  year={2022}
+    title = "{ASQA}: Factoid Questions Meet Long-Form Answers",
+    author = "Stelmakh, Ivan  and
+      Luan, Yi  and
+      Dhingra, Bhuwan  and
+      Chang, Ming-Wei",
+    editor = "Goldberg, Yoav  and
+      Kozareva, Zornitsa  and
+      Zhang, Yue",
+    booktitle = "Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing",
+    month = dec,
+    year = "2022",
+    address = "Abu Dhabi, United Arab Emirates",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2022.emnlp-main.566/",
+    doi = "10.18653/v1/2022.emnlp-main.566",
+    pages = "8273--8288",
+    abstract = "Recent progress on open domain factoid question answering (QA) does not easily transfer to the task of long-form QA, where the goal is to answer questions that require in-depth explanations. The hurdles include a lack of high-quality data and the absence of a well-defined notion of an answer{'}s quality. In this work, we address these problems by releasing a novel dataset and a task that we call ASQA (Answer Summaries for Questions which are Ambiguous); and proposing a reliable metric for measuring performance on ASQA. Our task focuses on ambiguous factoid questions which have different correct answers depending on the interpretation. Answers to ambiguous questions should combine factual information from multiple sources into a coherent long-form summary that resolves the ambiguity. In contrast to existing long-form QA tasks (such as ELI5), ASQA admits a clear notion of correctness: a user faced with a good summary should be able to answer different interpretations of the original ambiguous question. Our analysis demonstrates an agreement between this metric and human judgments, and reveals a considerable gap between human performance and strong baselines."
 }
+
 
 @inproceedings{li2025condambigqa,
-  title={{CondAmbigQA}: A Benchmark for Conditional Ambiguous Question Answering},
-  author={Li, Ziyun and others},
-  booktitle={Proceedings of EMNLP},
-  year={2025}
+    title = "{C}ond{A}mbig{QA}: A Benchmark and Dataset for Conditional Ambiguous Question Answering",
+    author = "Li, Zongxi  and
+      Li, Yang  and
+      Xie, Haoran  and
+      Qin, S. Joe",
+    editor = "Christodoulopoulos, Christos  and
+      Chakraborty, Tanmoy  and
+      Rose, Carolyn  and
+      Peng, Violet",
+    booktitle = "Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2025",
+    address = "Suzhou, China",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.emnlp-main.115/",
+    doi = "10.18653/v1/2025.emnlp-main.115",
+    pages = "2269--2288",
+    ISBN = "979-8-89176-332-6",
+    abstract = "Users often assume that large language models (LLMs) share their cognitive alignment of context and intent, leading them to omit critical information in question-answering (QA) and produce ambiguous queries. Responses based on misaligned assumptions may be perceived as hallucinations. Therefore, identifying possible implicit assumptions is crucial in QA. To address this fundamental challenge, we propose Conditional Ambiguous Question-Answering (CondAmbigQA), a benchmark comprising 2,000 ambiguous queries and condition-aware evaluation metrics. Our study pioneers ``conditions'' as explicit contextual constraints that resolve ambiguities in QA tasks through retrieval-based annotation, where retrieved Wikipedia fragments help identify possible interpretations for a given query and annotate answers accordingly. Experiments demonstrate that models considering conditions before answering improve answer accuracy by 11.75{\%}, with an additional 7.15{\%} gain when conditions are explicitly provided. These results highlight that apparent hallucinations may stem from inherent query ambiguity rather than model failure, and demonstrate the effectiveness of condition reasoning in QA, providing researchers with tools for rigorous evaluation."
 }
 
-@inproceedings{kuhn2022clam,
-  title={{CLAM}: Selective Clarification for Ambiguous Questions},
-  author={Kuhn, Lorenz and Gal, Yarin and Farquhar, Sebastian},
-  booktitle={ICML Workshop on Knowledge Retrieval and Language Models},
-  year={2022}
+@misc{kuhn2022clam,
+      title={CLAM: Selective Clarification for Ambiguous Questions with Generative Language Models}, 
+      author={Lorenz Kuhn and Yarin Gal and Sebastian Farquhar},
+      year={2023},
+      eprint={2212.07769},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2212.07769}, 
 }
+
 
 @article{gwet2008,
-  title={Computing inter-rater reliability and its variance in the presence of high agreement},
-  author={Gwet, Kilem Li},
-  journal={British Journal of Mathematical and Statistical Psychology},
-  volume={61},
-  number={1},
-  pages={29--48},
-  year={2008},
-  publisher={Wiley Online Library}
+author = {Gwet, Kilem Li},
+title = {Computing inter-rater reliability and its variance in the presence of high agreement},
+journal = {British Journal of Mathematical and Statistical Psychology},
+volume = {61},
+number = {1},
+pages = {29-48},
+doi = {https://doi.org/10.1348/000711006X126600},
+url = {https://bpspsychub.onlinelibrary.wiley.com/doi/abs/10.1348/000711006X126600},
+eprint = {https://bpspsychub.onlinelibrary.wiley.com/doi/pdf/10.1348/000711006X126600},
+abstract = {Pi (π) and kappa (κ) statistics are widely used in the areas of psychiatry and psychological testing to compute the extent of agreement between raters on nominally scaled data. It is a fact that these coefficients occasionally yield unexpected results in situations known as the paradoxes of kappa. This paper explores the origin of these limitations, and introduces an alternative and more stable agreement coefficient referred to as the AC1 coefficient. Also proposed are new variance estimators for the multiple-rater generalized π and AC1 statistics, whose validity does not depend upon the hypothesis of independence between raters. This is an improvement over existing alternative variances, which depend on the independence assumption. A Monte-Carlo simulation study demonstrates the validity of these variance estimators for confidence interval construction, and confirms the value of AC1 as an improved alternative to existing inter-rater reliability statistics.},
+year = {2008}
 }
 
-@article{interactcomp2026,
-  title={{InteractComp}: Evaluating Search Agents with Ambiguous Queries},
-  author={Deng, Mingyi and Huang, Lijun and Fan, Yani and Kong, Fanqi and Zhang, Jiayi and Ren, Fashen and Bai, Jinyi and Yang, Fuzhen and Miao, Dayi and Yu, Zhaoyang and Wu, Yifan and Zhang, Yanfei and Teng, Fengwei and Wan, Yingjia and Hu, Song and Li, Yude and Jin, Xin and Hu, Conghao and Li, Haoyu and Fu, Qirui and Zhong, Tai and Wang, Xinyu and Tang, Xiangru and Tang, Nan and Wu, Chenglin and Luo, Yuyu},
-  journal={arXiv preprint arXiv:2510.24668},
-  year={2025}
+
+
+COPY TEXT
+
+DOWNLOAD
+
+Tips on downloading citation
+
+@inproceedings{
+interactcomp2026,
+title={InteractComp: Evaluating Search Agents With Ambiguous Queries},
+author={Mingyi Deng and Lijun Huang and Yani Fan and Fanqi Kong and Jiayi Zhang and Fashen Ren and Jinyi Bai and Fuzhen Yang and Dayi Miao and Zhaoyang Yu and Yifan Wu and Yanfei Zhang and Fengwei Teng and Yingjia Wan and Song Hu and Yude Li and Xin Jin and Conghao Hu and Haoyu Li and Qirui Fu and Tai Zhong and Xinyu Wang and Xiangru Tang and Nan Tang and Chenglin Wu and Yuyu Luo},
+booktitle={Forty-third International Conference on Machine Learning},
+year={2026},
+url={https://openreview.net/forum?id=AiawINF2T0}
 }
 
-@article{mae2025,
-  title={Multi-Agent Evolve: {LLM} Self-Improve through Co-evolution},
-  author={Chen, Yixing and Wang, Yiding and Zhu, Siqi and Yu, Haofei and Feng, Tao and Zhang, Muhan and Patwary, Mostofa and You, Jiaxuan},
-  journal={arXiv preprint arXiv:2510.23595},
-  year={2025}
+@misc{mae2025,
+title={Multi-Agent Evolve: {LLM} Self-Improve through Multi-Agent Co-evolution},
+author={Yixing Chen and Yiding Wang and Haofei Yu and Tao Feng and Siqi Zhu and Muhan Zhang and Mostofa Patwary and Jiaxuan You},
+year={2026},
+url={https://openreview.net/forum?id=sknMpr8NWU}
 }
 
 @inproceedings{ace2025,
-  title={Think Twice, Act Once: A Co-Evolution Framework of {LLM} and {RL} for Large-Scale Decision Making},
-  author={Wan, Xu and Xu, Wenyue and Yang, Chao and Sun, Mingyang},
-  booktitle={Proceedings of the 42nd International Conference on Machine Learning (ICML)},
-  year={2025}
+title={Think Twice, Act Once: A Co-Evolution Framework of {LLM} and {RL} for Large-Scale Decision Making},
+author={Xu Wan and Wenyue Xu and Chao Yang and Mingyang Sun},
+booktitle={Forty-second International Conference on Machine Learning},
+year={2025},
+url={https://openreview.net/forum?id=ySWrJer7mW}
 }
 
-@article{bigeard2025financeagent,
-  title={Finance Agent Benchmark: Benchmarking {LLMs} on Real-world Financial Research Tasks},
-  author={Bigeard, Antoine and Nashold, Langston and Krishnan, Rayan and Wu, Shirley},
-  journal={arXiv preprint arXiv:2508.00828},
-  year={2025}
+@misc{bigeard2025financeagent,
+      title={Finance Agent Benchmark: Benchmarking LLMs on Real-world Financial Research Tasks}, 
+      author={Antoine Bigeard and Langston Nashold and Rayan Krishnan and Shirley Wu},
+      year={2025},
+      eprint={2508.00828},
+      archivePrefix={arXiv},
+      primaryClass={cs.CE},
+      url={https://arxiv.org/abs/2508.00828}, 
 }
 
-@article{choi2025finagentbench,
-  title={{FinAgentBench}: A Benchmark Dataset for Agentic Retrieval in Financial Question Answering},
-  author={Choi, Chanyeol and Kwon, Jihoon and Lopez-Lira, Alejandro and Kim, Chaewoon and others},
-  journal={arXiv preprint arXiv:2508.14052},
-  year={2025}
+@inproceedings{choi2025finagentbench,
+author = {Choi, Chanyeol and Kwon, Jihoon and Lopez-Lira, Alejandro and Kim, Chaewoon and Kim, Minjae and Hwang, Juneha and Ha, Jaeseon and Choi, Hojun and Yun, Suyeol and Kim, Yongjin and Lee, Yongjae},
+title = {FinAgentBench: A Benchmark Dataset for Agentic Retrieval in Financial Question Answering},
+year = {2025},
+isbn = {9798400722202},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3768292.3770362},
+doi = {10.1145/3768292.3770362},
+abstract = {Accurate information retrieval (IR) is critical in the financial domain, where investors must identify relevant information from large collections of documents. Traditional IR methods—whether sparse or dense—often fall short in retrieval accuracy, as it requires not only capturing semantic similarity but also performing fine-grained reasoning over document structure and domain-specific knowledge. Recent advances in large language models (LLMs) have opened up new opportunities for retrieval with multi-step reasoning, where the model ranks passages through iterative reasoning about which information is most relevant to a given query. However, there exists no benchmark to evaluate such capabilities in the financial domain. To address this gap, we introduce FinAgentBench, the first large-scale benchmark for evaluating retrieval with multi-step reasoning in finance – a setting we term agentic retrieval. The benchmark consists of 26K expert-annotated examples on S&P-500 listed firms and assesses whether LLM agents can (1) identify the most relevant document type among candidates, and (2) pinpoint the key passage within the selected document. Our evaluation framework explicitly separates these two reasoning steps to address context limitations. This design enables to provide a quantitative basis for understanding retrieval-centric LLM behavior in finance. We evaluate a suite of state-of-the-art models and further demonstrated how targeted fine-tuning can significantly improve agentic retrieval performance. Our benchmark provides a foundation for studying retrieval-centric LLM behavior in complex, domain-specific tasks for finance.},
+booktitle = {Proceedings of the 6th ACM International Conference on AI in Finance},
+pages = {632–637},
+numpages = {6},
+keywords = {Information Retrieval, Generative Retrieval, Large Language Models},
+location = {
+},
+series = {ICAIF '25}
 }
 
 @inproceedings{zhang2024clamber,
-  title={{CLAMBER}: A Benchmark of Identifying and Clarifying Ambiguous Information Needs in Large Language Models},
-  author={Zhang, Tong and others},
-  booktitle={Proceedings of the Annual Meeting of the Association for Computational Linguistics (ACL)},
-  year={2024}
+    title = "{CLAMBER}: A Benchmark of Identifying and Clarifying Ambiguous Information Needs in Large Language Models",
+    author = "Zhang, Tong  and
+      Qin, Peixin  and
+      Deng, Yang  and
+      Huang, Chen  and
+      Lei, Wenqiang  and
+      Liu, Junhong  and
+      Jin, Dingnan  and
+      Liang, Hongru  and
+      Chua, Tat-Seng",
+    editor = "Ku, Lun-Wei  and
+      Martins, Andre  and
+      Srikumar, Vivek",
+    booktitle = "Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = aug,
+    year = "2024",
+    address = "Bangkok, Thailand",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.acl-long.578/",
+    doi = "10.18653/v1/2024.acl-long.578",
+    pages = "10746--10766",
+    abstract = "Large language models (LLMs) are increasingly used to meet user information needs, but their effectiveness in dealing with user queries that contain various types of ambiguity remains unknown, ultimately risking user trust and satisfaction. To this end, we introduce CLAMBER, a benchmark for evaluating LLMs using a well-organized taxonomy. Building upon the taxonomy, we construct 12K high-quality data to assess the strengths, weaknesses, and potential risks of various off-the-shelf LLMs.Our findings indicate the limited practical utility of current LLMs in identifying and clarifying ambiguous user queries, even enhanced by chain-of-thought (CoT) and few-shot prompting. These techniques may result in overconfidence in LLMs and yield only marginal enhancements in identifying ambiguity. Furthermore, current LLMs fall short in generating high-quality clarifying questions due to a lack of conflict resolution and inaccurate utilization of inherent knowledge.In this paper, CLAMBER presents a guidance and promotes further research on proactive and trustworthy LLMs."
 }
+
 
 @inproceedings{li2025questbench,
-  title={{QuestBench}: Can {LLMs} Ask the Right Question to Acquire Information in Reasoning Tasks?},
-  author={Li, Belinda Z. and Kim, Been and Wang, Zi},
-  booktitle={Advances in Neural Information Processing Systems (NeurIPS), Datasets and Benchmarks Track},
-  year={2025}
+title={QuestBench: Can {LLM}s ask the right question to acquire information in reasoning tasks?},
+author={Belinda Z. Li and Been Kim and Zi Wang},
+booktitle={The Thirty-ninth Annual Conference on Neural Information Processing Systems Datasets and Benchmarks Track},
+year={2026},
+url={https://openreview.net/forum?id=gpwA9aZLTZ}
 }
 
-@inproceedings{aliannejadi2020clariq,
-  title={{ConvAI3}: Generating Clarifying Questions for Open-Domain Dialogue Systems ({ClariQ})},
-  author={Aliannejadi, Mohammad and Kiseleva, Julia and Chuklin, Aleksandr and Dalton, Jeff and Burtsev, Mikhail},
-  booktitle={Search-Oriented Conversational AI (SCAI) Workshop at EMNLP},
-  year={2020}
+@misc{aliannejadi2020clariq,
+      title={ConvAI3: Generating Clarifying Questions for Open-Domain Dialogue Systems (ClariQ)}, 
+      author={Mohammad Aliannejadi and Julia Kiseleva and Aleksandr Chuklin and Jeff Dalton and Mikhail Burtsev},
+      year={2020},
+      eprint={2009.11352},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2009.11352}, 
 }
-
 @inproceedings{rao2018clarification,
-  title={Learning to Ask Good Questions: Ranking Clarification Questions using Neural Expected Value of Perfect Information},
-  author={Rao, Sudha and Daum{\'e} III, Hal},
-  booktitle={Proceedings of the Annual Meeting of the Association for Computational Linguistics (ACL)},
-  year={2018}
+    title = "Learning to Ask Good Questions: Ranking Clarification Questions using Neural Expected Value of Perfect Information",
+    author = "Rao, Sudha  and
+      Daum{\'e} III, Hal",
+    editor = "Gurevych, Iryna  and
+      Miyao, Yusuke",
+    booktitle = "Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = jul,
+    year = "2018",
+    address = "Melbourne, Australia",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/P18-1255/",
+    doi = "10.18653/v1/P18-1255",
+    pages = "2737--2746",
+    abstract = "Inquiry is fundamental to communication, and machines cannot effectively collaborate with humans unless they can ask questions. In this work, we build a neural network model for the task of ranking clarification questions. Our model is inspired by the idea of expected value of perfect information: a good question is one whose expected answer will be useful. We study this problem using data from StackExchange, a plentiful online resource in which people routinely ask clarifying questions to posts so that they can better offer assistance to the original poster. We create a dataset of clarification questions consisting of 77K posts paired with a clarification question (and answer) from three domains of StackExchange: askubuntu, unix and superuser. We evaluate our model on 500 samples of this dataset against expert human judgments and demonstrate significant improvements over controlled baselines."
 }
 
-@article{zamani2023cis,
-  title={Conversational Information Seeking},
-  author={Zamani, Hamed and Trippas, Johanne R. and Dalton, Jeff and Radlinski, Filip},
-  journal={Foundations and Trends in Information Retrieval},
-  year={2023}
+@inproceedings{zamani2023cis,
+author = {Dalton, Jeffrey and Fischer, Sophie and Owoicho, Paul and Radlinski, Filip and Rossetto, Federico and Trippas, Johanne R. and Zamani, Hamed},
+title = {Conversational Information Seeking: Theory and Application},
+year = {2022},
+isbn = {9781450387323},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3477495.3532678},
+doi = {10.1145/3477495.3532678},
+abstract = {Conversational information seeking (CIS) involves interaction sequences between one or more users and an information system. Interactions in CIS are primarily based on natural language dialogue, while they may include other types of interactions, such as click, touch, and body gestures. CIS recently attracted significant attention and advancements continue to be made. This tutorial follows the content of the recent Conversational Information Seeking book authored by several of the tutorial presenters. The tutorial aims to be an introduction to CIS for newcomers to CIS in addition to the recent advanced topics and state-of-the-art approaches for students and researchers with moderate knowledge of the topic. A significant part of the tutorial is dedicated to hands-on experiences based on toolkits developed by the presenters for conversational passage retrieval and multi-modal task-oriented dialogues. The outcomes of this tutorial include theoretical and practical knowledge, including a forum to meet researchers interested in CIS.},
+booktitle = {Proceedings of the 45th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+pages = {3455–3458},
+numpages = {4},
+keywords = {interactive information retrieval, dialogue systems, conversational search, conversational recommendation, conversational question answering, chatbots},
+location = {Madrid, Spain},
+series = {SIGIR '22}
 }
 
-@inproceedings{yao2023react,
-  title={{ReAct}: Synergizing Reasoning and Acting in Language Models},
-  author={Yao, Shunyu and Zhao, Jeffrey and Yu, Dian and Du, Nan and Shafran, Izhak and Narasimhan, Karthik and Cao, Yuan},
-  booktitle={Proceedings of ICLR},
-  year={2023}
+
+@inproceedings{
+yao2023react,
+title={ReAct: Synergizing Reasoning and Acting in Language Models},
+author={Shunyu Yao and Jeffrey Zhao and Dian Yu and Nan Du and Izhak Shafran and Karthik R Narasimhan and Yuan Cao},
+booktitle={The Eleventh International Conference on Learning Representations },
+year={2023},
+url={https://openreview.net/forum?id=WE_vluYUL-X}
 }
 
-@article{wei2025browsecomp,
-  title={{BrowseComp}: A Simple yet Challenging Benchmark for Browsing Agents},
-  author={Wei, Jason and others},
-  journal={arXiv:2504.12516},
-  year={2025}
+@misc{wei2025browsecomp,
+      title={BrowseComp: A Simple Yet Challenging Benchmark for Browsing Agents}, 
+      author={Jason Wei and Zhiqing Sun and Spencer Papay and Scott McKinney and Jeffrey Han and Isa Fulford and Hyung Won Chung and Alex Tachard Passos and William Fedus and Amelia Glaese},
+      year={2025},
+      eprint={2504.12516},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2504.12516}, 
 }
 
 @inproceedings{cole2023selectively,
-  title={Selectively Answering Ambiguous Questions},
-  author={Cole, Jeremy R and Zhang, Michael J.Q. and Gillick, Daniel and Eisenschlos, Julian Martin and Dhingra, Bhuwan and Eisenstein, Jacob},
-  booktitle={Proceedings of EMNLP},
-  year={2023}
+  title = "Selectively Answering Ambiguous Questions",
+    author = "Cole, Jeremy  and
+      Zhang, Michael  and
+      Gillick, Daniel  and
+      Eisenschlos, Julian  and
+      Dhingra, Bhuwan  and
+      Eisenstein, Jacob",
+    editor = "Bouamor, Houda  and
+      Pino, Juan  and
+      Bali, Kalika",
+    booktitle = "Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing",
+    month = dec,
+    year = "2023",
+    address = "Singapore",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2023.emnlp-main.35/",
+    doi = "10.18653/v1/2023.emnlp-main.35",
+    pages = "530--543",
+    abstract = "Trustworthy language models should abstain from answering questions when they do not know the answer. However, the answer to a question can be unknown for a variety of reasons. Prior research has focused on the case in which the question is clear and the answer is unambiguous but possibly unknown. However, the answer to a question can also be unclear due to uncertainty of the questioner{'}s intent or context. We investigate question answering from this perspective, focusing on answering a subset of questions with a high degree of accuracy, from a set of questions in which many are inherently ambiguous. In this setting, we find that the most reliable approach to calibration involves quantifying repetition within a set of sampled model outputs, rather than the model{'}s likelihood or self-verification as used in prior work. We find this to be the case across different types of uncertainty, varying model scales and both with or without instruction tuning. Our results suggest that sampling-based confidence scores help calibrate answers to relatively unambiguous questions, with more dramatic improvements on ambiguous questions."
 }
 
-@article{guo2023fineval,
-  title={{FinEval}: A Chinese Financial Domain Knowledge Evaluation Benchmark for Large Language Models},
-  author={Guo, Xin and Xia, Haotian and Liu, Zhaowei and Cao, Hanyang and Yang, Zhi and Liu, Zhiqiang and Wang, Sizhe and Niu, Jinyi and Wang, Chuqi and Wang, Yanhui and others},
-  journal={arXiv preprint arXiv:2308.09975},
-  year={2023}
+
+@inproceedings{guo2023fineval,
+    title = "{F}in{E}val: A {C}hinese Financial Domain Knowledge Evaluation Benchmark for Large Language Models",
+    author = "Guo, Xin  and
+      Xia, Haotian  and
+      Liu, Zhaowei  and
+      Cao, Hanyang  and
+      Yang, Zhi  and
+      Liu, Zhiqiang  and
+      Wang, Sizhe  and
+      Niu, Jinyi  and
+      Wang, Chuqi  and
+      Wang, Yanhui  and
+      Liang, Xiaolong  and
+      Huang, Xiaoming  and
+      Zhu, Bing  and
+      Wei, Zhongyu  and
+      Chen, Yun  and
+      Shen, Weining  and
+      Zhang, Liwen",
+    editor = "Chiruzzo, Luis  and
+      Ritter, Alan  and
+      Wang, Lu",
+    booktitle = "Proceedings of the 2025 Conference of the Nations of the Americas Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers)",
+    month = apr,
+    year = "2025",
+    address = "Albuquerque, New Mexico",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.naacl-long.318/",
+    doi = "10.18653/v1/2025.naacl-long.318",
+    pages = "6258--6292",
+    ISBN = "979-8-89176-189-6",
+    abstract = "Large language models have demonstrated outstanding performance in various natural language processing tasks, but their security capabilities in the financial domain have not been explored, and their performance on complex tasks like financial agent remains unknown. This paper presents FinEval, a benchmark designed to evaluate LLMs' financial domain knowledge and practical abilities. The dataset contains 8,351 questions categorized into four different key areas: Financial Academic Knowledge, Financial Industry Knowledge, Financial Security Knowledge, and Financial Agent. Financial Academic Knowledge comprises 4,661 multiple-choice questions spanning 34 subjects such as finance and economics. Financial Industry Knowledge contains 1,434 questions covering practical scenarios like investment research. Financial Security Knowledge assesses models through 1,640 questions on topics like application security and cryptography. Financial Agent evaluates tool usage and complex reasoning with 616 questions. FinEval has multiple evaluation settings, including zero-shot, five-shot with chain-of-thought, and assesses model performance using objective and subjective criteria. Our results show that Claude 3.5-Sonnet achieves the highest weighted average score of 72.9 across all financial domain categories under zero-shot setting. Our work provides a comprehensive benchmark closely aligned with Chinese financial domain. The data and the code are available at https://github.com/SUFE-AIFLMLab/FinEval."
 }
 
-@article{mateega2025financeqa,
-  title={{FinanceQA}: A Benchmark for Evaluating Financial Analysis Capabilities of Large Language Models},
-  author={Mateega, Spencer and Georgescu, Carlos and Tang, Danny},
-  journal={arXiv preprint arXiv:2501.18062},
-  year={2025}
+
+@misc{mateega2025financeqa,
+      title={FinanceQA: A Benchmark for Evaluating Financial Analysis Capabilities of Large Language Models}, 
+      author={Spencer Mateega and Carlos Georgescu and Danny Tang},
+      year={2025},
+      eprint={2501.18062},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2501.18062}, 
 }
