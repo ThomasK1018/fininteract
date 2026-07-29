@@ -30,26 +30,37 @@ We build the instances from official filings. For English instances which take a
 $H_0=\log_2 k$ over $k$ plausible interpretations.}
 \label{tab:stats}
 \small
-\begin{tabular}{lr}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llr}
 \toprule
-Property & Value \\
+\multicolumn{2}{l}{Property} & Value \\
 \midrule
-Total instances        & 173 \\
-Language (EN / ZH)     & 53 / 120 \\
-Source (EDGAR / CSRC-CNINFO / DocFinQA) & 50 / 120 / 3 \\
-Filing type (10-K / annual report) & 53 / 120 \\
-Unique companies       & 61 \\
-Filing years (2022/23/24/25) & 40 / 53 / 58 / 19 \\
+\multicolumn{2}{l}{Total instances} & 173 \\
+\multirow{2}{*}{Language} & EN & 53 \\
+                          & ZH & 120 \\
+\multirow{3}{*}{Source}   & EDGAR & 50 \\
+                          & CSRC-CNINFO & 120 \\
+                          & DocFinQA & 3 \\
+\multirow{2}{*}{Filing type} & 10-K & 53 \\
+                             & Annual report & 120 \\
+\multicolumn{2}{l}{Unique companies} & 61 \\
+\multirow{4}{*}{Filing year} & 2022 & 40 \\
+                             & 2023 & 53 \\
+                             & 2024 & 58 \\
+                             & 2025 & 19 \\
 \midrule
-Primary category: entity\_scope     & 94 \\
-\quad metric\_definition        & 63 \\
-\quad recognition\_policy       & 9 \\
-\quad temporal\_scope           & 7 \\
-\quad filing\_vintage           & 0 \\
-\# categories (single / two)          & 128 / 45 \\
+\multirow{5}{*}{Primary category} & entity\_scope & 94 \\
+                                  & metric\_definition & 63 \\
+                                  & recognition\_policy & 9 \\
+                                  & temporal\_scope & 7 \\
+                                  & filing\_vintage & 0 \\
+\multirow{2}{*}{\# categories} & single & 128 \\
+                               & two & 45 \\
 \midrule
-$H_0$ (mean / median / range)   & 2.20 / 2.00 / 1.0--3.6 \\
-Mean blind-solve rate (verifier) & 0.7\% \\
+\multirow{3}{*}{$H_0$} & mean & 2.20 \\
+                       & median & 2.00 \\
+                       & range & 1.0--3.6 \\
+\multicolumn{2}{l}{Blind-solve rate} & 0.7\% \\
 \bottomrule
 \end{tabular}
 \end{table}
