@@ -31,37 +31,23 @@ $H_0=\log_2 k$ over $k$ plausible interpretations.}
 \label{tab:stats}
 \small
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{p{2cm}p{2cm}r}
-\toprule[1.5pt]
-\multicolumn{2}{l}{Property} & Value \\
-\midrule[1pt]
-\multicolumn{2}{l}{Total instances} & 173 \\
-\midrule[0.5pt]
-\multirow{2}{*}{Language} & EN & 53 \\
-                          & ZH & 120 \\
-\multirow{3}{*}{Source}   & EDGAR & 50 \\
-                          & CSRC-CNINFO & 120 \\
-                          & DocFinQA & 3 \\
-\multirow{2}{*}{Filing type} & 10-K & 53 \\
-                             & Annual report & 120 \\
-\multicolumn{2}{l}{Unique companies} & 61 \\
-\multirow{4}{*}{Filing year} & 2022 & 40 \\
-                             & 2023 & 53 \\
-                             & 2024 & 58 \\
-                             & 2025 & 19 \\
+\begin{tabular}{@{}lr@{\hskip 1.5em}lr@{}}
+\toprule
+Property & Value & Property & Value \\
 \midrule
-\multirow{5}{*}{Primary category} & entity\_scope & 94 \\
-                                  & metric\_definition & 63 \\
-                                  & recognition\_policy & 9 \\
-                                  & temporal\_scope & 7 \\
-                                  & filing\_vintage & 0 \\
-\multirow{2}{*}{\# categories} & single & 128 \\
-                               & two & 45 \\
-\midrule
-\multirow{3}{*}{$H_0$} & mean & 2.20 \\
-                       & median & 2.00 \\
-                       & range & 1.0--3.6 \\
-\multicolumn{2}{l}{Blind-solve rate} & 0.7\% \\
+Total instances     & 173 & Category: entity   & 94 \\
+Language: EN         & 53  & \quad metric        & 63 \\
+\quad ZH             & 120 & \quad recognition   & 9 \\
+Source: EDGAR        & 50  & \quad temporal      & 7 \\
+\quad CSRC-CNINFO    & 120 & \quad filing        & 0 \\
+\quad DocFinQA       & 3   & \# cat.: single     & 128 \\
+Filing: 10-K         & 53  & \quad two           & 45 \\
+\quad annual report  & 120 & $H_0$: mean         & 2.20 \\
+Unique companies     & 61  & \quad median        & 2.00 \\
+Filing yr: 2022      & 40  & \quad range         & 1.0--3.6 \\
+\quad 2023           & 53  & Blind-solve rate    & 0.7\% \\
+\quad 2024           & 58  &                     &      \\
+\quad 2025           & 19  &                     &      \\
 \bottomrule
 \end{tabular}
 \end{table}
