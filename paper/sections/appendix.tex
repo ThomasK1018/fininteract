@@ -209,26 +209,28 @@ backoff so no answer is silently dropped). \emph{Intended}: accuracy against a
 specified target reading. \emph{Any-valid}: accuracy against \emph{any} accepted
 reading, what a lenient single-gold benchmark credits. \emph{Def.-cap}: fraction
 producing a valid but non-target reading. \emph{Ask}: fraction that asks when
-permitted. gpt-5-mini interact omitted (it asks ${<}1\%$).}
+permitted. gpt-5-mini interact omitted (it asks ${<}1\%$).
+Modes: \emph{A} answer-only, \emph{A+O} answer with context oracle,
+\emph{A+I} answer with interaction.}
 \label{tab:general}
 \small
 \begin{tabular}{llcccc}
 \toprule
 Model & Mode & Intended & Any-valid & Def.-cap & Ask \\
 \midrule
-\multirow{3}{*}{gpt-4o-mini}
- & Answer-only & 31.5 & 72.5 & 55.0 & 0 \\
- & Oracle      & 49.5 & 68.5 & 31.0 & 0 \\
- & Interact    & 43.5 & 81.0 & 53.0 & 27.0 \\
+\multirow{3}{*}{\shortstack[l]{gpt\\4o-mini}}
+ & A   & 31.5 & 72.5 & 55.0 & 0 \\
+ & A+O & 49.5 & 68.5 & 31.0 & 0 \\
+ & A+I & 43.5 & 81.0 & 53.0 & 27.0 \\
 \midrule
-\multirow{3}{*}{gpt-4o}
- & Answer-only & 39.0 & 84.0 & 65.5 & 0 \\
- & Oracle      & 68.5 & 81.5 & 31.5 & 0 \\
- & Interact    & 43.0 & 86.0 & 64.0 & 2.5 \\
+\multirow{3}{*}{\shortstack[l]{gpt\\4o}}
+ & A   & 39.0 & 84.0 & 65.5 & 0 \\
+ & A+O & 68.5 & 81.5 & 31.5 & 0 \\
+ & A+I & 43.0 & 86.0 & 64.0 & 2.5 \\
 \midrule
-\multirow{2}{*}{gpt-5-mini}
- & Answer-only & 36.0 & 77.0 & 62.5 & 0 \\
- & Oracle      & 62.0 & 73.5 & 27.5 & 0 \\
+\multirow{2}{*}{\shortstack[l]{gpt\\5-mini}}
+ & A   & 36.0 & 77.0 & 62.5 & 0 \\
+ & A+O & 62.0 & 73.5 & 27.5 & 0 \\
 \bottomrule
 \end{tabular}
 \end{table}
