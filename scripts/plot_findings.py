@@ -37,7 +37,8 @@ def fig_bottleneck(out):
     ax.set_xlim(-3, 105)
     ax.set_xlabel("Accuracy (\\%)".replace("\\%", "%"))
     ax.set_title("The elicitation gap", fontsize=10.5)
-    ax.legend(loc="lower right", fontsize=9, frameon=False)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.24), ncol=2,
+              fontsize=9, frameon=False, handletextpad=0.4, columnspacing=1.2)
     fig.tight_layout(); fig.savefig(out, dpi=200, bbox_inches="tight"); fig.savefig(str(out).replace(".png", ".pdf"), bbox_inches="tight"); print("wrote", out)
 
 
