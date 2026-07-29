@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 matplotlib.rcParams["pdf.fonttype"] = 42
 matplotlib.rcParams["ps.fonttype"] = 42
 
-AXES = ["Entity\nscope", "Metric\ndefinition", "Recognition\npolicy", "Temporal\nscope"]
+AXES = ["Entity\nscope", "Metric\ndefinition", "Recognition\npolicy", "Temporal scope"]
 # touch AxisHit@1 per axis, from Table tab:skills
 SERIES = {
     "GPT-5":            [0.89, 0.92, 0.00, 1.00],
@@ -45,7 +45,7 @@ def main(a):
     ax.set_ylim(0, 1.0)
     ax.set_yticks([0.25, 0.5, 0.75, 1.0])
     ax.set_yticklabels(["", "0.5", "", "1.0"], fontsize=9, color="#555")
-    ax.set_rlabel_position(45)
+    ax.set_rlabel_position(135)
     ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.22), ncol=3,
               fontsize=9, frameon=False, columnspacing=1.0, handletextpad=0.4)
     fig.tight_layout()
