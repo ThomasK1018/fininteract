@@ -37,7 +37,7 @@ By re-grading models on default readings from existing benchmark and the intende
 
 \begin{table}[t]
 \centering
-\caption{By comparing the accuracy difference $\Delta$ between answering intended interpretation versus typical reading from single-gold benchmark, model performance in existing benchmarks will be conflated, specifically in the retrieval regime where search function is available. }
+\caption{By comparing the accuracy difference $\Delta$ between answering intended interpretation versus typical reading from single-gold benchmark (same abbreviation as in Table~\ref{tab:modes}), model performance in existing benchmarks will be conflated, specifically in the retrieval regime where search function is available. }
 \label{tab:illusion}
 \small
 \begin{tabular}{llccc}
@@ -45,17 +45,17 @@ By re-grading models on default readings from existing benchmark and the intende
 Model & Mode & Intended & Default & $\Delta$ \\
       &      & (true Acc) & (single-gold) & \\
 \midrule
-GPT-5  & Answer-only   & 0.6  & 2.3  & +1.7 \\
-       & Answer+Search & 6.4  & 10.4 & +4.0 \\
-       & +Interact     & \textbf{20.2} & 12.1 & $-8.1$ \\
+GPT-5  & A   & 0.6  & 2.3  & +1.7 \\
+       & A+S & 6.4  & 10.4 & +4.0 \\
+       & A+S+I & \textbf{20.2} & 12.1 & $-8.1$ \\
 \midrule
-GPT-4o & Answer-only   & 0.6  & 0.6  & 0.0 \\
-       & Answer+Search & 12.1 & \textbf{37.0} & \textbf{+24.9} \\
-       & +Interact     & 4.6  & 6.4  & +1.8 \\
+GPT-4o & A & 0.6  & 0.6  & 0.0 \\
+       & A+S & 12.1 & \textbf{37.0} & \textbf{+24.9} \\
+       & A+S+I & 4.6  & 6.4  & +1.8 \\
 \midrule
-GPT-5-mini & Answer-only   & 0.6 & 0.0 & $-0.6$ \\
-           & Answer+Search & 0.0 & 0.0 & 0.0 \\
-           & +Interact     & 0.0 & 0.0 & 0.0 \\
+GPT-5-mini & A & 0.6 & 0.0 & $-0.6$ \\
+           & A+S & 0.0 & 0.0 & 0.0 \\
+           & A+S+I & 0.0 & 0.0 & 0.0 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -94,10 +94,10 @@ data-abundant categories, so the signal is actionable but still blinded in recog
 \small
 \begin{tabular}{lcccc}
 \toprule
-Stage & AC@1 & Interaction & Accuracy$^{*}$ & Reward \\
+Stage & AC@1 & Interaction & Accuracy & Reward \\
 \midrule
-Base (Qwen3-4B)          & 25.0 & 54.9 & 84.3 & 0.96 \\
-\;\;+\,SFT (category-guided) & 68.6 & \textbf{100} & 88.2 & 1.28 \\
+Base      & 25.0 & 54.9 & 84.3 & 0.96 \\
+\;\;+\,SFT & 68.6 & \textbf{100} & 88.2 & 1.28 \\
 \;\;+\,KTO               & \textbf{70.6} & \textbf{100} & 84.3 & 1.27 \\
 \;\;+\,GRPO              & 66.7 & \textbf{100} & 88.2 & \textbf{1.30} \\
 \bottomrule
