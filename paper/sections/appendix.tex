@@ -600,7 +600,7 @@ Each type is diagnosable from existing metrics without additional annotation.
 \caption{Error taxonomy E1--E7 with diagnostic signals and improvement directions.}
 \label{tab:errors}
 \small
-\begin{tabular}{p{0.8cm}p{3.2cm}p{3.5cm}}
+\begin{tabular}{p{0.8cm}p{3cm}p{3.3cm}}
 \toprule
 Type & Description & Improvement direction \\
 \midrule
@@ -787,7 +787,7 @@ subordinate category (\texttt{recognition\_policy}), the abundant, salient categ
 (\texttt{metric\_definition}, \S\ref{sec:skills}), to ask not \emph{whether} the
 loop works but \emph{when}.
 
-\begin{table}[t]
+\begin{table*}[t]
 \centering
 \caption{Three co-evolution rounds (category-guided SFT on a 4B policy). Targeting
 (AC@1) is on a \emph{held-out human} probe never seen in training. The loop
@@ -807,7 +807,7 @@ Interaction rate                     & $40\to100$ & $50\to100$ & $67\to100$ \\
 De-leaked accuracy                   & $32.5\to22.5$ & $15\to\textbf{60}$ & $11\to11$ \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 All three rounds run end-to-end: the Constructor$\to$Verifier pipeline yields hard
 instances (every one passes the adversarial gate: the base fails it answer-only)
@@ -889,7 +889,7 @@ $.12\!\to\!.89$; and category-guided SFT leaves it unchanged. The category is fu
 not \emph{act} on it, the ``represents-but-doesn't-act'' gap of
 \S\ref{sec:mechanistic}, now shown to hold even for the category co-evolution cannot fix.
 
-\begin{table}[t]
+\begin{table*}[t]
 \centering
 \caption{What predicts co-evolvability. The observed outcomes track
 \emph{abundance/salience}, \emph{not} the AC@1 scale-slope (metric: low slope,
@@ -913,7 +913,7 @@ filing\_vintage     & 264 & 0.33 & --      & --   & untestable \\
 recognition\_policy &  30 & \textbf{0.04} & $+0.00$ & \textbf{0.93} & weak$^{\ddagger}$ \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 \textbf{Finding 16: co-evolvability is gated by source \emph{abundance}, driven by
 \emph{salience}, not by scale-learnability or representational decodability.} What
@@ -1374,7 +1374,7 @@ The pre-verifier applies fourteen automated code-level rules before any API call
 \caption{Pre-verifier sanity checks (14 rules).}
 \label{tab:qc}
 \small
-\begin{tabular}{cl}
+\begin{tabular}{cp{6cm}}
 \toprule
 Rule & Description \\
 \midrule
