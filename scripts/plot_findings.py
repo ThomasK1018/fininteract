@@ -36,7 +36,6 @@ def fig_bottleneck(out):
     ax.set_yticklabels(models, fontsize=10)
     ax.set_xlim(-3, 105)
     ax.set_xlabel("Accuracy (\\%)".replace("\\%", "%"))
-    ax.set_title("The elicitation gap", fontsize=10.5, pad=8.0)
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.24), ncol=2,
               fontsize=9, frameon=False, handletextpad=0.4, columnspacing=1.2)
     fig.tight_layout(); fig.savefig(out, dpi=200, bbox_inches="tight"); fig.savefig(str(out).replace(".png", ".pdf"), bbox_inches="tight"); print("wrote", out)
@@ -62,7 +61,6 @@ def fig_lever(out):
     ax.set_yticks(y); ax.set_yticklabels(names, fontsize=9)
     ax.set_xlabel("Interaction lever (points)")
     ax.set_xlim(-21, 29)
-    ax.set_title("Interaction helps only 2 of 12 models", fontsize=10.5)
     fig.tight_layout(); fig.savefig(out, dpi=200, bbox_inches="tight"); fig.savefig(str(out).replace(".png", ".pdf"), bbox_inches="tight"); print("wrote", out)
 
 
@@ -70,7 +68,7 @@ def fig_humanllm(out):
     # Accuracy vs AC@1 (interact): tab:main + Finding 8 human row
     pts = [("GPT-5", 0.86, 20.2, NAVY), ("GPT-4o", 0.94, 4.6, NAVY),
            ("GPT-5-mini", 0.94, 0.0, NAVY), ("Qwen3-30B", 0.90, 11.6, NAVY),
-           ("Qwen3.5-35B", 0.81, 28.9, NAVY), ("Human", 0.68, 30.0, ORANGE)]
+           ("Qwen3.5-35B", 0.81, 28.9, NAVY), ("Human", 0.72, 30.0, ORANGE)]
     fig, ax = plt.subplots(figsize=(3.25, 2.9))
     for name, ah, acc, col in pts:
         marker = "*" if name == "Human" else "o"
@@ -82,7 +80,6 @@ def fig_humanllm(out):
         ax.annotate(name, (ah, acc), xytext=(ah + dx, acc + 1.1), fontsize=9, ha=ha)
     ax.set_xlabel("Targeting: AC@1")
     ax.set_ylabel("Resolution: accuracy (\\%)".replace("\\%", "%"))
-    ax.set_title("Asking on target does not imply resolving", fontsize=10.5)
     ax.set_xlim(0.6, 1.0); ax.set_ylim(-2, 34)
     fig.tight_layout(); fig.savefig(out, dpi=200, bbox_inches="tight"); fig.savefig(str(out).replace(".png", ".pdf"), bbox_inches="tight"); print("wrote", out)
 

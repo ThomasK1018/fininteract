@@ -1,7 +1,7 @@
-Given an ambiguous financial question instance (example in Table~\ref{tab:example}), it should contain the ambiguous question over a company filing $Q$, the disambiguating context $C$ which is the minimal set of scope or definitional constraints that collapses $Q$ into the unique intended answer $A$ under intended interpretation $\mathcal{I}_{\text{int}}$. The ambiguous question typically contains correct answer $A_{d}\neq A$ under the default interpretation $\mathcal{I}_{\text{def}}$ which a non-expert would assume when reading $Q$. Specifically, $\mathcal{I}_{\text{int}},\mathcal{I}_{\text{def}}$ are structured records specifying the financial ambiguity taxonomy defined below. 
+We first define an ambiguous financial QA instance, then the five-category taxonomy, the entropy measure that scores instance difficulty, and the interaction protocol under which agents are evaluated. An instance (example in Table~\ref{tab:example}) consists of an ambiguous question $Q$ over a company filing and a disambiguating context $C$, the minimal set of scope or definitional constraints that collapses $Q$ into a unique intended answer $A$ under the intended interpretation $\mathcal{I}_{\text{int}}$. The same question also admits a second correct answer $A_{d}\neq A$ under the default interpretation $\mathcal{I}_{\text{def}}$, the reading a non-expert would assume when seeing $Q$ alone. Both $\mathcal{I}_{\text{int}}$ and $\mathcal{I}_{\text{def}}$ are structured records over the financial ambiguity taxonomy defined below.
 \begin{table}[h]
 \centering
-\caption{This example of ambiguous financial question contains three plausible entity scopes, i.e. consolidated total and two reportable segments, leading to an entropy of $1.58$ bits. Without the disambiguating context $C$, a model's default interpretation leads to the wrong answer.}
+\caption{This example of an ambiguous financial question admits three plausible entity scopes, i.e., the consolidated total and two reportable segments, giving an entropy of $1.58$ bits. Without the disambiguating context $C$, a model's default interpretation yields the wrong answer.}
 \label{tab:example}
 \small
 \begin{tabular}{p{2.7cm}p{4.7cm}}
@@ -30,9 +30,8 @@ Default span &
 \end{table}
 
 \textbf{Financial ambiguity taxonomy.}
-\label{sec:taxonomy}
 We derive five categories of financial ambiguity from standard
-accounting and disclosure practice (Table~\ref{tab:axes}). Each instance should normally exercise one primary category with one or two optional secondary categories in case of additional ambiguity. 
+accounting and disclosure practice (Table~\ref{tab:axes}). Each instance normally exercises one primary category, with one or two optional secondary categories when additional ambiguity is present.
 
 \begin{table}[h]
 \centering
@@ -68,7 +67,7 @@ Category & Definition \\
 \end{tabular}
 \end{table}
 
-\textbf{Disambiguation entropy.} We quantify how ambiguous an instance is using the prior confidence entropy $H_{0} = \log_{2} k$, where $k$ denotes the number of plausible interpretations of $Q$ without clarifying interaction, e.g. the example in Table~\ref{tab:example} has three plausible interpretations, hence contributing to an entropy of $H_0 = \log_2 3 \approx 1.58$ bits. This further serves as our metric to evaluate difficulty and efficiency in Sec. \ref{sec:metrics}. While both $A$ and $A_{d}$ are defensible from publicly available filings, an agent should be able to identify the ambiguity by reading $Q$ alone without $C$, where this pairing between default and intended interpretation generalizes the target-distractor design from \interactcomp~\cite{interactcomp2026} to the financial domain. 
+\textbf{Disambiguation entropy.} We quantify how ambiguous an instance is using the prior confidence entropy $H_{0} = \log_{2} k$, where $k$ denotes the number of plausible interpretations of $Q$ without clarifying interaction, e.g., the example in Table~\ref{tab:example} has three plausible interpretations and hence an entropy of $H_0 = \log_2 3 \approx 1.58$ bits. $H_0$ also serves as our measure of difficulty and clarification efficiency in Sec.~\ref{sec:metrics}. Both $A$ and $A_{d}$ are defensible from publicly available filings, so an agent should be able to identify the ambiguity by reading $Q$ alone without $C$. This pairing of default and intended interpretations generalizes the target-distractor design of \interactcomp~\citep{interactcomp2026} to the financial domain.
 
 \textbf{Agent interaction model.} We follow \interactcomp's ReAct framework~\citep{yao2023react} where the agent may issue three types of actions, namely \textbf{search}($Q$) to retrieve a passage from the filing corpus, \textbf{interact}($Q$) to present a yes-or-no question to the simulated user who answers based on $C$, and \textbf{answer}($Q$) to submit a final answer. Specifically, we evaluate agents in three primary modes (Table~\ref{tab:modes}) and four
 ablation modes. We additionally include a category-conditioned interaction mode, described in
