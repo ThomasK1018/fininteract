@@ -1,7 +1,7 @@
 We first define an ambiguous financial QA instance, then the five-category taxonomy, the entropy measure that scores instance difficulty, and the interaction protocol under which agents are evaluated. An instance (example in Table~\ref{tab:example}) consists of an ambiguous question $Q$ over a company filing and a disambiguating context $C$, the minimal set of scope or definitional constraints that collapses $Q$ into a unique intended answer $A$ under the intended interpretation $\mathcal{I}_{\text{int}}$. The same question also admits a second correct answer $A_{d}\neq A$ under the default interpretation $\mathcal{I}_{\text{def}}$, the reading a non-expert would assume when seeing $Q$ alone. Both $\mathcal{I}_{\text{int}}$ and $\mathcal{I}_{\text{def}}$ are structured records over the financial ambiguity taxonomy defined below.
 \begin{table}[h]
 \centering
-\caption{This ambiguous financial question example admits three plausible entity scopes, i.e., the consolidated total and two reportable segments, giving an entropy of $1.58$ bits. Without the disambiguating context $C$, a model's default interpretation yields the wrong answer.}
+\caption{This ambiguous financial question example admits three plausible entity scopes, i.e., the consolidated total and two reportable segments, giving an entropy of 1.58 bits. Without the disambiguating context $C$, a model's default interpretation yields the wrong answer.}
 \label{tab:example}
 \small
 \begin{tabular}{p{0.30\columnwidth}p{0.55\columnwidth}}

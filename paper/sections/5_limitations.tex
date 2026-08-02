@@ -3,8 +3,8 @@
 We note the following limitations of this study.
 \begin{enumerate}[leftmargin=*,itemsep=1pt,topsep=3pt]
   \item \textbf{Scale.} A 173-instance corpus is small, a consequence of prioritizing per-instance construction rigor.
-  \item \textbf{Language balance.} The English-to-Chinese split is $53{:}120$, which may favor models pre-trained more heavily in one of the two languages.
-  \item \textbf{Dominating categories.} Entity scope ($n{=}94$) and metric definition ($n{=}63$) dominate, against only $n{=}9$ for recognition policy, which suggests that current models are not able to generate instances of the rarer categories in the first place.
+  \item \textbf{Language balance.} The English-to-Chinese split is 53:120, which may favor models pre-trained more heavily in one of the two languages.
+  \item \textbf{Dominating categories.} Entity scope (n = 94) and metric definition (n = 63) dominate, against only n = 9 for recognition policy, which suggests that current models are not able to generate instances of the rarer categories in the first place.
   \item \textbf{Generator and evaluator bias.} Under API budget constraints we use the GPT-5 family for construction and simulation, which may bias results toward that family.
   \item \textbf{Data contamination.} Instances are freshly constructed from FY2022--2025 facts, but we cannot rule out that recently released models were pre-trained on those filings.
 \end{enumerate}
