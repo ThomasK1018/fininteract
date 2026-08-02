@@ -1,0 +1,33 @@
+%% Unnumbered "Ethical Considerations" section. *ACL exempts it from the page
+%% limit when placed after the conclusion, so it is inputted only by
+%% main_acl.tex; the AAAI build has no such exemption.
+\textbf{Deployment risk is the motivation and also the hazard.} The agents we study feed
+financial analytics and investment decisions, and our central result is that they commit
+confidently to an unintended reading of an ambiguous question far more often than they ask.
+A wrong number produced this way is well grounded in a real filing, so it is unusually hard
+for a downstream user to catch. We therefore frame the benchmark as a reason to prefer
+systems that ask and abstain over systems that answer, and we caution that a high score on
+\fininteract measures a narrow clarification ability, not readiness for deployment in a
+setting where a confident wrong figure carries financial consequences.
+
+\textbf{Intended use and misuse.} \fininteract is an evaluation resource, not a training
+corpus and not financial advice, as stated in its datasheet (Appendix~\ref{app:datasheet}).
+Because every instance is ambiguous by construction, the benchmark does not measure a
+calibrated decision of \emph{when} to ask, so it should not be used to certify that a system
+asks appropriately in general deployment; we make this limitation explicit in
+Appendix~\ref{app:limitations}.
+
+\textbf{Data provenance and privacy.} All source documents are public regulatory filings:
+SEC EDGAR filings for the English split and CSRC annual reports retrieved via CNINFO and
+akshare for the Chinese split. No proprietary, paywalled, or personal data is used. Instances
+consist of questions about corporate financial metrics and carry company identifiers rather
+than individuals, so the released artifact contains no personally identifying information and
+no objectionable content. Third-party corpora used only during construction are not
+redistributed.
+
+\textbf{Compute and environmental cost.} The evaluation is API-based rather than
+training-heavy. We instrument and report the full construction cost in
+Appendix~\ref{app:cost}, at \$0.31 per accepted instance and about \$54 for the released
+corpus. The only model training in this work is 4-bit QLoRA on a 4B-parameter policy, run for
+tens of optimization steps rather than to convergence, so the associated energy cost is small
+relative to a typical pretraining or full fine-tuning study.
