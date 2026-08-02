@@ -18,10 +18,11 @@
 \pdfinfo{/TemplateVersion (2027.1)}
 \setcounter{secnumdepth}{2}
 
-%% portable check / cross (drawn, not font glyphs)
-\newcommand{\cmark}{\tikz[baseline=-0.55ex]{\draw[green!55!black,line width=0.9pt] (0,0.6pt)--(2pt,-1.4pt)--(5pt,3.6pt);}}
-\newcommand{\xmark}{\tikz[baseline=-0.55ex]{\draw[red!75!black,line width=0.9pt] (0,0)--(4pt,4pt) (0,4pt)--(4pt,0);}}
-\newcommand{\checkmark}{\cmark}  % acmart provided \checkmark; AAAI does not
+%% Portable check / cross (drawn, not font glyphs).
+%% Robust so they survive moving arguments such as \caption.
+\DeclareRobustCommand{\cmark}{\tikz[baseline=-0.55ex]{\draw[green!55!black,line width=0.9pt] (0,0.6pt)--(2pt,-1.4pt)--(5pt,3.6pt);}}
+\DeclareRobustCommand{\xmark}{\tikz[baseline=-0.55ex]{\draw[red!75!black,line width=0.9pt] (0,0)--(4pt,4pt) (0,4pt)--(4pt,0);}}
+\DeclareRobustCommand{\checkmark}{\cmark}  % acmart provides \checkmark; AAAI does not
 \newcommand{\fininteract}{\textsc{FinInteract}\xspace}
 \newcommand{\interactcomp}{\textsc{InteractComp}\xspace}
 \newcommand{\HO}{$H_0$\xspace}

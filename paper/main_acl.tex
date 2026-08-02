@@ -28,10 +28,12 @@
 \usetikzlibrary{positioning, arrows.meta, calc}
 \setcounter{secnumdepth}{2}
 
-%% portable check / cross (drawn, not font glyphs)
-\newcommand{\cmark}{\tikz[baseline=-0.55ex]{\draw[green!55!black,line width=0.9pt] (0,0.6pt)--(2pt,-1.4pt)--(5pt,3.6pt);}}
-\newcommand{\xmark}{\tikz[baseline=-0.55ex]{\draw[red!75!black,line width=0.9pt] (0,0)--(4pt,4pt) (0,4pt)--(4pt,0);}}
-\providecommand{\checkmark}{}\renewcommand{\checkmark}{\cmark}
+%% Portable check / cross (drawn, not font glyphs).
+%% These MUST be robust: a TikZ picture is fragile, and hyperref (loaded by
+%% acl.sty) expands caption text, which breaks an unprotected \tikz.
+\DeclareRobustCommand{\cmark}{\tikz[baseline=-0.55ex]{\draw[green!55!black,line width=0.9pt] (0,0.6pt)--(2pt,-1.4pt)--(5pt,3.6pt);}}
+\DeclareRobustCommand{\xmark}{\tikz[baseline=-0.55ex]{\draw[red!75!black,line width=0.9pt] (0,0)--(4pt,4pt) (0,4pt)--(4pt,0);}}
+\DeclareRobustCommand{\checkmark}{\cmark}
 \newcommand{\fininteract}{\textsc{FinInteract}\xspace}
 \newcommand{\interactcomp}{\textsc{InteractComp}\xspace}
 \newcommand{\HO}{$H_0$\xspace}
