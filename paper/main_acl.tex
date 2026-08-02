@@ -1,13 +1,24 @@
-%% AAAI-27 submission (anonymous). Compile with pdflatex.
-\documentclass[letterpaper]{article} % DO NOT CHANGE THIS
-\usepackage[submission]{aaai2027}  % DO NOT CHANGE THIS
-\usepackage[hyphens]{url}  % DO NOT CHANGE THIS
-\usepackage{graphicx} % DO NOT CHANGE THIS
-\urlstyle{rm} % DO NOT CHANGE THIS
-\def\UrlFont{\rm}  % DO NOT CHANGE THIS
-\usepackage{natbib}  % DO NOT CHANGE THIS AND DO NOT ADD ANY OPTIONS TO IT
-\usepackage{caption} % DO NOT CHANGE THIS AND DO NOT ADD ANY OPTIONS TO IT
-\frenchspacing  % DO NOT CHANGE THIS
+%% *ACL (ARR) submission, anonymous. Compile with pdflatex from the repository
+%% root, exactly like main.tex:  pdflatex paper/main_acl.tex
+%%
+%% This wrapper shares every section file with the AAAI build (main.tex); only
+%% the preamble and the back-matter ordering differ. Switch "review" to "final"
+%% for the camera-ready, or to "preprint" for a non-anonymous arXiv version.
+\documentclass[11pt]{article}
+\usepackage[review]{acl}
+
+%% Standard *ACL template includes
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{inconsolata}
+\usepackage{graphicx}
+
+%% Packages this paper needs on top of the template.
+%% NOTE: acl.sty already loads natbib, caption and hyperref. Do not load them
+%% again here, or the citation and caption formatting will break.
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{amsmath}
@@ -15,13 +26,12 @@
 \usepackage{xspace}
 \usepackage{tikz}
 \usetikzlibrary{positioning, arrows.meta, calc}
-\pdfinfo{/TemplateVersion (2027.1)}
 \setcounter{secnumdepth}{2}
 
 %% portable check / cross (drawn, not font glyphs)
 \newcommand{\cmark}{\tikz[baseline=-0.55ex]{\draw[green!55!black,line width=0.9pt] (0,0.6pt)--(2pt,-1.4pt)--(5pt,3.6pt);}}
 \newcommand{\xmark}{\tikz[baseline=-0.55ex]{\draw[red!75!black,line width=0.9pt] (0,0)--(4pt,4pt) (0,4pt)--(4pt,0);}}
-\newcommand{\checkmark}{\cmark}  % acmart provided \checkmark; AAAI does not
+\providecommand{\checkmark}{}\renewcommand{\checkmark}{\cmark}
 \newcommand{\fininteract}{\textsc{FinInteract}\xspace}
 \newcommand{\interactcomp}{\textsc{InteractComp}\xspace}
 \newcommand{\HO}{$H_0$\xspace}
@@ -29,12 +39,16 @@
 \newcommand{\disei}{$\text{DisE}^+$\xspace}
 
 %% Where the shared appendix should point for the short limitations list.
-%% AAAI keeps it inside the numbered Discussion section.
-\newcommand{\limref}{Sec.~\ref{sec:limitations}}
+%% *ACL puts it in an unnumbered \section*, which has no number to \ref.
+\newcommand{\limref}{the Limitations section}
 
 \title{FinInteract: Benchmarking Clarification and Intent Integration in Ambiguous Financial Question Answering}
-\author{Anonymous Submission}
-\affiliations{Paper under double-blind review}
+
+%% Under the "review" option acl.sty replaces this with "Anonymous ACL
+%% submission". Fill in real authors before switching to "final".
+\author{
+  Anonymous ACL submission \\
+}
 
 \begin{document}
 \maketitle
@@ -55,12 +69,12 @@
 %% ============================================================
 \input{paper/sections/2_problem}
 
-
 %% ============================================================
 \section{Methodology}
 \label{sec:methodology}
 %% ============================================================
 \input{paper/sections/3_methodology}
+
 %% ============================================================
 \section{Experiments}
 \label{sec:exp}
@@ -71,33 +85,34 @@
 %% ============================================================
 \section{Discussion}
 \label{sec:discussion}
-\label{sec:limitations}
 %% ============================================================
 \input{paper/sections/5_discussion}
-\input{paper/sections/5_limitations}
-
 
 %% ============================================================
-
 \section{Related Work}
 \label{sec:related}
+%% ============================================================
 \input{paper/sections/6_related_work}
 
-
+%% ============================================================
 \section{Conclusion}
 \label{sec:conclusion}
 %% ============================================================
 \input{paper/sections/7_conclusion}
 
+%% ============================================================
+%% *ACL requires an unnumbered Limitations section after the Conclusion.
+%% It does not count against the page limit.
+%% ============================================================
+\section*{Limitations}
+\input{paper/sections/5_limitations}
 
+%% ============================================================
+%% acl.sty sets \bibliographystyle{acl_natbib}; do not set it again.
 %% ============================================================
 \bibliography{refs}
-\clearpage  % start the appendix on a fresh page so main (content+references) and appendix split as two clean documents
-\appendix
 
+\appendix
 \input{paper/sections/appendix}
 
-%% ============================================================
-
-%% ============================================================
 \end{document}
