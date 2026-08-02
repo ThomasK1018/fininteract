@@ -1363,6 +1363,18 @@ initial sort (passages sorted by
 $\sum_\text{categories}(\text{target\_share}/\text{pool\_frequency})$); and (4) a dynamic re-sort
 every 10 instances.
 
+\paragraph{Annotator recruitment, payment, and review status.}
+Annotators are finance professionals recruited individually by cold email, with no
+institutional collaboration or prior relationship to the authors, and no party in a position
+of authority over them; participation was voluntary and could be ended at any time. They were
+paid an agreed rate of USD 50 per hour of annotation, set to be commensurate with professional
+freelance rates for comparable financial-analysis work. Because the study engaged a small
+number of professional annotators on this basis, collected no personal data about them, and
+had them label only public corporate filings, we did not seek an ethics review board
+determination; no institutional review framework applied to the arrangement. Readers planning
+a larger or differently constituted annotation effort should confirm the requirements of their
+own institution.
+
 \paragraph{Human validation protocol.}
 Two finance-literate annotators (one bilingual, for the Chinese split) independently review
 instances on an eight-question protocol: H1 \emph{Is $Q$ ambiguous without $C$?} H2 \emph{Is the
@@ -1433,7 +1445,11 @@ normalization; fiscal-year mismatch = wrong). \textbf{Protocol.} ReAct with
 forced-interaction ablation requires n = 4 asks before answering; the
 context-oracle ceiling supplies $C$ plus both evidence spans (position-shuffled).
 \textbf{Statistics.} Accuracy CIs are 95\% bootstrap over instances (B = 2000);
-mode transitions use a two-sided paired bootstrap (B = 5000). All evaluation,
+mode transitions use a two-sided paired bootstrap (B = 5000).
+\textbf{Compute.} Evaluation is API-based and its cost is reported in dollars rather than
+GPU hours (Appendix~\ref{app:cost}); the only local compute is the open-weight probing and
+the 4-bit QLoRA training of the 4B policy, together with the locally served simulators,
+graders, and category judges, run on \GPUSPEC. All evaluation,
 construction, and analysis scripts are released.
 
 %% ============================================================
