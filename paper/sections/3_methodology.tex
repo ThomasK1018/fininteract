@@ -22,7 +22,7 @@ category, and resolve intent).}
 
 \subsection{Data sources}
 \label{sec:stats}
-We build the instances from official filings. English passages, which make up about 80\% of the candidate pool, come from SEC filings: DocFinQA long-context 10-K and 10-Q passages with verified QA pairs, and XBRL-derived facts for S\&P~500 and Russell~1000 companies for fiscal years 2024--2025. Chinese passages come from the A-share annual reports of SSE~50 and CSI~300 constituents, retrieved through the CNINFO and akshare structured APIs. We avoid reusing published QA pairs directly to reduce memorization risk, though we do not claim absolute contamination safety. The current evaluation corpus contains 173 instances over 61 companies drawn from 2022--2025 filings, labeled with the taxonomy of Sec.~\ref{sec:task}; Table~\ref{tab:stats} gives the detailed breakdown. Specific details regarding passage counts and difficulty distribution are included in Appendix~\ref{app:construction}.
+We build the instances from official filings. English passages, which make up about 80\% of the candidate pool, come from SEC filings: DocFinQA long-context 10-K and 10-Q passages with verified QA pairs, and XBRL-derived facts for S\&P~500 and Russell~1000 companies for fiscal years 2024-2025. Chinese passages come from the A-share annual reports of SSE~50 and CSI~300 constituents, retrieved through the CNINFO and akshare structured APIs. We avoid reusing published QA pairs directly to reduce memorization risk, though we do not claim absolute contamination safety. The current evaluation corpus contains 173 instances over 61 companies drawn from 2022-2025 filings, labeled with the taxonomy of Sec.~\ref{sec:task}; Table~\ref{tab:stats} gives the detailed breakdown. Specific details regarding passage counts and difficulty distribution are included in Appendix~\ref{app:construction}.
 
 \begin{table}[t]
 \centering
@@ -44,7 +44,7 @@ Property & Value & Property & Value \\
 \textbf{Filing}: 10-K         & 53  & \quad two           & 45 \\
 \quad annual report  & 120 & \textbf{$H_0$}: mean         & 2.20 \\
 \textbf{Filing yr}: 2022      & 40  & \quad median        & 2.00 \\
-\quad 2023           & 53  & \quad range         & 1.0--3.6 \\
+\quad 2023           & 53  & \quad range         & 1.0-3.6 \\
 \quad 2024           & 58  & \textbf{Blind-solve rate}    & 0.7\% \\
 \quad 2025           & 19  &  \textbf{Unique companies}     & 61  \\
 \bottomrule
