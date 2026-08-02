@@ -1094,6 +1094,13 @@ finance.
 
 This appendix expands the discussion points summarized in \S\ref{sec:discussion}.
 
+\paragraph{Ambiguity categories are different learning problems.} The per-category dissociation shows that some
+clarification abilities are solved by scale while others, in particular the recognition basis, resist
+it and are only unreliably teachable. A single aggregate interaction score therefore hides
+where the real difficulty sits. Future benchmarks and training curricula should treat each
+category as its own learning problem and budget data accordingly, which our salience estimate
+begins to quantify.
+
 \paragraph{Elicitation is a trainable skill that current models lack.} Our central result
 is that models fail to resolve ambiguity not for want of knowledge but for want of asking
 the right question (RQ2). This reframes the problem for future work. Progress will come less
@@ -1103,20 +1110,13 @@ policy and category-guided fine-tuning (RQ3) are first steps, and both leave a l
 oracle ceiling, so reward shaping on the ambiguity category and calibrated deferral are natural
 next directions.
 
-\paragraph{Categories are different learning problems.} The per-category dissociation shows that some
-clarification abilities are solved by scale while others, in particular the recognition basis, resist
-it and are only unreliably teachable. A single aggregate interaction score therefore hides
-where the real difficulty sits. Future benchmarks and training curricula should treat each
-category as its own learning problem and budget data accordingly, which our salience estimate
-begins to quantify.
-
-\paragraph{Human and AI collaboration under ambiguity.} Because models confidently return
+\paragraph{Ambiguity persists in human-AI collaboration.} Because models confidently return
 the default reading, the safe behavior is often to ask rather than to answer. This motivates
 evaluation and interfaces that credit well-timed clarification and calibrated abstention
 rather than raw commitment, and it connects to mixed-initiative retrieval where the cost of
 a confident wrong answer is high.
 
-\paragraph{Self-refreshing benchmarks and broader scope.} Our co-evolution probes suggest a
+\paragraph{The paired construction should transfer to further categories, languages, and high-stakes domains.} Our co-evolution probes suggest a
 benchmark can extend itself on categories whose evidence is abundant, guarded by held-out
 validation, which offers a path to keep the instrument fresh as models improve. Natural
 extensions include more ambiguity categories, additional languages and filing regimes, and
