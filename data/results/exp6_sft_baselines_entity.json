@@ -1,0 +1,39 @@
+{
+  "axis": "entity_scope",
+  "train_n": 56,
+  "train": "company-disjoint",
+  "test": "human_probe_n40",
+  "note": "AxisHit@1 is pre-retrieval; RL(KTO/GRPO) arm blocked (trainers not in repo)",
+  "results": {
+    "base": {
+      "axishit1": 0.375,
+      "resolve_acc": 0.325,
+      "ir": 0.4,
+      "n": 40
+    },
+    "guided": {
+      "axishit1": 0.9,
+      "resolve_acc": 0.375,
+      "ir": 1.0,
+      "n": 40
+    },
+    "generic": {
+      "axishit1": 1.0,
+      "resolve_acc": 0.35,
+      "ir": 1.0,
+      "n": 40
+    },
+    "random-axis": {
+      "axishit1": 0.9,
+      "resolve_acc": 0.275,
+      "ir": 1.0,
+      "n": 40
+    },
+    "always-ask": {
+      "axishit1": 1.0,
+      "resolve_acc": 0.275,
+      "ir": 1.0,
+      "n": 40
+    }
+  }
+}
