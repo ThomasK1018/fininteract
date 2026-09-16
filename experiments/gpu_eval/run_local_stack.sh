@@ -28,6 +28,8 @@ AGENT_UTIL="${AGENT_UTIL:-0.22}"
 JPORT=18001; APORT=18000
 AGENT_LABEL=qwen3-8b
 mkdir -p logs data/results
+# The venv's bin (ninja for JIT kernels) and nvcc must be on PATH for vLLM's engine subprocess.
+export PATH="$(dirname "$PY"):/usr/local/cuda/bin:$PATH"
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 PYTHONUNBUFFERED=1 PYTHONIOENCODING=utf-8
 # Driver 570 (CUDA 12.8) with a CUDA-13 torch/vLLM build: use the forward-compat libs if present.
 if [ -d "$HOME/cuda13compat" ]; then
