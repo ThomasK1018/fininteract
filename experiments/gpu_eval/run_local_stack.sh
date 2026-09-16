@@ -39,7 +39,10 @@ fi
 # without sudo, experiments/gpu_eval/get_py_headers.sh extracts the headers into ~/pyinclude.
 PYMM=$("$PY" -c 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}")')
 if [ -f "$HOME/pyinclude/usr/include/python${PYMM}/Python.h" ]; then
-  export C_INCLUDE_PATH="$HOME/pyinclude/usr/include/python${PYMM}:$HOME/pyinclude/usr/include/x86_64-linux-gnu/python${PYMM}${C_INCLUDE_PATH:+:$C_INCLUDE_PATH}"
+  # pyconfig.h includes x86_64-linux-gnu/python3.X/pyconfig.h relative to the include root.
+  export C_INCLUDE_PATH="$HOME/pyinclude/usr/include:$HOME/pyinclude/usr/include/python${PYMM}:$HOME/pyinclude/usr/include/x86_64-linux-gnu/python${PYMM}${C_INCLUDE_PATH:+:$C_INCLUDE_PATH}"
+  export CPATH="$C_INCLUDE_PATH"
+  echo "C_INCLUDE_PATH=$C_INCLUDE_PATH"
 fi
 
 if [ -n "${INSTALL_LOG:-}" ]; then
