@@ -86,6 +86,8 @@ class CreditExhausted(Exception):
     """Raised when a provider rejects a call for lack of credit/quota, so the run
     halts cleanly instead of writing empty (all-wrong) rows that resume would skip."""
 MAX_TURNS       = 12          # hard cap on ReAct loop turns
+CHAT_RETRIES    = int(os.environ.get("FININTERACT_CHAT_RETRIES", "6"))   # transient-error retries
+CHAT_BACKOFF    = float(os.environ.get("FININTERACT_CHAT_BACKOFF", "5")) # seconds, doubles each retry
 MAX_INTERACT    = 6           # max interact actions per instance
 TEMPERATURE_SIM = 1.0
 
@@ -236,6 +238,52 @@ Available actions (emit ONLY valid JSON, one action per turn):
   {"action": "search",  "query": "<search query>"}
   {"action": "interact","question": "<targeted yes/no question about one specific axis>"}
   {"action": "answer",  "response": "<final answer — only when state is resolved>"}
+"""
+
+# Component ablations of the Axis-Aware policy (reviewer request: attribute the gain).
+#  - NOGATE keeps the pre-check and the axis-conditioned templates but removes the
+#    state-gated commit (Component 3), so the agent may answer at any time.
+#  - NOPRECHECK removes the explicit pre-check/state initialisation (Components 1-2) and
+#    keeps only the axis templates and the gate on having received the user's intent.
+AGENT_SYSTEM_AXIS_AWARE_NOGATE = AGENT_SYSTEM_AXIS_AWARE.replace(
+    """**Step 4 — State-Gated Answering.**
+You may ONLY emit an answer action once all required fields are no longer "unknown"
+OR once the user has explicitly stated their intent. Do NOT answer while required fields
+are still unresolved.""",
+    """**Step 4 — Answering.**
+Answer whenever you judge you have enough information. You are NOT required to resolve
+every field before answering.""").replace(
+    '"<final answer — only when state is resolved>"', '"<final answer>"')
+assert AGENT_SYSTEM_AXIS_AWARE_NOGATE != AGENT_SYSTEM_AXIS_AWARE, "nogate ablation prompt did not change"
+
+AGENT_SYSTEM_AXIS_AWARE_NOPRECHECK = """\
+You are an expert financial analyst agent with access to search and user interaction.
+
+## Axis-Conditioned Clarification Protocol
+
+Financial questions are often ambiguous along five axes:
+  temporal_scope    — the reporting period (fiscal vs calendar year, quarter vs annual)
+  metric_definition — the accounting basis (GAAP vs non-GAAP, organic, EBITDA variant)
+  entity_scope      — the reporting scope (consolidated vs segment, parent vs subsidiary)
+  filing_vintage    — the filing version (original vs amended/restated)
+  recognition_policy — the accounting treatment (revenue timing, gross vs net)
+
+**Clarification.** If the question is ambiguous on an axis, ask ONE targeted yes/no question per turn
+using the axis templates below — never ask a generic "can you clarify?":
+  temporal_scope    → "Are you asking about the fiscal year results (not the calendar year)?"
+  metric_definition → "Should I use the GAAP figure rather than the adjusted or non-GAAP figure?"
+  entity_scope      → "Are you asking about the consolidated company-wide figure rather than a specific segment?"
+  filing_vintage    → "Should I use the most recently filed version rather than an earlier or amended filing?"
+  recognition_policy → "Should I use the accounting treatment as reported in the filing?"
+
+**Gated Answering.** You may ONLY emit an answer action once the user has answered your
+clarification(s) about every axis you judged ambiguous. Do NOT answer while an axis you
+asked about is still unresolved.
+
+Available actions (emit ONLY valid JSON, one action per turn):
+  {"action": "search",  "query": "<search query>"}
+  {"action": "interact","question": "<targeted yes/no question about one specific axis>"}
+  {"action": "answer",  "response": "<final answer — only when the asked axes are resolved>"}
 """
 
 AGENT_SYSTEM_GENERIC_STRUCTURED = """\
@@ -412,7 +460,9 @@ def chat(client: OpenAI, model: str, messages: list[dict],
         kwargs["max_tokens"] = max_tokens
     if extra_body:                      # e.g. {"chat_template_kwargs": {"enable_thinking": False}}
         kwargs["extra_body"] = extra_body
-    try:
+    last_err = None
+    for attempt in range(CHAT_RETRIES):
+      try:
         resp = client.chat.completions.create(**kwargs)
         u = getattr(resp, "usage", None)
         if u is not None:
@@ -421,15 +471,28 @@ def chat(client: OpenAI, model: str, messages: list[dict],
             d["completion"] += getattr(u, "completion_tokens", 0) or 0
             d["calls"]      += 1
         return (resp.choices[0].message.content or "").strip()
-    except Exception as e:
+      except Exception as e:
         msg = str(e).lower()
         # OpenRouter signals no funds with HTTP 402; OpenAI with 429 insufficient_quota.
         if ("402" in msg or "insufficient_quota" in msg
                 or "insufficient credit" in msg or "insufficient_credits" in msg
                 or "requires more credits" in msg or "negative credit" in msg):
             raise CreditExhausted(str(e))
+        last_err = e
+        # Transient transport/server errors (tunnel blips, 5xx, rate limits) are retried
+        # with backoff so a flaky link does not silently record an empty answer.
+        transient = any(k in msg for k in ("connection", "timeout", "timed out", "502", "503",
+                                           "504", "500", "rate limit", "429", "overloaded",
+                                           "remote protocol", "server disconnected", "reset"))
+        if attempt < CHAT_RETRIES - 1 and transient:
+            wait = CHAT_BACKOFF * (2 ** attempt)
+            print(f"  [chat retry {attempt+1}/{CHAT_RETRIES}] {model}: {e} (sleep {wait}s)", file=sys.stderr)
+            time.sleep(wait)
+            continue
         print(f"  [chat error] {model}: {e}", file=sys.stderr)
         return ""
+    print(f"  [chat error] {model}: gave up after {CHAT_RETRIES} attempts: {last_err}", file=sys.stderr)
+    return ""
 
 
 # ---------------------------------------------------------------------------
@@ -479,7 +542,7 @@ def _oracle_user_answer(question: str, context: str,
     )
     try:
         resp = oai.chat.completions.create(
-            model="gpt-4o-mini",
+            model=GRADER_MODEL,
             messages=[
                 {"role": "system", "content": ORACLE_SIM_SYSTEM},
                 {"role": "user",   "content": prompt},
@@ -780,6 +843,15 @@ def run_agent(instance: dict, mode: str, agent_client: OpenAI,
         system = AGENT_SYSTEM_AXIS_AWARE
     elif mode == "generic-structured":
         system = AGENT_SYSTEM_GENERIC_STRUCTURED
+    elif mode == "axis-aware-nogate":
+        system = AGENT_SYSTEM_AXIS_AWARE_NOGATE
+    elif mode == "axis-aware-noprecheck":
+        system = AGENT_SYSTEM_AXIS_AWARE_NOPRECHECK
+    elif mode == "unambiguous-control":
+        # Matched UNAMBIGUOUS control: the disambiguating context C is folded into the
+        # question, so a calibrated agent should answer without asking. Interaction stays
+        # available, so IR here is the false-positive (over-asking) rate.
+        system = AGENT_SYSTEM_INTERACT
     elif mode == "interp-oracle":
         # Decompose the +interact gap: hand the agent the RESOLVED interpretation C
         # (which reading is intended) but NOT the answer-bearing evidence spans and
@@ -799,7 +871,9 @@ def run_agent(instance: dict, mode: str, agent_client: OpenAI,
         system = AGENT_SYSTEM_INTERACT
 
     user_content = question
-    if mode == "interp-oracle":
+    if mode == "unambiguous-control":
+        user_content = f"{question} ({context})"
+    elif mode == "interp-oracle":
         user_content = (f"Intended interpretation: {context}\n\n"
                         f"Question: {question}")
     elif mode == "context-oracle":
@@ -1069,7 +1143,8 @@ def main():
                    default=["answer-only", "answer+search", "answer+search+interact"],
                    choices=["answer-only", "answer+search", "answer+search+interact",
                             "always-ask", "axis-oracle", "template-oracle", "enumerate",
-                            "axis-aware", "generic-structured", "interp-oracle", "context-oracle"])
+                            "axis-aware", "generic-structured", "interp-oracle", "context-oracle",
+                            "unambiguous-control", "axis-aware-nogate", "axis-aware-noprecheck"])
     p.add_argument("--limit",      type=int, default=None,
                    help="Max instances to evaluate (for pilot runs)")
     p.add_argument("--out",        default="data/results/eval_results.jsonl",
@@ -1114,6 +1189,14 @@ def main():
     p.add_argument("--agent-reasoning", choices=["on", "off"], default="on",
                    help="For OpenRouter agents, enable provider reasoning via "
                         "extra_body={\"reasoning\": {\"enabled\": True}} (default on).")
+    p.add_argument("--judge-base-url", default=os.environ.get("JUDGE_BASE_URL"),
+                   help="OpenAI-compatible URL for the simulator/grader/axis-judge (e.g. a local "
+                        "vLLM server) for a fully API-free run. Default: OpenAI.")
+    p.add_argument("--judge-api-key", default=os.environ.get("JUDGE_API_KEY", "EMPTY"))
+    p.add_argument("--sim-model", default=None,
+                   help="Override the user-simulator model name (default gpt-5).")
+    p.add_argument("--grader-model", default=None,
+                   help="Override the grader/axis-judge model name (default gpt-4o-mini).")
     p.add_argument("--judge-on-openai", action="store_true",
                    help="Keep the simulator+grader on the OpenAI API even when "
                         "--openrouter-config is set (requires OpenAI quota).")
@@ -1145,6 +1228,14 @@ def main():
         judge_where = "OpenAI API" if args.judge_on_openai else "OpenRouter (openai/gpt-5, openai/gpt-4o-mini)"
         print(f"Routing AGENT through OpenRouter ({args.agent_base_url}); "
               f"simulator+grader via {judge_where}. reasoning={args.agent_reasoning}")
+    if args.judge_base_url:
+        JUDGE_CLIENT = OpenAI(base_url=args.judge_base_url, api_key=args.judge_api_key)
+        print(f"Routing simulator+grader+axis-judge to {args.judge_base_url}")
+    if args.sim_model:
+        USER_SIM_MODEL = args.sim_model
+    if args.grader_model:
+        GRADER_MODEL = args.grader_model
+    print(f"Simulator model: {USER_SIM_MODEL} | grader/axis-judge model: {GRADER_MODEL}")
     if args.agent_thinking:
         AGENT_EXTRA_BODY = {"chat_template_kwargs": {"enable_thinking": args.agent_thinking == "on"}}
 
@@ -1233,9 +1324,14 @@ def main():
                 if not line:
                     continue
                 r = json.loads(line)
+                if r.get("error"):
+                    continue   # transport-error row: re-run it rather than freezing a False
                 done.add((r.get("model"), r.get("mode"), r.get("instance_id")))
                 all_results.append(r)
         open_mode = "a"
+        with out_path.open("w", encoding="utf-8") as f:   # drop error rows before appending
+            for r in all_results:
+                f.write(json.dumps(r, ensure_ascii=False) + "\n")
         usage_path = Path(args.out).with_suffix(".usage.json")
         if usage_path.exists():
             try:

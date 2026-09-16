@@ -38,7 +38,10 @@ def main(a):
     inst = [json.loads(l) for l in open(a.instances)]
     if a.limit: inst = inst[:a.limit]
     client = make_client(a.model, {"base_url": a.base_url, "api_key": a.api_key} if a.base_url else {})
-    grader = OpenAI()  # grader stays on the OpenAI API
+    import evaluate as _ev
+    if a.grader_model:
+        _ev.GRADER_MODEL = a.grader_model
+    grader = OpenAI(base_url=a.judge_base_url, api_key=a.judge_api_key) if a.judge_base_url else OpenAI()
     out = open(a.out, "w")
     n=correct=0
     for i, x in enumerate(inst):
@@ -68,4 +71,8 @@ if __name__ == "__main__":
     p.add_argument("--base-url", default=os.environ.get("AGENT_BASE_URL"),
                    help="OpenAI-compatible endpoint for a local agent (vLLM). Grader stays on OpenAI.")
     p.add_argument("--api-key", default=os.environ.get("AGENT_API_KEY", "EMPTY"))
+    p.add_argument("--judge-base-url", default=os.environ.get("JUDGE_BASE_URL"),
+                   help="OpenAI-compatible URL for the grader (local vLLM) for an API-free run")
+    p.add_argument("--judge-api-key", default=os.environ.get("JUDGE_API_KEY", "EMPTY"))
+    p.add_argument("--grader-model", default=None, help="override grader model name")
     main(p.parse_args())
