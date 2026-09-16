@@ -29,6 +29,11 @@ JPORT=18001; APORT=18000
 AGENT_LABEL=qwen3-8b
 mkdir -p logs data/results
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 PYTHONUNBUFFERED=1 PYTHONIOENCODING=utf-8
+# Driver 570 (CUDA 12.8) with a CUDA-13 torch/vLLM build: use the forward-compat libs if present.
+if [ -d "$HOME/cuda13compat" ]; then
+  export LD_LIBRARY_PATH="$HOME/cuda13compat${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+  export TRITON_LIBCUDA_PATH="$HOME/cuda13compat"
+fi
 
 if [ -n "${INSTALL_LOG:-}" ]; then
   echo "[$(date)] waiting for $INSTALL_LOG to report FIVENV_DONE"
