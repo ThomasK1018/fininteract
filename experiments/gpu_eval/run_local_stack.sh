@@ -35,6 +35,13 @@ if [ -d "$HOME/cuda13compat" ]; then
   export TRITON_LIBCUDA_PATH="$HOME/cuda13compat"
 fi
 
+# Triton compiles a small CUDA-utils extension at runtime and needs Python.h; on a box
+# without sudo, experiments/gpu_eval/get_py_headers.sh extracts the headers into ~/pyinclude.
+PYMM=$("$PY" -c 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}")')
+if [ -f "$HOME/pyinclude/usr/include/python${PYMM}/Python.h" ]; then
+  export C_INCLUDE_PATH="$HOME/pyinclude/usr/include/python${PYMM}:$HOME/pyinclude/usr/include/x86_64-linux-gnu/python${PYMM}${C_INCLUDE_PATH:+:$C_INCLUDE_PATH}"
+fi
+
 if [ -n "${INSTALL_LOG:-}" ]; then
   echo "[$(date)] waiting for $INSTALL_LOG to report FIVENV_DONE"
   until grep -q FIVENV_DONE "$INSTALL_LOG" 2>/dev/null; do sleep 60; done
