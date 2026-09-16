@@ -46,7 +46,7 @@ serve() { # label model port util extra...
   if curl -s "http://127.0.0.1:$port/v1/models" >/dev/null 2>&1; then echo "port $port already serving"; return; fi
   for attempt in 1 2 3 4 5 6; do
     nohup "$PY" -m vllm.entrypoints.openai.api_server --model "$model" --served-model-name "$label" \
-      --host 127.0.0.1 --port "$port" --gpu-memory-utilization "$util" --enforce-eager \ "$@" > "logs/serve_${label}.log" 2>&1 &
+      --host 127.0.0.1 --port "$port" --gpu-memory-utilization "$util" --enforce-eager "$@" > "logs/serve_${label}.log" 2>&1 &
     echo $! > "logs/serve_${label}.pid"
     for i in $(seq 1 120); do
       sleep 10
