@@ -1,0 +1,10 @@
+FinInteract original benchmark records
+Copyright (c) 2026 Xinyu Wang, Tung Sum Thomas Kwok, Zhenghan Tai, and Guang Cheng
+
+The authors' original benchmark records, annotations, and metadata are licensed under the Creative Commons Attribution 4.0 International license (CC BY 4.0):
+https://creativecommons.org/licenses/by/4.0/
+Legal code: https://creativecommons.org/licenses/by/4.0/legalcode
+
+Attribute the FinInteract authors and paper, identify the dataset version, link the license, and indicate any changes.
+
+This license applies only to material the FinInteract authors have the right to license. Quoted regulatory filings, source evidence, and other third-party materials retain their original rights and terms. This notice does not relicense those materials. The benchmark is a research resource, not financial advice.
