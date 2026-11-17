@@ -1,0 +1,41 @@
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+Model & Mode & Intended & Default & Diff. \\
+\midrule
+GPT-5 & A & 0.6 & 2.3 & $+1.7$ \\
+ & A+S & 6.4 & 10.4 & $+4.0$ \\
+ & A+S+I & 20.2 & 12.1 & $-8.1$ \\
+\midrule
+GPT-4o & A & 0.6 & 0.6 & $0.0$ \\
+ & A+S & 12.1 & 37.0 & $+24.9$ \\
+ & A+S+I & 4.6 & 6.4 & $+1.8$ \\
+\midrule
+GPT-5-mini & A & 0.6 & 0.0 & $-0.6$ \\
+ & A+S & 0.0 & 0.0 & $0.0$ \\
+ & A+S+I & 0.0 & 0.0 & $0.0$ \\
+\bottomrule
+\end{tabular}
+\caption{Re-grading identical outputs against intended and default readings (\%, $N=173$). Diff. is default minus intended accuracy in percentage points. Abbreviations follow Table~\ref{tab:modes}.}
+\label{tab:default}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Model & Entity & Metric & Rec. & Temp. \\
+\midrule
+GPT-5 & .89 & .92 & .00 & 1.00 \\
+GPT-4o & 1.00 & .97 & .00 & 1.00 \\
+GPT-5-mini & .99 & 1.00 & .00 & 1.00 \\
+Qwen3-30B$^*$ & .93 & .96 & .00 & 1.00 \\
+Qwen3.5-35B$^*$ & .85 & .87 & .00 & 1.00 \\
+\bottomrule
+\end{tabular}
+\caption{Per-category touch targeting in the archived corrected-classifier analysis. Rec.: recognition policy; Temp.: temporal scope. $^*$The two MoE rows use thinking-enabled trajectories, not the canonical accuracy runs in Table~\ref{tab:main}. Primary-category sample sizes are 94, 63, 9, and 7; targeting denominators also depend on whether the model asks.}
+\label{tab:category_targeting}
+\end{table}

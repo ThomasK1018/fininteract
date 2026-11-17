@@ -60,6 +60,7 @@ fininteract_flow_results.zip
 fininteract-*-main.zip
 AuthorKit*.zip
 *.zip
+!paper/fininteract_camera_ready_sources.zip
 
 # AI reviewer chat dumps (local reference only, large HTML)
 ai_reviewer/
@@ -72,6 +73,7 @@ annotation/sheets/
 paper/main.fdb_latexmk
 paper/main.fls
 paper/main.xdv
+paper/build_acl/
 
 # General-domain replication: raw AmbigQA dump is re-downloadable
 data/general_domain/raw/
