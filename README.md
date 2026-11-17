@@ -1,5 +1,7 @@
 # FinInteract
 
+**Accepted to Findings of ACL: EACL 2027.** [Project page, paper, and versioned benchmark downloads](https://thomask1018.github.io/fininteract-project/).
+
 A bilingual (EN/ZH) benchmark for evaluating financial search agents on **ambiguous
 queries** — questions that are *easy to verify but ambiguous to resolve*. Each instance pairs a
 question with a **default** interpretation (what a non-expert assumes) and an **intended**
@@ -53,3 +55,7 @@ DocFinQA, BBT-FinCUGE) are **not redistributed here** — clone them from their 
 See `docs/methodology.md` for the full construction pipeline, the 14-rule QC layer, the five-axis
 financial-ambiguity taxonomy, and the evaluation framework; `docs/dataset_analysis.md` for the
 empirical analysis of the frozen dataset.
+
+## License
+
+Original project code is licensed under [MIT](LICENSE). Original benchmark records, annotations, and metadata are licensed under [CC BY 4.0](data/final/LICENSE.txt). Source filings and other third-party materials retain their original rights and terms.

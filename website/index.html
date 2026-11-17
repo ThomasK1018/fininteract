@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FinInteract — Clarify the question. Resolve the intent.</title>
+  <meta name="description" content="FinInteract benchmarks clarification and intent integration in ambiguous financial question answering. EACL 2027. Explore the paired interpretations and download the English/Chinese benchmark.">
+  <meta name="theme-color" content="#183e3b">
+  <meta property="og:title" content="FinInteract · Findings of ACL: EACL 2027">
+  <meta property="og:description" content="A correct number can still answer the wrong question. A bilingual benchmark for financial agents that ask, clarify, and integrate.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <a class="wordmark" href="#" aria-label="FinInteract home"><span class="mark" aria-hidden="true">f<span>i</span></span>FinInteract</a>
+  <nav aria-label="Main navigation"><a href="#benchmark">Benchmark</a><a href="#findings">Findings</a><a href="#resources">Resources</a><a href="#citation">Cite</a></nav>
+  <a class="header-link" href="https://github.com/ThomasK1018/fininteract">Code <span aria-hidden="true">↗</span></a>
+</header>
+<main id="main">
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="status-dot"></span> Accepted to Findings of ACL: EACL 2027</p>
+      <h1>The right number.<br>The <em>wrong</em><br>interpretation.</h1>
+      <p class="hero-deck">Financial questions can have more than one defensible answer. Can an AI agent ask the question that reveals which one you mean?</p>
+      <div class="actions"><a class="button primary" href="assets/fininteract.pdf">Read the paper <span aria-hidden="true">↗</span></a><a class="button secondary" href="#resources">Get the benchmark <span aria-hidden="true">↓</span></a></div>
+      <p class="paper-subtitle">FinInteract: Benchmarking Clarification and Intent Integration in Ambiguous Financial Question Answering</p>
+      <p class="authors">Xinyu Wang<sup>1</sup> · Tung Sum Thomas Kwok<sup>2</sup><br>Zhenghan Tai<sup>3</sup> · Guang Cheng<sup>2</sup></p>
+      <p class="affiliations"><sup>1</sup> McGill University &nbsp; <sup>2</sup> UCLA &nbsp; <sup>3</sup> University of Toronto</p>
+    </div>
+    <div class="hero-demo" aria-label="Illustrative benchmark interaction">
+      <div class="demo-heading"><span class="tiny-label">ONE QUESTION. TWO READINGS.</span><span class="file-tag">META · FY2023</span></div>
+      <div class="question-bubble">“What was Meta Platforms’<br><strong>operating income?</strong>”</div>
+      <div class="branch-line" aria-hidden="true"><span></span></div>
+      <div class="answer-pair">
+        <div class="answer-option default-option"><span class="tiny-label">DEFAULT READING</span><strong>$62.87<span>B</span></strong><p>Family of Apps segment</p><span class="answer-note">Grounded in the filing</span></div>
+        <div class="answer-option intended-option"><span class="tiny-label">INTENDED READING</span><strong>$46.75<span>B</span></strong><p>Consolidated company</p><span class="answer-note">Also grounded in the filing</span></div>
+      </div>
+      <div class="demo-divider"><span>THE MISSING STEP</span></div>
+      <button class="clarify-button" id="clarify-button" aria-expanded="false" aria-controls="clarification">Ask a clarifying question <span aria-hidden="true">↗</span></button>
+      <div class="clarification" id="clarification" hidden><p><strong>Agent</strong> Do you mean the consolidated company under U.S. GAAP?</p><p><strong>User</strong> Yes.</p><p class="resolved"><span aria-hidden="true">✓</span> Now the answer is $46.75B.</p></div>
+      <p class="demo-caption">An illustrative interaction using a real benchmark instance. No model is called.</p>
+    </div>
+  </section>
+
+  <section class="stats-strip" aria-label="Benchmark at a glance"><div class="wrap stats"><div><strong>173</strong><span>frozen evaluation instances</span></div><div><strong>EN / ZH</strong><span>English & Chinese</span></div><div><strong>5</strong><span>ambiguity categories defined</span></div><div><strong>2</strong><span>paired interpretations per query</span></div></div></section>
+
+  <section class="wrap section" id="benchmark">
+    <div class="section-intro"><p class="eyebrow">01 / THE BENCHMARK</p><h2>Evaluate the interaction,<br>not just the final number.</h2><p>A single gold answer can reward an agent for guessing one plausible reading. FinInteract pairs a default reading with a hidden intended reading, then evaluates whether the agent clarifies and uses the answer.</p></div>
+    <div class="protocol"><div><span class="step-num">01</span><h3>Search</h3><p>Read evidence from financial filings. Both candidate answers are supported.</p></div><span class="protocol-arrow" aria-hidden="true">→</span><div><span class="step-num">02</span><h3>Clarify</h3><p>Ask a simulated user about the hidden context, without being handed the answer.</p></div><span class="protocol-arrow" aria-hidden="true">→</span><div><span class="step-num">03</span><h3>Integrate</h3><p>Use the clarification to commit to the intended interpretation and its answer.</p></div></div>
+    <div class="taxonomy"><div class="taxonomy-heading"><h3>Where ambiguity lives</h3><p>Primary categories in the frozen 173-item evaluation set</p></div><div class="category-row"><span>Entity scope</span><div class="category-track"><span style="width:100%"></span></div><b>94</b></div><div class="category-row"><span>Metric definition</span><div class="category-track"><span style="width:67.02%"></span></div><b>63</b></div><div class="category-row"><span>Recognition policy</span><div class="category-track"><span style="width:9.57%"></span></div><b>9</b></div><div class="category-row"><span>Temporal scope</span><div class="category-track"><span style="width:7.45%"></span></div><b>7</b></div><div class="category-row"><span>Filing vintage</span><div class="category-track"><span style="width:0%"></span></div><b>0</b></div><p class="note">Four categories are represented in this release. Recognition policy and temporal scope have small samples; filing vintage is part of the taxonomy but has no primary-category instances.</p></div>
+  </section>
+
+  <section class="example-section" id="examples"><div class="wrap section"><div class="section-intro"><p class="eyebrow">02 / LOOK INSIDE</p><h2>The ambiguity is in the details.</h2><p>Explore original benchmark records. The intended context is hidden from the agent and available to the user simulator.</p></div><div class="example-browser"><div class="example-toolbar"><label for="example-select">Choose an instance</label><select id="example-select"><option value="0">Meta · Entity scope · EN</option><option value="1">上海机场 · Entity + metric · ZH</option><option value="2">General Electric · Temporal scope · EN</option><option value="3">Workday · Metric definition · EN</option></select><span id="example-id" class="file-tag">fininteract_0001</span></div><blockquote id="example-question">What was Meta Platforms' operating income?</blockquote><div class="example-columns"><div><span class="tiny-label">DEFAULT ANSWER</span><strong id="example-default">$62.87B</strong><p id="example-default-reading">Family of Apps segment</p></div><div><span class="tiny-label">INTENDED ANSWER</span><strong id="example-answer">$46.75B</strong><p id="example-intended-reading">Meta Platforms, Inc. total company (consolidated)</p></div></div><details open><summary>Hidden disambiguating context</summary><p id="example-context">Total company (consolidated) results under U.S. GAAP for the year ended December 31, 2023; exclude segment-only figures.</p></details><details><summary>Inspect the source evidence</summary><p class="tiny-label">INTENDED EVIDENCE</p><p id="example-evidence">Income from operations for 2023 was $46.75 billion, an increase of $17.81 billion, or 62%, compared to 2022, driven by an increase in advertising revenue.</p><p class="tiny-label">DEFAULT EVIDENCE</p><p id="example-default-evidence">Family of Apps: income from operations $62,871 million.</p></details><p class="note" id="example-status" role="status">Original dataset wording is preserved in the downloadable records.</p></div></div></section>
+
+  <section class="wrap section" id="findings"><div class="section-intro"><p class="eyebrow">03 / FINDINGS</p><h2>Asking is only<br>half the challenge.</h2><p>Agents must ask a question that resolves the ambiguity, then carry that clarification into their answer. Mentioning the right category alone does not establish success.</p></div><div class="findings-grid"><article class="finding-chart"><span class="chart-tag">GPT-5 · 173 INSTANCES</span><h3>A large gap to supplied intent</h3><div class="result-row"><div><span>Free interaction</span><b>20.2%</b></div><div class="result-track"><span class="coral" style="width:20.2%"></span></div></div><div class="result-row"><div><span>Context + evidence oracle</span><b>95.4%</b></div><div class="result-track"><span style="width:95.4%"></span></div></div><p>Supplying the intended context and both evidence spans makes the task much easier. This is an oracle condition, not the performance of an autonomous agent.</p></article><article class="finding-chart"><span class="chart-tag">QWEN3-14B · 173 INSTANCES · OPEN-MODEL STACK</span><h3>Clarification can be trained</h3><div class="result-row"><div><span>Base model</span><b>32.4%</b></div><div class="result-track"><span class="coral" style="width:32.4%"></span></div></div><div class="result-row"><div><span>Category-guided SFT</span><b>60.1%</b></div><div class="result-track"><span style="width:60.1%"></span></div></div><p>End-to-end interaction accuracy improves with 231 non-benchmark demonstrations. The gain is concentrated in Chinese: 39.2→78.3%; English changes from 17.0→18.9%.</p></article></div><div class="limits-note"><strong>Read the results in context.</strong> The evaluation set is small and imbalanced (53 English, 120 Chinese), and language is confounded with filing regime. Every benchmark item is ambiguous. Results do not establish a calibrated decision about when to ask in deployment.</div></section>
+
+  <section class="resources-section" id="resources"><div class="wrap section"><div class="section-intro"><p class="eyebrow">04 / RESOURCES</p><h2>Inspect. Reproduce. Build on it.</h2><p>Choose the frozen snapshot to reproduce the paper, or the corrected release for new evaluations. Keep the version in your reported results.</p></div><div class="resource-list"><a href="assets/fininteract.pdf"><div><span class="resource-kind">PAPER</span><h3>Author manuscript</h3><p>Benchmark design, experiments, and detailed appendices.</p></div><span class="resource-action">PDF ↗</span></a><a href="assets/data/fininteract_v1.jsonl" download><div><span class="resource-kind">DATA · V1.0</span><h3>Frozen evaluation snapshot</h3><p>173 instances · matches the reported experimental results.</p></div><span class="resource-action">JSONL ↓</span></a><a href="assets/data/fininteract_v1.1.jsonl" download><div><span class="resource-kind">DATA · V1.1</span><h3>Corrected public release</h3><p>172 instances · removes fininteract_0172 after human validation.</p></div><span class="resource-action">JSONL ↓</span></a><a href="https://github.com/ThomasK1018/fininteract"><div><span class="resource-kind">CODE</span><h3>Construction & evaluation</h3><p>Research code, model evaluation, analysis, and training scripts.</p></div><span class="resource-action">GitHub ↗</span></a></div><p class="note">The paper reports the 173-item snapshot. Removing an item changes evaluation denominators; results on v1.1 should be recomputed. <a href="assets/data/dataset-manifest.json">Version details & checksums</a>.</p><p class="license-note">Project code: <a href="LICENSE">MIT</a>. Original benchmark records: <a href="DATA_LICENSE.txt">CC BY 4.0</a>. Quoted source filings and third-party materials retain their original rights and terms.</p></div></section>
+
+  <section class="wrap section citation-section" id="citation"><div><p class="eyebrow">05 / CITE FININTERACT</p><h2>Use it in your research.</h2><p>Accepted to Findings of ACL: EACL 2027. Proceedings metadata will be updated when available.</p><a class="contact" href="mailto:guangcheng@ucla.edu">Contact Guang Cheng <span aria-hidden="true">↗</span></a></div><div class="citation-box"><button id="copy-citation" class="copy-button" type="button">Copy BibTeX</button><pre id="bibtex">@misc{wang2027fininteract,
+  title = {FinInteract: Benchmarking Clarification
+    and Intent Integration in Ambiguous
+    Financial Question Answering},
+  author = {Wang, Xinyu and
+    Kwok, Tung Sum Thomas and Tai, Zhenghan
+    and Cheng, Guang},
+  year = {2027},
+  note = {Accepted to Findings of ACL: EACL 2027},
+  url = {https://thomask1018.github.io/fininteract-project/}
+}</pre><span id="copy-status" role="status" class="sr-only"></span></div></section>
+</main>
+<footer class="wrap"><a class="wordmark" href="#">FinInteract</a><p>Better questions. Better grounded answers.</p><a href="https://github.com/ThomasK1018/fininteract-project">Project page source ↗</a></footer>
+</body>
+</html>

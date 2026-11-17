@@ -1,0 +1,69 @@
+\section{Additional Validation and Reproducibility}
+\label{app:additional_validation}
+
+This appendix reports additional analyses of stored trajectories and controlled pilot evaluations. Scores use the frozen 173-instance v1.0 dataset unless a smaller sample is explicitly stated.
+
+\subsection{Resolution-sufficient clarification}
+A question targets a category when it mentions the relevant dimension, but it resolves the paired ambiguity only if a truthful answer distinguishes the intended and default readings. We apply a GPT-4o-mini resolution-sufficiency judge to stored questions, conditioned on the question, both readings, and the intended context. Resolving AC@1 is the fraction of first questions judged sufficient, conditional on asking. It differs from both the touch and central category-targeting metrics.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Model & Asked & Touch & Resolving \\
+\midrule
+GPT-5 & 171 & .86 & .27 \\
+GPT-4o & 172 & .94 & .02 \\
+GPT-5-mini & 166 & .94 & .17 \\
+Qwen3-8B & 26 & .88 & .23 \\
+Qwen3-32B & 95 & .96 & .66 \\
+\bottomrule
+\end{tabular}
+\caption{First-question targeting and resolution sufficiency, conditional on asking. The first four runs evaluate 173 items; Qwen3-32B evaluates 155. Touch values use the corrected category classifier and matching trajectory denominators. Resolving values use a separate model judge without an independent human-validation study.}
+\label{tab:resolving}
+\end{table}
+
+The distinction also qualifies the error taxonomy. Among wrong answers after asking, GPT-5 had received an answer to a resolving question in 69 of 136 cases (50.7\%), whereas GPT-4o had in only 12 of 164 (7.3\%). Thus the wrong-after-asking bucket mixes integration failures with inadequate clarification. For GPT-5, 28 of 97 trajectories containing a resolving question end correctly (28.9\%); an informative clarification does not ensure correct integration. These are judge-based diagnostics, not independently human-validated causal attributions.
+
+\subsection{Pilot controls and protocol sensitivity}
+Table~\ref{tab:pilot_controls} uses the first 50 frozen instances, comprising 3 English and 47 Chinese items. The matched unambiguous control folds $C$ into the user question. GPT-5 still asks on 24 of 50 items (48\%), indicating over-asking in this controlled setting. The core benchmark contains only ambiguous questions and therefore does not by itself measure a calibrated when-to-ask policy.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{@{}lr@{}}
+\toprule
+GPT-5 condition & Accuracy (\%) \\
+\midrule
+Standard ReAct & 34 \\
+Category-Aware ReAct & 46 \\
+Generic structured clarification & 28 \\
+Category-Aware without state gate & 50 \\
+Matched unambiguous control & 70 \\
+Free-form interaction & 38 \\
+Ask once, yes/no & 22 \\
+Ask once, free-form & 36 \\
+\midrule
+Interpretation only & 4 \\
+Evidence only & 6 \\
+Interpretation and evidence & 92 \\
+\bottomrule
+\end{tabular}
+\caption{Controlled pilot conditions, each with $N=50$ (3 EN, 47 ZH). Protocol variants remain far below the context-plus-evidence oracle. These are single pilot runs, not repeated-seed estimates. The human study uses a different subset.}
+\label{tab:pilot_controls}
+\end{table}
+
+The generic structured policy retains a pre-check and interpretation-state machinery but omits category templates. Its 28\% accuracy is below the category-conditioned policy's 46\%; removing the state gate reaches 50\%. These exploratory results are consistent with a benefit from category-conditioned questioning and do not support attributing the improvement to the gate. They do not establish a general component effect across models or languages. Values are recomputed from complete 50-record trajectory blocks. A no-pre-check run has incomplete or inconsistent archived records and is not included.
+
+Free-form and ask-once variants leave substantial gaps to the oracle, but all run on this language-skewed pilot. The 22\% ask-once yes/no result is not directly comparable with the 30\% human result, which uses a distinct, stratified 50-instance sample. Likewise, the oracle jointly supplies interpretation and evidence, so it does not isolate a pure reasoning ceiling.
+
+\subsection{Category-guided supervision on an open-model stack}
+The Qwen3-14B comparison in Table~\ref{tab:sft14b} uses 231 demonstrations from 85 unique training IDs, with no exact ID overlap with the benchmark. We train a rank-16 LoRA adapter for three epochs at learning rate $2\times10^{-4}$. Exact ID disjointness does not establish semantic disjointness. Evaluation uses ordinary retrieval and a locally served Qwen2.5-14B-Instruct simulator and judges. Every requested passage ID is present, so no missing-passage fallback to the hidden context is triggered.
+
+Interaction accuracy changes from 56/173 to 104/173, with 63 improvements and 15 regressions on paired instances. English accuracy changes from 9/53 to 10/53; Chinese accuracy changes from 47/120 to 94/120. Search-only accuracy changes from 59/173 to 55/173. This is one training run, and the language and filing-regime confound limits generalization. The recipe is provided in \path{experiments/gpu_eval/run_sft_leakfree.sh}.
+
+\subsection{Version and configuration provenance}
+The corrected v1.1 public release removes \texttt{fininteract\_0172}, leaving 172 instances. All reported experiments retain v1.0; results should be recomputed before comparison on v1.1. The original Qwen3-32B archive has 173 answer-only and search records, but only 155 interactive records. Table~\ref{tab:main} uses their shared 155-item subset for all three modes (1, 44, and 13 correct), giving a matched interaction difference of $-20.0$ points. Retrieval re-grading uses all 173 available search records.
+
+The archived corrected touch-classifier aggregates for Qwen3-30B-A3B and Qwen3.5-35B-A3B match thinking-enabled runs with 162 and 125 asked instances. Their canonical accuracy runs have 124 and 63 asked instances. We omit those aggregates from the main accuracy table and label the configuration explicitly in Table~\ref{tab:category_targeting}. Targeting-versus-accuracy plots based on the original aggregate analysis should be read descriptively, with this configuration mismatch in mind.

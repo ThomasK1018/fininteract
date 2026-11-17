@@ -1,0 +1,128 @@
+{
+  "source": "fininteract_v1.jsonl",
+  "also_present_in": "fininteract_v1.1.jsonl",
+  "description": "Four illustrative instances; original wording, values, labels and evidence spans are retained.",
+  "examples": [
+    {
+      "instance_id": "fininteract_0001",
+      "language": "en",
+      "source": "edgar",
+      "company": "Meta Platforms, Inc.",
+      "ticker": "META",
+      "filing_type": "10-K",
+      "filing_date": "2024-02-02",
+      "question": "What was Meta Platforms' operating income?",
+      "context": "Total company (consolidated) results under U.S. GAAP for the year ended December 31, 2023; exclude segment-only figures.",
+      "answer": "$46.75B",
+      "default_answer": "$62.87B",
+      "axes": [
+        "entity_scope"
+      ],
+      "intended_interpretation": {
+        "entity": "Meta Platforms, Inc. total company (consolidated)",
+        "period": "Year ended December 31, 2023",
+        "metric": "Operating income (income from operations)",
+        "basis": "GAAP"
+      },
+      "default_interpretation": {
+        "entity": "Family of Apps segment",
+        "period": "Year ended December 31, 2023",
+        "metric": "Operating income (income from operations)",
+        "basis": "GAAP"
+      },
+      "intended_evidence_span": "Income from operations for 2023 was $46.75 billion, an increase of $17.81 billion, or 62%, compared to 2022, driven by an increase in advertising revenue.",
+      "default_evidence_span": "Family of AppsReality LabsTotal ... Income (loss) from operations $62,871 $42,661 47% $(16,120)$(13,717)(18)% $46,751 $28,944 62%"
+    },
+    {
+      "instance_id": "fininteract_0005",
+      "language": "zh",
+      "source": "cninfo_akshare",
+      "company": "上海机场",
+      "ticker": "600009",
+      "filing_type": "年报",
+      "filing_date": "2023-04-30",
+      "question": "上海机场的净利润是多少？",
+      "context": "请按归属于上市公司股东口径，并以扣除非经常性损益的净利润口径作答。",
+      "answer": "8.29亿元",
+      "default_answer": "11.89亿元",
+      "axes": [
+        "entity_scope",
+        "metric_definition"
+      ],
+      "intended_interpretation": {
+        "entity": "归属于上市公司股东口径（不含少数股东权益）",
+        "period": "2023年度",
+        "metric": "净利润",
+        "basis": "扣除非经常性损益"
+      },
+      "default_interpretation": {
+        "entity": "合并报表整体（含少数股东损益）",
+        "period": "2023年度",
+        "metric": "净利润",
+        "basis": "包含非经常性损益的常规定义"
+      },
+      "intended_evidence_span": "归属于上市公司股东的扣除非经常性损益的净利润（扣非净利润）：8.29亿元。",
+      "default_evidence_span": "净利润：11.89亿元；"
+    },
+    {
+      "instance_id": "fininteract_0062",
+      "language": "en",
+      "source": "edgar",
+      "company": "GENERAL ELECTRIC CO",
+      "ticker": "GE",
+      "filing_type": "10-K",
+      "filing_date": "2024-02-02",
+      "question": "What was General Electric's revenue growth rate?",
+      "context": "Year-over-year change for the year ended December 31, 2023, comparing to the immediately preceding year; total revenues from continuing operations at the consolidated level; GAAP as reported.",
+      "answer": "17.0%",
+      "default_answer": "2.9%",
+      "axes": [
+        "temporal_scope"
+      ],
+      "intended_interpretation": {
+        "entity": "General Electric Company (consolidated, continuing operations)",
+        "period": "Year ended December 31, 2023 vs. 2022 (YoY)",
+        "metric": "Total revenue growth rate",
+        "basis": "GAAP, as reported"
+      },
+      "default_interpretation": {
+        "entity": "General Electric Company (consolidated, continuing operations)",
+        "period": "Year ended December 31, 2022 vs. 2021 (YoY)",
+        "metric": "Total revenue growth rate",
+        "basis": "GAAP, as reported"
+      },
+      "intended_evidence_span": "For the year ended December 31, 2023, total revenues increased $9.9 billion (17%).",
+      "default_evidence_span": "REVENUES 2023 2022 2021 ... Total revenues $67,954 $58,100 $56,469"
+    },
+    {
+      "instance_id": "fininteract_0130",
+      "language": "en",
+      "source": "edgar",
+      "company": "Workday, Inc.",
+      "ticker": "WDAY",
+      "filing_type": "10-K",
+      "filing_date": "2023-02-27",
+      "question": "What was Workday's subscription revenue backlog growth rate?",
+      "context": "Interpret 'subscription revenue backlog' as the 24-month subscription revenue backlog and use the year-over-year change shown in the Financial Results Overview table.",
+      "answer": "21.0%",
+      "default_answer": "28.0%",
+      "axes": [
+        "metric_definition"
+      ],
+      "intended_interpretation": {
+        "entity": "Workday, Inc.",
+        "period": "Year-over-year change for the years ended January 31, 2023 and 2022",
+        "metric": "subscription revenue backlog growth rate",
+        "basis": "24-month subscription revenue backlog"
+      },
+      "default_interpretation": {
+        "entity": "Workday, Inc.",
+        "period": "Year-over-year change for the years ended January 31, 2023 and 2022",
+        "metric": "subscription revenue backlog growth rate",
+        "basis": "total subscription revenue backlog"
+      },
+      "intended_evidence_span": "24-month subscription revenue backlog$9,677,373 $7,975,554 21 %",
+      "default_evidence_span": "Total subscription revenue backlog$16,448,155 $12,806,855 28 %"
+    }
+  ]
+}
