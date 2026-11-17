@@ -1,0 +1,85 @@
+{
+  "name": "FinInteract",
+  "taxonomy": [
+    "entity_scope",
+    "metric_definition",
+    "temporal_scope",
+    "recognition_policy",
+    "filing_vintage"
+  ],
+  "represented_primary_categories": 4,
+  "versions": [
+    {
+      "file": "fininteract_v1.jsonl",
+      "version": "1.0",
+      "description": "Frozen evaluation snapshot used for all results reported in the paper.",
+      "instances": 173,
+      "languages": {
+        "en": 53,
+        "zh": 120
+      },
+      "primary_categories": {
+        "entity_scope": 94,
+        "temporal_scope": 7,
+        "recognition_policy": 9,
+        "metric_definition": 63
+      },
+      "sources": {
+        "edgar": 43,
+        "docfinqa": 3,
+        "cninfo_akshare": 120,
+        "edgar_recognition": 7
+      },
+      "sha256": "0437d218c8270e04681712667de4a2c26268e6657438e149fffcc14f6058b93d",
+      "size_bytes": 246365,
+      "sanitization": "No secrets, email addresses, or local filesystem paths matched the scanned patterns. The frozen scientific records are copied byte for byte without changes.",
+      "scan_counts": {
+        "credential": 0,
+        "local_path": 0,
+        "email_address": 0
+      }
+    },
+    {
+      "file": "fininteract_v1.1.jsonl",
+      "version": "1.1",
+      "description": "Corrected public release; removes fininteract_0172 after human adjudication.",
+      "instances": 172,
+      "languages": {
+        "en": 52,
+        "zh": 120
+      },
+      "primary_categories": {
+        "entity_scope": 94,
+        "temporal_scope": 7,
+        "recognition_policy": 8,
+        "metric_definition": 63
+      },
+      "sources": {
+        "edgar": 43,
+        "docfinqa": 3,
+        "cninfo_akshare": 120,
+        "edgar_recognition": 6
+      },
+      "sha256": "4673d4fa18356214f16da7cd6590daf337c474c2510240d755852cf2cdea0251",
+      "size_bytes": 245163,
+      "sanitization": "No secrets, email addresses, or local filesystem paths matched the scanned patterns. The frozen scientific records are copied byte for byte without changes.",
+      "scan_counts": {
+        "credential": 0,
+        "local_path": 0,
+        "email_address": 0
+      }
+    }
+  ],
+  "license": "CC-BY-4.0",
+  "license_note": "Original benchmark records are CC BY 4.0. Quoted source filings and third-party materials retain their original rights and terms. Project code is MIT licensed.",
+  "provenance": "Author-constructed question, context and answer records with short evidence excerpts from SEC EDGAR filings, CNINFO/akshare filings and three DocFinQA-derived items. Raw third-party datasets and filings are not included.",
+  "intended_use": "Research evaluation of ambiguity clarification and intent integration in financial question answering.",
+  "limitations": [
+    "The frozen evaluation snapshot contains 173 items; the corrected public release contains 172 and should not be confused with the experimental snapshot.",
+    "Entity scope and metric definition account for 157 of 173 frozen instances. Recognition policy and temporal scope are exploratory; filing vintage has no instances.",
+    "The language split is also a source and filing-regime split: all 120 Chinese items come from CNINFO/akshare.",
+    "119 of the 120 Chinese questions mention net profit. This is not broad coverage of financial question answering.",
+    "Questions are constructed to be ambiguous. The dataset alone does not measure whether an agent knows when clarification is unnecessary.",
+    "The paired context specifies one intended interpretation; this is a controlled evaluation setting rather than observed real-user intent."
+  ]
+}

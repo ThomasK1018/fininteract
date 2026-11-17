@@ -45,6 +45,7 @@ This appendix gives the full tables, figures, and findings summarized in \S\ref{
 \S\ref{sec:ceiling}, and \S\ref{sec:skills}.
 
 \subsection{The Single-Gold Illusion}
+\input{paper/tables/supporting_tables}
 Before analyzing model behavior, we establish the core motivation empirically:
 \emph{a conventional single-gold financial-QA benchmark cannot see the failure
 \fininteract measures.} Existing benchmarks (FinanceBench, FinQA, DocFinQA)
@@ -53,27 +54,11 @@ benchmark would almost always adopt the \emph{default} reading, the headline
 figure a non-expert assumes, as that gold. Our paired construction lets us
 quantify the consequence directly: every instance carries both an intended and a
 default answer, so we re-grade the \emph{identical} model outputs under both
-conventions (Table~\ref{tab:main}(b)).
+conventions (Table~\ref{tab:default}).
 
 
 
-\textbf{Finding 5: A single-gold convention over-states competence by up to
-3 times, and the gap is the benchmark's reason to exist.} In the
-retrieval-augmented regime where current single-gold benchmarks operate, the
-larger models return the \emph{default} reading more often than the intended one:
-GPT-4o is graded 37.0\% correct against the default but only 12.1\% against
-the intended answer, a single-gold benchmark would report 3.1 times its true
-competence. The model is not reasoning to the right answer; it is confidently
-producing a well-grounded answer to the \emph{wrong reading of the question},
-which a single-gold benchmark rewards and therefore cannot detect. (GPT-5-mini is
-the instructive exception: it captures \emph{neither} reading because it asks
-rather than commits, so single-gold grading does not flatter it, but
-nor does it answer.) Critically,
-interaction is the \emph{only} mode where intended accuracy exceeds
-default-capture (GPT-5: 20.2 vs.\ 12.1): asking is what converts a
-default-anchored guess into the correct intended answer. This is precisely the
-capability single-gold benchmarks are structurally blind to, and what
-\fininteract is built to measure.
+\textbf{Finding 5: accuracy depends strongly on the chosen gold interpretation.} In the retrieval-assisted GPT-4o run, 64 of 173 outputs match the default versus 21 that match the intended answer, approximately a threefold difference. Across the eight models with defined ratios, default-to-intended accuracy ranges from 0.9 to 6.2 (median 1.8). The direction reverses for the English split: every defined ratio is below one. Seven of eight Chinese-split ratios exceed one. This establishes sensitivity to the gold reading on our constructed ambiguous items; it does not quantify bias in other financial benchmarks. With interaction, GPT-5 matches the intended answer more often than the default (20.2\% versus 12.1\%).
 
 \textbf{Human validation of the default.} The single-gold argument assumes a conventional
 benchmark builder, seeing only the question and passage, would record the \emph{default}
@@ -100,26 +85,11 @@ model must still ground the correct value.
 \centering
 \includegraphics[width=\linewidth]{fig_bottleneck.pdf}
 \caption{\textbf{The elicitation gap.} Free-interaction accuracy (orange) versus the
-context-oracle ceiling (teal) per model. Once the ambiguity is resolved every model
-answers 90--95\% correctly, so the 63--95 point gap is the cost of the model
-failing to \emph{elicit} the disambiguation itself, not missing knowledge.}
+context-plus-evidence oracle (teal) for the plotted models. The oracle supplies both the intended context and evidence, so the difference includes the effect of those additional inputs.}
 \label{fig:bottleneck}
 \end{figure}
 
-\textbf{Finding 6: Models can answer once the ambiguity is resolved, they
-cannot resolve it themselves.} The context-oracle ceiling is 93--95\% for all
-three models, including GPT-5-mini, which scores 0\% under free interaction.
-Latent answering capacity is therefore near-ceiling and roughly scale-invariant;
-what varies, and what \fininteract measures, is whether a model can \emph{resolve}
-the ambiguity end to end, eliciting the disambiguating context and then integrating
-it into a committed answer. Crucially, \emph{forcing} clarification
-does not recover this capacity: requiring four asks leaves GPT-4o and GPT-5-mini
-near 0\% (0.0\% and 0.6\%) and \emph{lowers} GPT-5 from 20.2\% to 1.5\%, because forced asks
-consume the round budget on low-value questions without converging on a committed
-answer. This already points past pure elicitation: models frequently ask on-category
-yet still fail to commit the right value (the dominant error mode, \S\ref{sec:error}),
-so the bottleneck is targeted, self-initiated disambiguation \emph{and} the integration
-of the resulting answer, which neither scale nor brute-force asking supplies.
+\textbf{Finding 6: Supplied intent and evidence yield much higher accuracy than autonomous interaction.} The context-plus-evidence oracle reaches 93--95\% for the three GPT models, including GPT-5-mini, which scores 0\% under free interaction. Requiring four asks leaves GPT-4o and GPT-5-mini near 0\% (0.0\% and 0.6\%) and lowers GPT-5 from 20.2\% to 1.5\%. Forced questioning therefore does not close the observed gap. Because the oracle supplies both intent and evidence, the gap cannot be attributed solely to elicitation or interpreted as a scale-independent reasoning ceiling. Appendix~\ref{app:additional_validation} separates category targeting from resolution-sufficient questions and reports matched pilot controls.
 
 \subsection{Per-Category Skills}
 The five categories are not just data strata; each names a distinct \emph{skill}, the
@@ -131,7 +101,7 @@ model's per-category \texttt{+interact} competence into three components:
 \textbf{Resolution} (accuracy, does asking yield the intended answer?). A model
 ``has'' a category skill only when all three are high; a low value localizes the
 failure to not-asking, asking-wrong, or asking-right-but-still-wrong.
-Table~\ref{tab:main}(c) reports Targeting, the decisive component, and
+Table~\ref{tab:category_targeting} reports category targeting, and
 Figure~\ref{fig:radar} shows the same profile as a per-category bar chart.
 
 
@@ -140,7 +110,7 @@ Figure~\ref{fig:radar} shows the same profile as a per-category bar chart.
 \centering
 \includegraphics[width=\linewidth]{fig_radar.pdf}
 \caption{\textbf{Per-category clarification-capability profile} (touch AC@1 from
-Table~\ref{tab:main}(c)). Every model targets entity, metric, and temporal ambiguity well (0.85--1.00)
+Table~\ref{tab:category_targeting}). Every model targets entity, metric, and temporal ambiguity well (0.85--1.00)
 but collapses to zero on \texttt{recognition\_policy}, a blind spot shared across the
 closed frontier and the strongest open model.}
 \label{fig:radar}
@@ -148,10 +118,10 @@ closed frontier and the strongest open model.}
 
 \textbf{Finding 7: Ambiguity clarification is a per-category skill with a sharp touch
 versus central-targeting dissociation.} Under the corrected classifier the pattern is
-precise. \texttt{recognition\_policy} is a robust blind spot. No model ever asks about it,
+precise. \texttt{recognition\_policy} is an exploratory blind spot on nine items. No evaluated model asks about it,
 in either the touch or the central form (AC@1 of 0), so models essentially never
 question whether a figure is recognized point-in-time or over time. \texttt{temporal\_scope}
-is fully solved. Models both touch it and make it the central concern (central AC@1
+has high targeting scores on seven items. Models both touch it and make it the central concern (central AC@1
 of 1.0). Entity and metric occupy a revealing middle. Models almost always \emph{touch} them
 (touch AC@1 0.85--1.0) yet rarely make them the \emph{central} point of the question
 (central AC@1 at most 0.16), defaulting instead to period confirmation. For these two categories
@@ -171,8 +141,7 @@ ambiguity category. The top five rows are the full-scale panel (n = 173, all cat
 the bottom seven are the proprietary pilot (n = 50), for which only entity and metric
 carry enough instances (n = 29 and 19), with recognition, temporal, and filing at
 $n$ at most 1 and shown n/a. \texttt{filing\_vintage} is empty at full scale too (n = 0).
-Every model targets entity and metric almost perfectly, the proprietary models resolve
-them better than the older OpenAI ladder, and no model targets recognition policy.}
+The two MoE targeting rows use thinking-enabled runs, whereas their accuracy rows use the canonical configuration; they are not paired measurements. The pilot is a different, language-skewed subset. Recognition-policy and temporal results have small sample sizes.}
 \label{fig:axisperf}
 \end{figure*}
 
@@ -203,18 +172,10 @@ The main text reports four headline findings: the elicitation--integration gap, 
 
 \begin{table}[t]
 \centering
-\caption{The single-gold illusion replicates on AmbigQA (general domain,
-n = 200, three models, \emph{same} grading methodology; the grader retries with
-backoff so no answer is silently dropped). \emph{Intended}: accuracy against a
-specified target reading. \emph{Any-valid}: accuracy against \emph{any} accepted
-reading, what a lenient single-gold benchmark credits. \emph{Def.-cap}: fraction
-producing a valid but non-target reading. \emph{Ask}: fraction that asks when
-permitted. gpt-5-mini interact omitted (it asks below 1\%).
-Modes: \emph{A} answer-only, \emph{A+O} answer with context oracle,
-\emph{A+I} answer with interaction.}
-\label{tab:general}
+
 \small
-\begin{tabular}{llcccc}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}llcccc@{}}
 \toprule
 Model & Mode & Intended & Any-valid & Def.-cap & Ask \\
 \midrule
@@ -233,6 +194,16 @@ Model & Mode & Intended & Any-valid & Def.-cap & Ask \\
  & A+O & 62.0 & 73.5 & 27.5 & 0 \\
 \bottomrule
 \end{tabular}
+\caption{The single-gold illusion replicates on AmbigQA (general domain,
+n = 200, three models, \emph{same} grading methodology; the grader retries with
+backoff so no answer is silently dropped). \emph{Intended}: accuracy against a
+specified target reading. \emph{Any-valid}: accuracy against \emph{any} accepted
+reading, what a lenient single-gold benchmark credits. \emph{Def.-cap}: fraction
+producing a valid but non-target reading. \emph{Ask}: fraction that asks when
+permitted. gpt-5-mini interact omitted (it asks below 1\%).
+Modes: \emph{A} answer-only, \emph{A+O} answer with context oracle,
+\emph{A+I} answer with interaction.}
+\label{tab:general}
 \end{table}
 
 \textbf{Finding 8: the single-gold illusion is domain-general.} Running the
@@ -305,13 +276,7 @@ lifts GPT-5 to only 6.4\%: because each disambiguating passage contains
 does not resolve it. Only a targeted clarification collapses the question to a
 unique answer, which interaction (20.2\%) begins to do.
 
-\textbf{Finding 12: The weak model's failure is clarification non-integration, not
-inability to ask.} GPT-4o asks readily (IR 99\%, 4.7 questions on average) but
-fails to \emph{integrate} the user's responses: 87\% of its interactive errors
-are non-committal refusals (e.g.\ ``please specify the exact period'') issued
-\emph{after} the simulator has answered. It can recognize ambiguity and ask, but
-cannot close the loop and commit, a multi-turn integration gap, not a protocol
-artifact (only 2\% produced no answer at all).
+\textbf{Finding 12: Asking frequently does not ensure a committed answer.} GPT-4o asks readily (IR 99\%, 4.7 questions on average), yet 87\% of its interactive errors are non-committal refusals (e.g.\ ``please specify the exact period'') issued after a simulator response; 2\% produced no answer. These outcomes do not by themselves establish non-integration: the response may not resolve the ambiguity. The resolution-sufficiency analysis in Appendix~\ref{app:additional_validation} distinguishes these cases.
 
 \textbf{Finding 13: Models are severely overconfident on ambiguous queries.}
 Expected Calibration Error ranges from 0.53 (GPT-5, interact) to 0.95 (GPT-4o,
@@ -321,8 +286,7 @@ human-validated classifier (agreement 0.75, matching inter-annotator agreement 0
 both models almost always ask a question that touches the correct ambiguity category (AC@1
 0.86 for GPT-5 and 0.94 for GPT-4o). What they lack is precise \emph{central} targeting,
 only 0.06 and 0.04 of first questions make the true category their single central concern,
-and, above all, integration (Finding~12). The bottleneck is targeting precision and
-commitment rather tha category detection, which motivates the category-conditioned policy of
+and sufficient clarification followed by commitment (Finding~12). These diagnostics motivate the category-conditioned policy of
 \S\ref{sec:error}.
 
 \textbf{Finding 14: A smaller model collapses into ill-formed clarification, 
@@ -378,36 +342,16 @@ containing both candidate values, position-shuffled and unlabeled. Each may ask
 \emph{one} yes/no question, which the experimenter answers truthfully from the
 withheld context $C$ (Yes/No/IDK), before committing a final answer. This mirrors
 the agent's \texttt{search}to\texttt{interact}to\texttt{answer} loop, so the
-human row is directly comparable to the +Interact column; we grade it with the
+human task shares elements of the +Interact protocol, although its subset and question budget differ; we grade it with the
 identical GPT-4o-mini grader.
 
-\textbf{Finding 15: Even humans who can ask resolve only 30\%, the task is hard,
-not merely mis-specified for models.} Annotators reach 30.0\% accuracy overall
-(34.4\% EN, 22.2\% ZH), above every full-scale model (which top out at 28.9\%) but
-far from the 93--95\% context-oracle ceiling. The gap between the oracle ceiling and the
-human baseline is the cost of \emph{elicitation}: knowing the resolved answer is
-near-trivial, but extracting the right bit through a single clarification is hard
-even for experts. Across models and the human baseline, targeting and resolution
-\emph{dissociate}: the models with the highest AC@1 (GPT-4o and GPT-5-mini at
-0.94) post the lowest accuracy, while the human, at a lower touch AC@1 of 0.72
-(one focused question rather than a sweep of several categories), posts the highest
-(Figure~\ref{fig:humanllm}). The annotators also never targeted the recognition-policy
-category either (AC@1 0 on its eight items), so the blind spot is not
-model-specific. The asymmetry is sharpest in Chinese, where annotators still capture the
-default reading 72.2\% of the time at only 22.2\% accuracy. Chinese instances are
-therefore harder to \emph{resolve}, not harder to \emph{recognize}, the
-\emph{gui-mu}/\emph{kou-fei} (parent-attributable vs.\ deduction-of-nonrecurring) net-income
-distinction is sticky even once correctly surfaced, corroborating the
-language-asymmetry caveat of Appendix~\ref{app:limitations} with a mechanism.
+\textbf{Finding 15: Human accuracy is low under the single-question protocol.} Annotators reach 30.0\% accuracy overall (34.4\% EN, 22.2\% ZH), with touch AC@1 of 0.72. They never target recognition policy (AC@1 0 on eight sampled items). On Chinese items they capture the default reading 72.2\% of the time. These observations show difficulty under this protocol, but do not establish a human-versus-model ranking or isolate an elicitation cost: the human subset has 32 EN and 18 ZH items, differs from both the model pilot and full benchmark, and permits only one question. The language difference is also confounded with filing regime and question type.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{fig_humanllm.pdf}
 \caption{\textbf{Targeting does not imply resolution.} Accuracy against AC@1
-(touch) in the interact regime, for the five full-scale models and the human baseline
-(star). The relationship is inverted: models that ask on the correct category most often
-resolve the ambiguity least often, whereas the human asks less precisely yet resolves
-more. Asking the right question and answering it are separate abilities.}
+(touch) for five models and the human baseline (star). This is a descriptive plot: the human uses a distinct subset and protocol, and the MoE targeting and accuracy values come from different configurations. It is not a matched comparison or a causal test of targeting.}
 \label{fig:humanllm}
 \end{figure}
 
@@ -415,14 +359,7 @@ more. Asking the right question and answering it are separate abilities.}
 
 \begin{table}[t]
 \centering
-\caption{Zero-shot \emph{central}-targeting (central-form AC@1) by base-model scale
-(Qwen3, \texttt{+interact}, denominator = instances where the model asked). Under the
-validated touch form every scale already reaches about 0.9 on entity and metric, so scale
-buys the precision to \emph{center} the question on the right category rather than detection.
-Entity central-targeting scales steeply and is largely solved at 32B, while recognition policy
-stays 0 at every scale, including the same 32B that targets entity well. Recognition is
-underpowered ($n$ at most 9 asked-on) but flat throughout.}
-\label{tab:scaledissoc}
+
 \small
 \begin{tabular}{lccc}
 \toprule
@@ -433,6 +370,14 @@ metric\_definition  & .05 & .00 & .17 \\
 recognition\_policy & \textbf{.00} & \textbf{.00} & \textbf{.00} \\
 \bottomrule
 \end{tabular}
+\caption{Zero-shot \emph{central}-targeting (central-form AC@1) by base-model scale
+(Qwen3, \texttt{+interact}, denominator = instances where the model asked). Under the
+validated touch form every scale already reaches about 0.9 on entity and metric, so scale
+buys the precision to \emph{center} the question on the right category rather than detection.
+Entity central-targeting scales steeply and is largely solved at 32B, while recognition policy
+stays 0 at every scale, including the same 32B that targets entity well. Recognition is
+underpowered ($n$ at most 9 asked-on) but flat throughout.}
+\label{tab:scaledissoc}
 \end{table}
 
 \textbf{Finding 16: the categories are different \emph{kinds} of skill, some
@@ -536,17 +481,14 @@ to search for both open models, as it is for GPT-4o (12.1 to 4.6), and only the
 strongest model, GPT-5, converts clarification into a gain (6.4 to 20.2). An
 interpretation-oracle control (the resolved interpretation supplied but no evidence)
 scores about 0\% for both MoE models, so the residual gap to the oracle ceiling is
-an evidence-grounding cost, not a parametric-recall one. These two open models therefore
-do act on the represented category to the extent of \emph{asking}, unlike the closed
-models, yet asking still fails to convert into a correct answer, which is the same
-integration gap seen throughout. A linear-probe replication on the
+consistent with a role for supplied evidence; this control does not isolate the underlying mechanism. Both open models ask questions, but the probe does not establish that they causally use the decoded representation. Asking also does not ensure that the question resolves the ambiguity or that its answer is integrated correctly. A linear-probe replication on the
 \emph{base} (non-instruct) checkpoints reproduces the decodability and the early-vs-late depth
 split (peaks 0.71/0.74 vs.\ baseline 0.60).
 
 \begin{figure*}[t]
   \centering
   \includegraphics[width=\textwidth]{fig_crossmodel_depthflow.pdf}
-  \caption{Four-model depth profile of the ambiguity signal (Qwen3 4Bto35B, dense and
+  \caption{Four-model depth profile of the ambiguity signal (Qwen3 4B to 35B, dense and
   MoE). (a) Ambiguous-disambiguated separation rises to a peak in the final layers of every
   model (dotted verticals mark per-model peaks; normalized for depth and magnitude). (b) The
   ambiguity \emph{type} (entity vs.\ metric) is linearly decodable at 0.80 on both MoE models,
@@ -607,10 +549,9 @@ seven-type error taxonomy (Table~\ref{tab:errors}) derived from
 \fininteract's evaluation signals.
 Each type is diagnosable from existing metrics without additional annotation.
 
-\begin{table}[h]
+\begin{table}[t]
 \centering
-\caption{Error taxonomy E1--E7 with diagnostic signals and improvement directions.}
-\label{tab:errors}
+
 \small
 \begin{tabular}{p{0.09\columnwidth}p{0.35\columnwidth}p{0.38\columnwidth}}
 \toprule
@@ -624,54 +565,42 @@ E3 & \textbf{Generic clarification}: vague ask, no category target
    & Category-conditioned clarification templates \\
 E4 & \textbf{Retrieval dominance}: searched but skipped interaction
    & Force interpretation check after retrieval \\
-E5 & \textbf{Clarification misuse}: right question, wrong answer
-   & State-gated answering; stronger grounding \\
+E5 & \textbf{Wrong after category touch}: on-category question, wrong answer
+   & Check question sufficiency and answer integration \\
 E6 & \textbf{Evidence grounding}: template-oracle correct, agent wrong
    & Improved source-grounded extraction \\
 E7 & \textbf{Over-interaction}: correct but low DisE$^+$
    & Penalize via DisE$^+$/AC@1 efficiency signal \\
 \bottomrule
 \end{tabular}
+\caption{Error taxonomy E1--E7 with diagnostic signals and improvement directions.}
+\label{tab:errors}
 \end{table}
 
 \subsubsection{Diagnostic Mapping from Evaluation Signals}
 
-The existing evaluation metrics map directly onto error types, enabling
-failure attribution without additional annotation:
+The evaluation metrics suggest candidate error types. They are screening signals, not causal attributions; resolution sufficiency and evidence availability require additional checks:
 
 \begin{itemize}[leftmargin=*,noitemsep]
   \item \textbf{Low IR + low Acc} to E1 (ambiguity blindness dominant)
   \item \textbf{High IR + low AC@1} to E2/E3 (interacts but misdirected)
-  \item \textbf{High AC@1 + low Acc} to E5/E6 (right category, wrong grounding)
+  \item \textbf{High AC@1 + low Acc} to E5/E6 (check question sufficiency and grounding)
   \item \textbf{High GenericAskRate} to E3 (lacks financial clarification structure)
   \item \textbf{High WrongCategoryRate} to E2 (confidently misdirected)
   \item \textbf{Always-ask far exceeds Standard ReAct} to E1 dominant; latent capacity exists
-  \item \textbf{Template-oracle far exceeds Agent-interact} to ``what to ask'' is the bottleneck
-  \item \textbf{Category-oracle far exceeds Agent-interact} to category recognition is the bottleneck
+  \item \textbf{Template-oracle far exceeds Agent-interact} to a possible clarification or evidence-access gap
+  \item \textbf{Category-oracle far exceeds Agent-interact} to possible category-selection difficulty
   \item \textbf{Template-oracle still low} to E6 residual; evidence extraction still fails
 \end{itemize}
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{fig_errordist.pdf}
-\caption{\textbf{Error-type distribution} in \texttt{+interact}, attributing every
-instance to the taxonomy of Table~\ref{tab:errors} with the corrected category classifier.
-\emph{E5 misintegration} (the agent asks, touches the correct category, yet answers wrong)
-dominates for every model, while ambiguity blindness (E1), wrong-category (E2), and generic
-(E3) asks stay comparatively rare.}
+\caption{\textbf{Archived error-category distribution} in \texttt{+interact}. The plot's original ``E5 misintegration'' label denotes wrong answers after category touch; it does not establish that the preceding clarification was sufficient. MoE classifier aggregates have the configuration mismatch described in Appendix~\ref{app:additional_validation}.}
 \label{fig:errordist}
 \end{figure*}
 
-\textbf{Misintegration, not misdirection, dominates the error budget.} Attributing each
-interact-mode outcome to the taxonomy (Figure~\ref{fig:errordist}) shows that \emph{E5}
-(right category touched, wrong answer) accounts for the large majority of failures, 67\% for
-GPT-5, 89\% for GPT-4o, 90\% for GPT-5-mini, and 75\% for Qwen3-30B, while not-asking
-(E1) and off-category asks (E2 and E3) together stay below 15\% for the closed models. The
-bottleneck is converting a correctly targeted clarification into the intended answer, not
-deciding whether or what to ask. Qwen3.5-35B-A3B is the informative exception, asking less
-(E1 21\%) but resolving more of what it attempts (Correct 35\%), so its failures lean
-toward under-asking rather than misintegration. This corroborates Findings~7 and~12 across
-the full error budget and motivates the state-gated answering of \S\ref{sec:axisreact}.
+\textbf{Wrong answers often follow category-targeting questions.} Figure~\ref{fig:errordist} groups these cases into E5. A question can mention the right category without distinguishing the paired interpretations, so this bucket mixes inadequate clarification and integration failures. In the separate resolution-sufficiency analysis, only 12 of GPT-4o's 164 wrong-after-asking trajectories contain a resolving question, versus 69 of 136 for GPT-5. This motivates evaluating both question quality and subsequent use of the response. The pilot controls do not establish a benefit from the state gate itself (Appendix~\ref{app:additional_validation}).
 
 \subsubsection{Inference-Time Intervention: Category-Aware Clarification ReAct}
 \label{sec:axisreact}
@@ -709,7 +638,7 @@ template-oracle performance, it confirms that category recognition is the domina
 remaining bottleneck after the E1--E3 errors are addressed.
 
 \paragraph{Pilot results.}
-We evaluate the policy on a GPT-5 backbone over a stratified N = 50 subset run
+We evaluate the policy on a GPT-5 backbone over the first N = 50 release instances (3 EN and 47 ZH) run
 through the same OpenRouter harness, alongside four matched baselines (Standard ReAct,
 Always-Ask, Category-Oracle, Template-Oracle). Category-Aware ReAct reaches 46.0\% accuracy
 against the 34.0\% of Standard ReAct in the same run, a +12 point gain, and posts the
@@ -722,15 +651,35 @@ any-category touch form saturates near 1.0 while the strict central-category for
 neither cleanly credits the policy and we omit AC@1 for it in Table~\ref{tab:main}. The
 accuracy and calibration gains are the load-bearing result. We report this as a pilot rather
 than a full-panel row because it is a single backbone at N = 50, and we expect the effect
-size to tighten at full scale. One caveat bears directly on the mechanism: the policy bundles all
-three components above, and we do not ablate them here, so part of the +12 may come from the
-state-gated commit (Component~3, an integration fix) rather than from better category-conditioned
-elicitation (Component~2). A generic-structured clarification baseline that keeps the structure
-but drops the named categories, together with a per-component ablation, is the clean control and
-remains future work.
+size to tighten at full scale. The policy bundles three components, so this initial comparison alone does not isolate their effects. Additional pilot controls in Appendix~\ref{app:additional_validation} give 28\% for a generic structured policy and 50\% without the state gate. These are exploratory single-run comparisons on the same language-skewed subset; they do not support crediting the state gate for the improvement.
 
 \subsubsection{Training-Time Intervention: Category-Guided SFT and GRPO}
 \label{sec:grpo}
+
+\begin{table}[t]
+\centering
+
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Stage & AC@1 & Interaction & Accuracy & Reward \\
+\midrule
+Base      & 25.0 & 54.9 & 84.3 & 0.96 \\
+\;\;+\,SFT & 68.6 & \textbf{100} & 88.2 & 1.28 \\
+\;\;+\,KTO               & \textbf{70.6} & \textbf{100} & 84.3 & 1.27 \\
+\;\;+\,GRPO              & 66.7 & \textbf{100} & 88.2 & \textbf{1.30} \\
+\bottomrule
+\end{tabular}
+\caption{RLVR ladder on \fininteract with Qwen3-4B, held-out n = 51. Category-guided supervision installs on-category clarification, with the question-based signals (AC@1 and interaction) rising almost entirely at the SFT stage. Accuracy is leak-confounded and is reported for completeness only.}
+\label{tab:grpo}
+\end{table}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.8\textwidth]{fig_grpo_insights.pdf}
+\caption{\textbf{Category-guided training installs on-category clarification.} (a) The question-based signals, AC@1 and interaction rate, jump at the supervised stage and change little thereafter. (b) True multi-turn GRPO on the 4B policy: mean reward and clarifying turns rise together over training.}
+\label{fig:grpo}
+\end{figure*}
 
 The per-category skill analysis (\S\ref{sec:skills}) gives this intervention a precise
 target: models do not lack clarification ability uniformly, they lack \emph{specific}
@@ -742,7 +691,7 @@ only diagnosable but \emph{trainable}. Starting from Qwen3-4B-Instruct (4-bit
 QLoRA), we run an RLVR ladder, supervised fine-tuning (SFT), KTO, then GRPO, on
 the \fininteract training split, with all user simulators, graders, and category
 judges served locally (zero API cost). We score each stage with the two
-\emph{leak-proof} metrics, AC@1 and interaction rate (Table~\ref{tab:grpo});
+\emph{question-based} metrics, AC@1 and interaction rate (Table~\ref{tab:grpo});
 accuracy is reported only with the caveat that the training environment's
 retrieval returns the disambiguated evidence span, so it is partly leaked and is
 \emph{not} a reliable learning signal.
@@ -758,7 +707,7 @@ clarification task.
 
 
 
-\textbf{SFT does the heavy lifting.} The leak-proof signals jump almost entirely
+\textbf{SFT does the heavy lifting.} The question-based signals jump almost entirely
 at the supervised stage, AC@1 rises 25 to 69 and interaction 55 to 100
 (Figure~\ref{fig:grpo}a), while KTO and GRPO move within run-to-run noise at
 n = 51. Training teaches the model to \emph{always interact and target the
@@ -801,11 +750,7 @@ loop works but \emph{when}.
 
 \begin{table*}[t]
 \centering
-\caption{Three co-evolution rounds (category-guided SFT on a 4B policy). Targeting
-(AC@1) is on a \emph{held-out human} probe never seen in training. The loop
-closes on both \emph{abundant} categories and fails only on the \emph{scarce} one; whether
-asking \emph{helps accuracy} flips on whether the base could already answer.}
-\label{tab:coevolve}
+
 \small
 \begin{tabular}{lccc}
 \toprule
@@ -819,6 +764,11 @@ Interaction rate                     & $40\to100$ & $50\to100$ & $67\to100$ \\
 De-leaked accuracy                   & $32.5\to22.5$ & $15\to\textbf{60}$ & $11\to11$ \\
 \bottomrule
 \end{tabular}
+\caption{Three co-evolution rounds (category-guided SFT on a 4B policy). Targeting
+(AC@1) is on a \emph{held-out human} probe never seen in training. The loop
+closes on both \emph{abundant} categories and fails only on the \emph{scarce} one; whether
+asking \emph{helps accuracy} flips on whether the base could already answer.}
+\label{tab:coevolve}
 \end{table*}
 
 All three rounds run end-to-end: the ConstructortoVerifier pipeline yields hard
@@ -904,16 +854,7 @@ not \emph{act} on it, the ``represents-but-doesn't-act'' gap of
 
 \begin{table*}[t]
 \centering
-\caption{What predicts co-evolvability. The observed outcomes track
-\emph{abundance/salience}, \emph{not} the AC@1 scale-slope (metric: low slope,
-GO) and \emph{not} decodability (recognition: highest AUROC, yet does not
-co-evolve). Salience = primary$/$any-candidate passages; decodability = peak
-one-vs-rest AUROC (recognition on a size-matched augmented sample; raw n = 9
-overfits to 1.0). $^*$metric is a GO but needs about 2 accumulated slices
-(about 50 instances); one 30-instance slice teaches it nothing (Finding~21).
-$^\ddagger$recognition is \emph{unreliable} rather than a clean fail: held-out human
-AC@1 ranges 0--0.44 across training runs on the scarce n = 9 probe.}
-\label{tab:learnability}
+
 \small
 \begin{tabular}{lrrccc}
 \toprule
@@ -926,6 +867,16 @@ filing\_vintage     & 264 & 0.33 & --      & --   & untestable \\
 recognition\_policy &  30 & \textbf{0.04} & $+0.00$ & \textbf{0.93} & weak$^{\ddagger}$ \\
 \bottomrule
 \end{tabular}
+\caption{What predicts co-evolvability. The observed outcomes track
+\emph{abundance/salience}, \emph{not} the AC@1 scale-slope (metric: low slope,
+GO) and \emph{not} decodability (recognition: highest AUROC, yet does not
+co-evolve). Salience = primary$/$any-candidate passages; decodability = peak
+one-vs-rest AUROC (recognition on a size-matched augmented sample; raw n = 9
+overfits to 1.0). $^*$metric is a GO but needs about 2 accumulated slices
+(about 50 instances); one 30-instance slice teaches it nothing (Finding~21).
+$^\ddagger$recognition is \emph{unreliable} rather than a clean fail: held-out human
+AC@1 ranges 0--0.44 across training runs on the scarce n = 9 probe.}
+\label{tab:learnability}
 \end{table*}
 
 \textbf{Finding 20: co-evolvability is gated by source \emph{abundance}, driven by
@@ -988,9 +939,7 @@ This appendix expands the related work summarized in \S\ref{sec:related}.
 \begin{table*}[t]
 \centering
 \setlength{\tabcolsep}{5pt}
-\caption{Comparison of financial QA benchmarks. A check mark denotes a
-supported feature; -- denotes not applicable or not evaluated.}
-\label{tab:comparison}
+
 \small
 \begin{tabular}{p{3.1cm}ccccccc}
 \toprule
@@ -1019,6 +968,9 @@ FinEval \newline \citep{guo2023fineval}
   & 173 & \checkmark & \checkmark & \checkmark & EN+ZH & LLM+human & EDGAR+CNINFO \\
 \bottomrule
 \end{tabular}
+\caption{Comparison of financial QA benchmarks. A check mark denotes a
+supported feature; -- denotes not applicable or not evaluated.}
+\label{tab:comparison}
 \end{table*}
 
 \paragraph{Financial QA Benchmarks.}
@@ -1030,20 +982,14 @@ DocFinQA~\citep{reddy2024docfinqa},
 BizBench~\citep{krumdick2024bizbench},
 FinBen~\citep{xie2024finben}, and
 FinanceQA~\citep{mateega2025financeqa}
-all enforce single-gold-answer conventions and evaluate models in a single turn;
-FinanceQA further shows that frontier models fail about60\% of realistic
-analyst tasks, but attributes this to numerical rigor rather than ambiguity.
+cover financial answering and reasoning under varied protocols. FinBen additionally includes generation, trading, and agent tasks. FinanceQA reports approximately 60\% failure in its financial-analysis evaluation, including tasks requiring assumptions under incomplete information; it does not isolate user clarification through paired default/intended readings.
 FinEval~\citep{guo2023fineval}, a large Chinese financial-knowledge benchmark,
 incidentally identifies an ``ambiguity handling weakness'' error type in its
 agent tasks but does not isolate or control it. Recent \emph{agentic} financial
 benchmarks raise task realism, Finance Agent Benchmark~\citep{bigeard2025financeagent}
 (537 expert research tasks, where the best model reaches only 46.8\%) and
 FinAgentBench~\citep{choi2025finagentbench} (agentic retrieval over EDGAR), but both
-remain single-turn and single-gold, evaluating analysis and retrieval rather than
-whether an agent recognizes that a query is under-specified. \fininteract is the
-first to make query ambiguity the central, controlled construct, via paired
-default/intended interpretations and multi-turn interaction, in the financial
-domain.
+evaluate analysis and retrieval without the controlled hidden-intent clarification protocol used here. Their agents may take multiple tool steps; this differs from asking a user to disambiguate a query. \fininteract makes that distinction explicit through paired readings and user interaction.
 
 
 
@@ -1060,7 +1006,7 @@ they can ask the minimal necessary question in reasoning tasks. Closest in spiri
 diagnosis, \citet{su2026knowing} show in the general domain that models recognize ambiguity when
 asked to judge it yet rarely ask about it in ordinary question answering, and that retrieved
 context makes them ask \emph{less}, a result our retrieval-augmented rows reproduce in finance.
-These works are general-domain and judge a single clarifying step; \fininteract adds \emph{per-category}
+These works address general-domain ambiguity under different answer-generation and clarification protocols; \fininteract adds \emph{per-category}
 targeting (AC@1), programmatically verifiable financial grounding, and, via the
 co-evolution rounds (\S\ref{sec:coevolve}), an analysis of \emph{when} asking helps
 versus hurts. We adapt this line's formalism to finance, replacing human-judged
@@ -1071,18 +1017,15 @@ Asking clarifying questions is a long-standing goal in information retrieval and
 dialogue. Rao and Daum\'e III~\citep{rao2018clarification} rank clarification
 questions by expected value of perfect information; ClariQ~\citep{aliannejadi2020clariq}
 established a shared task for generating clarifying questions in open-domain dialogue;
-and the mixed-initiative paradigm is surveyed in Conversational Information
-Seeking~\citep{zamani2023cis}. \fininteract instantiates this lineage with a
-leak-proof, per-category measure of \emph{which} clarification an agent should issue and a
+and mixed-initiative retrieval is discussed in the Conversational Information Seeking tutorial~\citep{zamani2023cis}. \fininteract instantiates this lineage with a
+question-based, per-category measure of \emph{which} clarification an agent should issue and a
 verifiable outcome for whether issuing it resolves the query.
 
 \paragraph{Interactive Search Agents.}
 \interactcomp~\citep{interactcomp2026} is the direct methodological ancestor.
 We extend its general-domain setting to finance with a domain-specific
 ambiguity taxonomy and bilingual evaluation.
-BrowseComp~\citep{wei2025browsecomp} tracks longitudinal retrieval trends;
-we test whether the interaction-capability gap identified there persists in
-finance.
+BrowseComp~\citep{wei2025browsecomp} evaluates difficult web retrieval with short, verifiable answers. Our benchmark complements retrieval-focused evaluation by introducing a hidden intended interpretation that the agent must elicit from a user.
 
 
 %% ============================================================
@@ -1195,7 +1138,7 @@ construction relative to the non-OpenAI vendors the filter does not target (mean
 answer-only across six vendors), so cross-vendor answer-only comparisons are not fully
 apples-to-apples and the GPT-5-family floor is a filter-induced lower bound. The elicitation
 gap itself is unaffected: the filter targets answer-only solvability, not interactive
-resolution, and every vendor still resolves far below its oracle ceiling. Verifying a
+resolution, and the evaluated oracle conditions substantially outperform free interaction. Verifying a
 subsample with a non-OpenAI adversarial ensemble is a natural robustness check for future work.
 A related construct-validity caveat is that questions are reverse-constructed from filings
 rather than drawn from real user queries, and the ``intended'' interpretation is a
@@ -1204,32 +1147,16 @@ recover a \emph{specified} interpretation, a necessary and controllable proxy fo
 identical to, disambiguating the intent of a real analyst.
 
 \textbf{Contamination.}
-Instances are freshly constructed from FY2022--2025 structured facts and
-answer-only accuracy is about0.6\% across all sources, but we do not claim
+Most instances are constructed from FY2022--2025 structured facts, with older DocFinQA-derived records also present, and
+answer-only accuracy is about 0.6\% across all sources, but we do not claim
 absolute contamination safety for the DocFinQA-derived minority.
 
 \textbf{All instances are ambiguous by construction.} Every one of the 173 items is built to
 require clarification, so a model can succeed by assuming ambiguity is always present.
 FinInteract therefore measures \emph{what} to ask and \emph{how} to integrate the answer, not a
-calibrated \emph{when}-to-ask policy: it does not score false-positive clarification, over-asking
-on already-specified questions, or the correct choice to answer directly when a mild ambiguity
-does not change the value. Adding matched unambiguous and answer-invariant controls is the single
-most important extension for turning the benchmark into a test of calibrated interaction, and we
-accordingly frame our claims around asking-and-integrating rather than when-to-ask.
+calibrated \emph{when}-to-ask policy: it does not itself score false-positive clarification or answer-invariant ambiguity. The matched unambiguous pilot in Appendix~\ref{app:additional_validation} measures one form of over-asking, but a broader control set is needed for calibrated interaction.
 
-\textbf{Intervention evidence is preliminary and not component-attributed.} The Category-Aware
-ReAct gain (34 to 46\%) is a single GPT-5 backbone on N = 50 (about six additional items),
-without a significance test, and its matched-baseline subset scores above the full-scale GPT-5
-row, so the effect must be confirmed at full scale with confidence intervals. Just as important,
-the policy bundles three components (ambiguity pre-check, category-conditioned questioning, and
-interpretation-state-gated answering) that we do not ablate: the improvement may stem
-substantially from the state-gated commit, an \emph{integration} fix, rather than from better
-category \emph{elicitation}, so the pilot does not by itself isolate the taxonomy's mechanistic
-role. A generic-structured clarification baseline and a per-component ablation are the needed
-controls. The training-time results are likewise early, resting on a small held-out probe, gains
-dominated by supervised fine-tuning with only a short reinforcement phase, an optimistic
-oracle-retrieval reference, and interaction driven to near-total compliance rather than a learned
-when-to-ask policy.
+\textbf{Intervention evidence is preliminary.} The Category-Aware ReAct comparison is a single GPT-5 pilot on the first 50 instances (3 EN, 47 ZH), so it requires replication at full scale and across seeds. The component controls in Appendix~\ref{app:additional_validation} are consistent with a category-template benefit, but do not establish a general causal mechanism. The 4B training study's answer accuracy is confounded by disambiguated retrieval. The separate 14B evaluation improves interaction accuracy on ordinary retrieval, chiefly in Chinese; it is one training run and does not establish generalization across languages or a learned when-to-ask policy.
 
 \textbf{A single protocol confounds ability with interface adherence.} All vendors share one
 ReAct prompt and yes/no action grammar. GPT-5-mini's 0\% is partly a protocol-adherence failure
@@ -1272,12 +1199,7 @@ that turn out not to support a genuine ambiguity, not by verification.
 
 \begin{table}[!htbp]
 \centering
-\caption{Measured curation cost. Unit costs are from instrumented pipeline runs
-(constructor-only n = 20; full pipeline n = 6); the acceptance funnel is from
-the full construction run (n = 1127 candidate passages). A full pipeline pass
-is one GPT-5 constructor call plus ten verifier trials (five GPT-5, five
-GPT-5-mini) with GPT-4o-mini grading.}
-\label{tab:cost}
+
 \small
 \begin{tabular}{lr}
 \toprule
@@ -1293,6 +1215,12 @@ Blended cost per candidate passage              & \$0.035 \\
 \textbf{Cost per accepted instance}             & \textbf{\$0.31} \\
 \bottomrule
 \end{tabular}
+\caption{Measured curation cost. Unit costs are from instrumented pipeline runs
+(constructor-only n = 20; full pipeline n = 6); the acceptance funnel is from
+the full construction run (n = 1127 candidate passages). A full pipeline pass
+is one GPT-5 constructor call plus ten verifier trials (five GPT-5, five
+GPT-5-mini) with GPT-4o-mini grading.}
+\label{tab:cost}
 \end{table}
 
 \paragraph{Projected cost to scale.} At the measured blended rate, producing $N$
@@ -1317,10 +1245,10 @@ This appendix expands the data sources, curation pipeline, and validation summar
 
 \paragraph{Data sources.}
 Figure~\ref{fig:datastats} summarizes the resulting category and difficulty distributions.
-\textbf{English (EN, about80\% of pool).} \textit{DocFinQA}, 780 long-context passages extracted
+\textbf{English (EN, about 80\% of pool).} \textit{DocFinQA}, 780 long-context passages extracted
 from 10-K and 10-Q filings, with verified candidate answers from annotated QA pairs.
 \textit{EDGAR (XBRL-derived)}, 111 passages built from machine-readable XBRL facts for S\&P~500 and
-Russell~1000 companies (FY2024--2025). \textbf{Chinese (ZH, about20\% of pool).}
+Russell~1000 companies (FY2024--2025). \textbf{Chinese (ZH, about 20\% of pool).}
 \textit{CNINFO/akshare}, 237 passages derived from A-share annual reports (SSE~50 + CSI~300) via
 structured financial-statement APIs, in three passage types: (1) metric definition, \emph{kou-fei}
 vs.\ \emph{gui-mu} (non-recurring-excluded profit vs.\ parent-attributable profit); (2) entity
@@ -1389,8 +1317,7 @@ skewed toward ``yes'' ($>85\%$ per item), Cohen's $\kappa$ is degenerate under t
 Feinstein--Cicchetti prevalence paradox, so we report Gwet's AC1 (0.85 average, range
 0.78--0.97; 1.00 for H7). The single consensus-rejected instance (consensus rejection
 1.7\%) was a category over-reach, a revenue-recognition-timing pairing whose plausible default is
-the firm's total revenue rather than a disaggregation component. It is answerable only under
-context-oracle, where removing it shifts the ceiling by $<\!0.05$pp (93--95\% unchanged).
+the firm's total revenue rather than a disaggregation component. The paper retains the frozen 173-item v1.0 snapshot for reproducibility. The corrected public v1.1 release excludes this instance and contains 172 items; scores on that version must be recomputed with the new denominator.
 
 \section{Construction Quality-Control Rules}
 \label{app:qc}
@@ -1398,10 +1325,9 @@ context-oracle, where removing it shifts the ceiling by $<\!0.05$pp (93--95\% un
 
 The pre-verifier applies fourteen automated code-level rules before any API call (Table~\ref{tab:qc}), rejecting a candidate the moment any rule fails.
 
-\begin{table}[h]
+\begin{table}[t]
 \centering
-\caption{Pre-verifier sanity checks (14 rules).}
-\label{tab:qc}
+
 \small
 \begin{tabular}{cp{0.72\columnwidth}}
 \toprule
@@ -1423,6 +1349,8 @@ R13 & Evidence spans must be meaningfully distinct ($\leq$85\% overlap) \\
 R14 & Intended and default \emph{answers} differ beyond grader tolerance \\
 \bottomrule
 \end{tabular}
+\caption{Pre-verifier sanity checks (14 rules).}
+\label{tab:qc}
 \end{table}
 
 
@@ -1449,8 +1377,7 @@ mode transitions use a two-sided paired bootstrap (B = 5000).
 \textbf{Compute.} Evaluation is API-based and its cost is reported in dollars rather than
 GPU hours (Appendix~\ref{app:cost}); the only local compute is the open-weight probing and
 the 4-bit QLoRA training of the 4B policy, together with the locally served simulators,
-graders, and category judges, run on \GPUSPEC. All evaluation,
-construction, and analysis scripts are released.
+graders, and category judges, run on \GPUSPEC. The project page links the evaluation, construction, and analysis code and both dataset versions. An API-free evaluation uses \texttt{experiments/gpu\_eval/run\_local\_stack.sh}; the 14B supervision run uses \texttt{run\_sft\_leakfree.sh} in the same directory.
 
 %% ============================================================
 \section{Datasheet and Licensing}
@@ -1473,31 +1400,13 @@ fields: \texttt{instance\_id}, \texttt{language}, \texttt{source}, \texttt{ticke
 \textbf{Intended use.} Evaluating whether interactive search agents recognize and
 resolve query ambiguity; not a training corpus and not financial advice.
 \textbf{License and release.} The benchmark, construction pipeline, and evaluation
-code are released for research use; redistribution of source filings follows the
-respective public-domain (EDGAR) and regulatory-disclosure (CSRC) terms.
+code are released under CC BY 4.0 for the authors' original benchmark records and MIT for project code. Quoted source filings and third-party materials retain their original rights and terms.
 \textbf{Maintenance.} The frozen v1 release is versioned; corrections and the
 planned EN-split expansion will be issued as numbered releases.
 
 %% ============================================================
+\ifdefined\acknowledgmentsinmain
+\else
 \section*{Disclosure of Generative AI Use}
-%% ============================================================
-
-Generative AI tools were used in this work in two distinct roles. First, as
-\emph{components of the research artifact itself}: large language models act as the
-adversarial constructor, the user simulator, and the automated grader described in
-Section~\ref{sec:methodology} and Section~\ref{sec:eval}, and every such use is
-documented in the paper and the accompanying code with the specific model, version,
-and prompt. Second, generative AI tools were used to assist with \emph{manuscript and
-code preparation}, in four respects: prose editing and restructuring, including
-condensing and reordering material we had already written; \LaTeX{} formatting,
-cross-reference repair, and preparation of the alternate-format build; consistency
-checking of the manuscript against our own result files, which surfaced mismatches we
-then corrected; and auxiliary tooling for packaging the supplementary archives and for
-normalizing in-text notation. One literature search was AI-assisted and led us to a
-concurrent work that we read, verified, and cite.
-All research questions, experimental design, data construction decisions, experiments,
-analyses, and scientific claims are the authors' own. No reported result, table, or
-figure was produced by an AI assistant; every number derives from our own experimental
-runs. The authors have independently verified every result, table,
-figure, and citation reported here, and take full responsibility for the
-entire content of this paper, in accordance with \ethicscode.
+\input{paper/sections/acknowledgments}
+\fi

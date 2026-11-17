@@ -1,12 +1,7 @@
 \newlength{\midgap}\setlength{\midgap}{0.02\textwidth}% <-- gap between the two panels; adjust here
 \begin{table*}[t]
 \centering
-\caption{\textbf{(a)}~Main results, reporting accuracy (\%) against the \emph{intended}
-interpretation per mode, with $\Delta$ the +Interact minus +Search difference.
-\textbf{(b)}~Re-grading the same outputs against the intended versus the default reading a conventional benchmark would treat as gold (Same abbreviation as Table~\ref{tab:modes}). \textbf{(c)}~Per-category targeting
-(AC@1), where recognition policy is a shared blind spot ($=0$ for every model). Category
-sizes: entity (Ent.) 94, metric (Met.) 63, recognition (Rec.) 9, temporal (Tmp.) 7.}
-\label{tab:main}
+
 %
 \begin{minipage}[t]{0.53\textwidth}
 \centering
@@ -84,4 +79,10 @@ Q3.5-35B & .85 & .87 & \textbf{.00} & 1.00 \\
 \bottomrule
 \end{tabular}}}
 \end{minipage}
+\caption{\textbf{(a)}~Main results, reporting accuracy (\%) against the \emph{intended}
+interpretation per mode, with $\Delta$ the +Interact minus +Search difference.
+\textbf{(b)}~Re-grading the same outputs against the intended versus the default reading a conventional benchmark would treat as gold (Same abbreviation as Table~\ref{tab:modes}). \textbf{(c)}~Per-category targeting
+(AC@1), where recognition policy is a shared blind spot ($=0$ for every model). Category
+sizes: entity (Ent.) 94, metric (Met.) 63, recognition (Rec.) 9, temporal (Tmp.) 7.}
+\label{tab:main}
 \end{table*}

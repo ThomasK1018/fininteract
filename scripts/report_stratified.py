@@ -11,6 +11,7 @@ Usage:
   python scripts/report_stratified.py [--models gpt-5 gpt-4o ...] [--md out.md]
 """
 import argparse, glob, json, collections, math, random
+from statistics import median
 from pathlib import Path
 
 FULL_SCALE = ["gpt-5", "gpt-4o", "gpt-5-mini", "qwen3-4b", "qwen3-8b", "qwen3-14b",
@@ -122,7 +123,7 @@ def main():
     if finite:
         emit("")
         emit(f"Inflation ratio over {len(finite)} full-scale models with non-zero intended accuracy: "
-             f"min {finite[0]:.1f}x, median {finite[len(finite)//2]:.1f}x, max {finite[-1]:.1f}x; "
+             f"min {finite[0]:.1f}x, median {median(finite):.1f}x, max {finite[-1]:.1f}x; "
              f"models where default-capture exceeds intended accuracy: "
              f"{sum(v > 1 for v in finite)}/{len(finite)}.")
     emit("")

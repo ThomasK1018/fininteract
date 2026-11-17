@@ -1,0 +1,35 @@
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lrrrrrrr@{}}
+\toprule
+& \multicolumn{3}{c}{Intended-answer accuracy (\%)} & & & & \\
+\cmidrule(lr){2-4}
+Model & A & A+S & A+S+I & $\Delta$ & IR (\%) & AC@1 & ECE \\
+\midrule
+\multicolumn{8}{l}{\textit{Proprietary models}} \\
+GPT-5.6$^{\dagger}$           & 10.0 & 36.0 & 30.0 & $-6.0$  & -- & .98 & -- \\
+GPT-5                         & 0.6 & 6.4 & 20.2 & $+13.8$ & 98.8 & .86 & .53 \\
+GPT-4o                        & 0.6 & 12.1 & 4.6 & $-7.5$ & 99.4 & .94 & .82 \\
+GPT-5-mini                    & 0.6 & 0.0 & 0.0 & $0.0$ & 96.0 & .94 & .00 \\
+Claude-Sonnet-5$^{\dagger}$   & 4.0 & 46.0 & 44.0 & $-2.0$ & -- & .98 & -- \\
+Grok-4.5$^{\dagger}$         & 2.0 & 40.0 & 32.0 & $-8.0$ & -- & .87 & -- \\
+GLM-5.2$^{\dagger}$          & 12.0 & 40.0 & 40.0 & $0.0$ & -- & .96 & -- \\
+Kimi-K3$^{\dagger}$          & 16.0 & 38.0 & 34.0 & $-4.0$ & -- & .98 & -- \\
+DeepSeek-V4-flash$^{\dagger}$ & 12.0 & 28.0 & 24.0 & $-4.0$ & -- & .96 & -- \\
+Gemini-3.5-flash$^{\dagger}$  & 14.0 & 6.0 & 30.0 & $+24.0$ & -- & .96 & -- \\
+\midrule
+\multicolumn{8}{l}{\textit{Open-weight models}} \\
+Qwen3-4B       & 0.0 & 8.1 & 12.1 & $+4.0$ & 28 & .85 & -- \\
+Qwen3-8B       & 0.6 & 14.4 & 24.9 & $+10.5$ & 15 & .88 & -- \\
+Qwen3-14B      & 0.0 & 18.5 & 22.5 & $+4.0$ & 36 & .74 & -- \\
+Qwen3-32B$^{\ddagger}$ & 0.6 & 28.4 & 8.4 & $-20.0$ & 61.3 & .96 & -- \\
+Qwen3-30B-A3B  & 1.2 & 28.3 & 11.6 & $-16.7$ & 72 & -- & -- \\
+Qwen3.5-35B-A3B & 0.6 & 35.8 & 28.9 & $-6.9$ & 36 & -- & -- \\
+\midrule
+Human ($N=50$) & -- & -- & 30.0 & -- & 100 & .72 & -- \\
+\bottomrule
+\end{tabular*}
+\caption{Main results. A: answer-only; S: search; I: interaction. $\Delta$ is the A+S+I minus A+S accuracy in percentage points. IR and touch AC@1 describe A+S+I. Unmarked model rows use $N=173$; $\dagger$ uses the first 50 items (3 EN, 47 ZH); $\ddagger$ uses the 155 items with all three modes recorded (35 EN, 120 ZH). The human subset is different (32 EN, 18 ZH), so its score is not a matched comparison. MoE AC@1 is omitted because the available corrected aggregates come from a different, thinking-enabled configuration.}
+\label{tab:main}
+\end{table*}
