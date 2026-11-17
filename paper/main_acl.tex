@@ -1,11 +1,10 @@
-%% *ACL (ARR) submission, anonymous. Compile with pdflatex from the repository
-%% root, exactly like main.tex:  pdflatex paper/main_acl.tex
+%% Findings of ACL: EACL 2027 camera-ready. Build from the repository root with:
+%%   python scripts/build_camera_ready.py
 %%
 %% This wrapper shares every section file with the AAAI build (main.tex); only
-%% the preamble and the back-matter ordering differ. Switch "review" to "final"
-%% for the camera-ready, or to "preprint" for a non-anonymous arXiv version.
+%% the preamble and the back-matter ordering differ.
 \documentclass[11pt]{article}
-\usepackage[review]{acl}
+\usepackage[final]{acl}
 
 %% Standard *ACL template includes
 \usepackage{times}
@@ -15,6 +14,7 @@
 \usepackage{microtype}
 \usepackage{inconsolata}
 \usepackage{graphicx}
+\graphicspath{{paper/}}
 
 %% Packages this paper needs on top of the template.
 %% NOTE: acl.sty already loads natbib, caption and hyperref. Do not load them
@@ -34,8 +34,8 @@
 \DeclareRobustCommand{\cmark}{\tikz[baseline=-0.55ex]{\draw[green!55!black,line width=0.9pt] (0,0.6pt)--(2pt,-1.4pt)--(5pt,3.6pt);}}
 \DeclareRobustCommand{\xmark}{\tikz[baseline=-0.55ex]{\draw[red!75!black,line width=0.9pt] (0,0)--(4pt,4pt) (0,4pt)--(4pt,0);}}
 \DeclareRobustCommand{\checkmark}{\cmark}
-\newcommand{\fininteract}{\textsc{FinInteract}\xspace}
-\newcommand{\interactcomp}{\textsc{InteractComp}\xspace}
+\newcommand{\fininteract}{\textnormal{\textsc{FinInteract}}\xspace}
+\newcommand{\interactcomp}{\textnormal{\textsc{InteractComp}}\xspace}
 \newcommand{\HO}{$H_0$\xspace}
 \newcommand{\disep}{$\text{DisE}^+$\xspace}
 \newcommand{\disei}{$\text{DisE}^+$\xspace}
@@ -47,18 +47,19 @@
 %% Venue code of ethics cited by the generative-AI disclosure in the appendix.
 \newcommand{\ethicscode}{the ACL Code of Ethics}
 
-%% >>> ACTION REQUIRED <<<  Local hardware for the probing and QLoRA runs,
-%% cited by the Compute sentence in Appendix J. Replace with the real GPU and
-%% approximate hours, e.g. "a single NVIDIA A100 80GB for about 20 GPU hours".
-%% Left deliberately loud so an unfilled value cannot slip into a submission.
-\newcommand{\GPUSPEC}{\textbf{[FILL IN: GPU model and approximate GPU hours]}}
+%% Hardware and total local compute confirmed by the authors.
+\newcommand{\GPUSPEC}{NVIDIA H200 hardware for approximately 30 GPU-hours in total}
+\newcommand{\acknowledgmentsinmain}{}
 
 \title{FinInteract: Benchmarking Clarification and Intent Integration in Ambiguous Financial Question Answering}
 
-%% Under the "review" option acl.sty replaces this with "Anonymous ACL
-%% submission". Fill in real authors before switching to "final".
 \author{
-  Anonymous ACL submission \\
+  Xinyu Wang\textsuperscript{1}, Tung Sum Thomas Kwok\textsuperscript{2} \\
+  \textbf{Zhenghan Tai\textsuperscript{3}, Guang Cheng\textsuperscript{2}} \\
+  \textsuperscript{1}McGill University \\
+  \textsuperscript{2}University of California, Los Angeles \\
+  \textsuperscript{3}University of Toronto \\
+  \textbf{Correspondence:} \href{mailto:guangcheng@ucla.edu}{guangcheng@ucla.edu}
 }
 
 \begin{document}
@@ -114,14 +115,20 @@
 %% ============================================================
 %% ARR CFP: Limitations is REQUIRED, unnumbered, placed after the conclusion
 %% and before the references, and "it will not count toward the page limit".
-%% Long papers get 8 pages of content plus unlimited extra space for this
-%% section and for an optional ethics section, plus unlimited references.
+%% EACL 2027 acceptance email: at most 9 content pages, plus at most one
+%% combined page for Limitations and optional Ethical Considerations.
+%% References and supplemental material are unlimited.
 %% Appendices come after the references and also do not count.
 %% (The bundled formatting.md does not state this; it defers to the venue CFP.)
 %% ============================================================
 \section*{Limitations}
 \input{paper/sections/5_limitations}
 
+\section*{Ethical Considerations}
+\input{paper/sections/ethical_considerations}
+
+\section*{Acknowledgments}
+\input{paper/sections/acknowledgments}
 
 %% ============================================================
 %% acl.sty sets \bibliographystyle{acl_natbib}; do not set it again.
@@ -130,5 +137,6 @@
 
 \appendix
 \input{paper/sections/appendix}
+\input{paper/sections/camera_ready_updates}
 
 \end{document}

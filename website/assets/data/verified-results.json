@@ -1,0 +1,651 @@
+{
+  "dataset": "fininteract_v1.jsonl",
+  "verification": "Summaries recomputed from stored experiment records without new model calls. Corrected touch AC@1 is read from the archived corrected-classifier aggregate.",
+  "category_guided_sft_14b": {
+    "model": "Qwen3-14B",
+    "dataset": "fininteract_v1.jsonl",
+    "evaluation_stack": "Locally served Qwen3-14B agent with Qwen2.5-14B-Instruct simulator and graders; same evaluation modes before and after category-guided LoRA training.",
+    "sources": [
+      "eval_local_qwen3-14b.jsonl",
+      "eval_local_qwen3-14b-catsft.jsonl",
+      "eval_local_qwen3-14b.summary.json",
+      "eval_local_qwen3-14b-catsft.summary.json",
+      "run_sft_leakfree.sh"
+    ],
+    "modes": {
+      "answer+search": {
+        "base": {
+          "n": 173,
+          "correct": 59,
+          "accuracy_percent": 34.104046242774565,
+          "default_captured": 65,
+          "default_capture_percent": 37.57225433526011,
+          "asked": 0,
+          "interaction_percent": 0.0
+        },
+        "category_guided_sft": {
+          "n": 173,
+          "correct": 55,
+          "accuracy_percent": 31.791907514450866,
+          "default_captured": 49,
+          "default_capture_percent": 28.32369942196532,
+          "asked": 0,
+          "interaction_percent": 0.0
+        },
+        "language_split": {
+          "en": {
+            "base": {
+              "n": 53,
+              "correct": 10,
+              "accuracy_percent": 18.867924528301888,
+              "default_captured": 6,
+              "default_capture_percent": 11.320754716981131,
+              "asked": 0,
+              "interaction_percent": 0.0
+            },
+            "category_guided_sft": {
+              "n": 53,
+              "correct": 8,
+              "accuracy_percent": 15.09433962264151,
+              "default_captured": 7,
+              "default_capture_percent": 13.20754716981132,
+              "asked": 0,
+              "interaction_percent": 0.0
+            }
+          },
+          "zh": {
+            "base": {
+              "n": 120,
+              "correct": 49,
+              "accuracy_percent": 40.833333333333336,
+              "default_captured": 59,
+              "default_capture_percent": 49.166666666666664,
+              "asked": 0,
+              "interaction_percent": 0.0
+            },
+            "category_guided_sft": {
+              "n": 120,
+              "correct": 47,
+              "accuracy_percent": 39.166666666666664,
+              "default_captured": 42,
+              "default_capture_percent": 35.0,
+              "asked": 0,
+              "interaction_percent": 0.0
+            }
+          }
+        }
+      },
+      "answer+search+interact": {
+        "base": {
+          "n": 173,
+          "correct": 56,
+          "accuracy_percent": 32.369942196531795,
+          "default_captured": 64,
+          "default_capture_percent": 36.994219653179194,
+          "asked": 65,
+          "interaction_percent": 37.57225433526011
+        },
+        "category_guided_sft": {
+          "n": 173,
+          "correct": 104,
+          "accuracy_percent": 60.115606936416185,
+          "default_captured": 8,
+          "default_capture_percent": 4.624277456647399,
+          "asked": 173,
+          "interaction_percent": 100.0
+        },
+        "language_split": {
+          "en": {
+            "base": {
+              "n": 53,
+              "correct": 9,
+              "accuracy_percent": 16.9811320754717,
+              "default_captured": 4,
+              "default_capture_percent": 7.547169811320755,
+              "asked": 52,
+              "interaction_percent": 98.11320754716981
+            },
+            "category_guided_sft": {
+              "n": 53,
+              "correct": 10,
+              "accuracy_percent": 18.867924528301888,
+              "default_captured": 6,
+              "default_capture_percent": 11.320754716981131,
+              "asked": 53,
+              "interaction_percent": 100.0
+            }
+          },
+          "zh": {
+            "base": {
+              "n": 120,
+              "correct": 47,
+              "accuracy_percent": 39.166666666666664,
+              "default_captured": 60,
+              "default_capture_percent": 50.0,
+              "asked": 13,
+              "interaction_percent": 10.833333333333334
+            },
+            "category_guided_sft": {
+              "n": 120,
+              "correct": 94,
+              "accuracy_percent": 78.33333333333333,
+              "default_captured": 2,
+              "default_capture_percent": 1.6666666666666667,
+              "asked": 120,
+              "interaction_percent": 100.0
+            }
+          }
+        }
+      }
+    },
+    "paired_interaction_comparison": {
+      "n": 173,
+      "base_wrong_sft_correct": 63,
+      "base_correct_sft_wrong": 15,
+      "difference_percentage_points": 27.745664739884393
+    },
+    "touch_targeting": {
+      "base": {
+        "first_question_hits": 49,
+        "asked_instances": 65
+      },
+      "category_guided_sft": {
+        "first_question_hits": 160,
+        "asked_instances": 173
+      }
+    },
+    "training": {
+      "demonstrations": 231,
+      "unique_training_instance_ids": 85,
+      "benchmark_instance_id_overlap": 0,
+      "epochs": 3,
+      "lora_rank": 16,
+      "learning_rate": 0.0002,
+      "demo_files": [
+        "entity/demos/sft.jsonl",
+        "metric/demos/sft.jsonl",
+        "round0/demos/sft.jsonl"
+      ],
+      "overlap_scope": "Exact instance IDs; this check does not establish semantic nonoverlap."
+    },
+    "caveats": [
+      "This is one base-versus-SFT run, not a multi-seed estimate.",
+      "The accuracy improvement is concentrated in the Chinese split: 47/120 to 94/120; English changes from 9/53 to 10/53. Language and filing regime are confounded.",
+      "All 173 requested passage IDs exist in the supplied passage file, so no missing-passage context fallback is triggered. Literal presence of both evidence-span strings within the first 4000 retrieved characters is verified for 130/173 records; do not describe all retrieved passages as exact two-span concatenations.",
+      "Touch targeting measures category mention; it does not establish that clarification resolves the interpretation."
+    ]
+  },
+  "strict_clarification": {
+    "rows": [
+      {
+        "model": "gpt-5",
+        "evaluated_instances": 173,
+        "asked_instances": 171,
+        "resolving_first_question_count": 46,
+        "resolving_ac_at_1": 0.26900584795321636,
+        "resolving_any_question_count": 97,
+        "resolving_ac_any": 0.5672514619883041,
+        "corrected_touch_ac_at_1": 0.8596,
+        "wrong_after_asking": 136,
+        "wrong_after_resolving_question": 69,
+        "correct_after_resolving_question": 28,
+        "trajectory_source": "eval_gpt5_gpt4o.jsonl"
+      },
+      {
+        "model": "gpt-4o",
+        "evaluated_instances": 173,
+        "asked_instances": 172,
+        "resolving_first_question_count": 4,
+        "resolving_ac_at_1": 0.023255813953488372,
+        "resolving_any_question_count": 14,
+        "resolving_ac_any": 0.08139534883720931,
+        "corrected_touch_ac_at_1": 0.936,
+        "wrong_after_asking": 164,
+        "wrong_after_resolving_question": 12,
+        "correct_after_resolving_question": 2,
+        "trajectory_source": "eval_gpt5_gpt4o.jsonl"
+      },
+      {
+        "model": "gpt-5-mini",
+        "evaluated_instances": 173,
+        "asked_instances": 166,
+        "resolving_first_question_count": 28,
+        "resolving_ac_at_1": 0.1686746987951807,
+        "resolving_any_question_count": 87,
+        "resolving_ac_any": 0.5240963855421686,
+        "corrected_touch_ac_at_1": 0.9398,
+        "wrong_after_asking": 166,
+        "wrong_after_resolving_question": 87,
+        "correct_after_resolving_question": 0,
+        "trajectory_source": "eval_gpt5mini_interact.jsonl"
+      },
+      {
+        "model": "qwen3-32b",
+        "evaluated_instances": 155,
+        "asked_instances": 95,
+        "resolving_first_question_count": 63,
+        "resolving_ac_at_1": 0.6631578947368421,
+        "resolving_any_question_count": 69,
+        "resolving_ac_any": 0.7263157894736842,
+        "corrected_touch_ac_at_1": 0.9579,
+        "wrong_after_asking": 86,
+        "wrong_after_resolving_question": 63,
+        "correct_after_resolving_question": 6,
+        "trajectory_source": "eval_open_qwen3-32b.jsonl"
+      },
+      {
+        "model": "qwen3-8b",
+        "evaluated_instances": 173,
+        "asked_instances": 26,
+        "resolving_first_question_count": 6,
+        "resolving_ac_at_1": 0.23076923076923078,
+        "resolving_any_question_count": 8,
+        "resolving_ac_any": 0.3076923076923077,
+        "corrected_touch_ac_at_1": 0.8846,
+        "wrong_after_asking": 24,
+        "wrong_after_resolving_question": 7,
+        "correct_after_resolving_question": 1,
+        "trajectory_source": "eval_open_qwen3-8b.jsonl"
+      }
+    ],
+    "sources": [
+      "resolving_ac.json",
+      "resolving_ac.cache.json",
+      "axishit_recompute.json"
+    ],
+    "definition": "A first question is resolving if its truthful answer distinguishes the intended from the default reading. Rates are conditional on having asked a question.",
+    "caveats": [
+      "Strict labels are from a GPT-4o-mini judge; independent human validation of this strict criterion is not established by these files.",
+      "The touch_AC1 field inside resolving_ac.json uses obsolete single-label scores. The table instead uses ahit1_new from axishit_recompute.json and only includes models with matching denominators.",
+      "Qwen3-32B evaluated only 155 items, with 95 asked instances. It is not a 173-item completed run."
+    ]
+  },
+  "single_gold_regrading": {
+    "mode": "answer+search",
+    "rows": [
+      {
+        "model": "gpt-5",
+        "sources": [
+          "eval_gpt5_gpt4o.jsonl"
+        ],
+        "splits": {
+          "en": {
+            "n": 53,
+            "intended_correct": 5,
+            "default_correct": 4,
+            "default_to_intended_ratio": 0.8
+          },
+          "zh": {
+            "n": 120,
+            "intended_correct": 6,
+            "default_correct": 14,
+            "default_to_intended_ratio": 2.3333333333333335
+          },
+          "all": {
+            "n": 173,
+            "intended_correct": 11,
+            "default_correct": 18,
+            "default_to_intended_ratio": 1.6363636363636365
+          }
+        }
+      },
+      {
+        "model": "gpt-4o",
+        "sources": [
+          "eval_gpt5_gpt4o.jsonl"
+        ],
+        "splits": {
+          "en": {
+            "n": 53,
+            "intended_correct": 8,
+            "default_correct": 4,
+            "default_to_intended_ratio": 0.5
+          },
+          "zh": {
+            "n": 120,
+            "intended_correct": 13,
+            "default_correct": 60,
+            "default_to_intended_ratio": 4.615384615384615
+          },
+          "all": {
+            "n": 173,
+            "intended_correct": 21,
+            "default_correct": 64,
+            "default_to_intended_ratio": 3.0476190476190474
+          }
+        }
+      },
+      {
+        "model": "gpt-5-mini",
+        "sources": [
+          "eval_gpt5mini_search.jsonl"
+        ],
+        "splits": {
+          "en": {
+            "n": 53,
+            "intended_correct": 0,
+            "default_correct": 0,
+            "default_to_intended_ratio": null
+          },
+          "zh": {
+            "n": 120,
+            "intended_correct": 0,
+            "default_correct": 0,
+            "default_to_intended_ratio": null
+          },
+          "all": {
+            "n": 173,
+            "intended_correct": 0,
+            "default_correct": 0,
+            "default_to_intended_ratio": null
+          }
+        }
+      },
+      {
+        "model": "qwen3-4b",
+        "sources": [
+          "eval_open_qwen3-4b.jsonl"
+        ],
+        "splits": {
+          "en": {
+            "n": 53,
+            "intended_correct": 9,
+            "default_correct": 3,
+            "default_to_intended_ratio": 0.3333333333333333
+          },
+          "zh": {
+            "n": 120,
+            "intended_correct": 5,
+            "default_correct": 84,
+            "default_to_intended_ratio": 16.8
+          },
+          "all": {
+            "n": 173,
+            "intended_correct": 14,
+            "default_correct": 87,
+            "default_to_intended_ratio": 6.214285714285714
+          }
+        }
+      },
+      {
+        "model": "qwen3-8b",
+        "sources": [
+          "eval_open_qwen3-8b.jsonl"
+        ],
+        "splits": {
+          "en": {
+            "n": 53,
+            "intended_correct": 9,
+            "default_correct": 4,
+            "default_to_intended_ratio": 0.4444444444444444
+          },
+          "zh": {
+            "n": 120,
+            "intended_correct": 16,
+            "default_correct": 74,
+            "default_to_intended_ratio": 4.625
+          },
+          "all": {
+            "n": 173,
+            "intended_correct": 25,
+            "default_correct": 78,
+            "default_to_intended_ratio": 3.12
+          }
+        }
+      },
+      {
+        "model": "qwen3-14b",
+        "sources": [
+          "eval_open_qwen3-14b.jsonl"
+        ],
+        "splits": {
+          "en": {
+            "n": 53,
+            "intended_correct": 11,
+            "default_correct": 3,
+            "default_to_intended_ratio": 0.2727272727272727
+          },
+          "zh": {
+            "n": 120,
+            "intended_correct": 21,
+            "default_correct": 62,
+            "default_to_intended_ratio": 2.9523809523809526
+          },
+          "all": {
+            "n": 173,
+            "intended_correct": 32,
+            "default_correct": 65,
+            "default_to_intended_ratio": 2.03125
+          }
+        }
+      },
+      {
+        "model": "qwen3-32b",
+        "sources": [
+          "eval_open_qwen3-32b.jsonl"
+        ],
+        "splits": {
+          "en": {
+            "n": 53,
+            "intended_correct": 13,
+            "default_correct": 2,
+            "default_to_intended_ratio": 0.15384615384615385
+          },
+          "zh": {
+            "n": 120,
+            "intended_correct": 34,
+            "default_correct": 52,
+            "default_to_intended_ratio": 1.5294117647058822
+          },
+          "all": {
+            "n": 173,
+            "intended_correct": 47,
+            "default_correct": 54,
+            "default_to_intended_ratio": 1.148936170212766
+          }
+        }
+      },
+      {
+        "model": "qwen3-30b-a3b",
+        "sources": [
+          "eval_open_qwen3-30b-a3b.jsonl"
+        ],
+        "splits": {
+          "en": {
+            "n": 53,
+            "intended_correct": 11,
+            "default_correct": 3,
+            "default_to_intended_ratio": 0.2727272727272727
+          },
+          "zh": {
+            "n": 120,
+            "intended_correct": 38,
+            "default_correct": 63,
+            "default_to_intended_ratio": 1.6578947368421053
+          },
+          "all": {
+            "n": 173,
+            "intended_correct": 49,
+            "default_correct": 66,
+            "default_to_intended_ratio": 1.346938775510204
+          }
+        }
+      },
+      {
+        "model": "qwen3p5-35b-a3b",
+        "sources": [
+          "eval_open_qwen3p5-35b-a3b.jsonl"
+        ],
+        "splits": {
+          "en": {
+            "n": 53,
+            "intended_correct": 11,
+            "default_correct": 6,
+            "default_to_intended_ratio": 0.5454545454545454
+          },
+          "zh": {
+            "n": 120,
+            "intended_correct": 51,
+            "default_correct": 48,
+            "default_to_intended_ratio": 0.9411764705882353
+          },
+          "all": {
+            "n": 173,
+            "intended_correct": 62,
+            "default_correct": 54,
+            "default_to_intended_ratio": 0.8709677419354839
+          }
+        }
+      }
+    ],
+    "aggregate": {
+      "models_with_defined_ratio": 8,
+      "minimum_ratio": 0.8709677419354839,
+      "median_ratio": 1.8338068181818183,
+      "maximum_ratio": 6.214285714285714,
+      "default_exceeds_intended_models": 7
+    },
+    "caveats": [
+      "Ratios compare alternative scoring conventions on this deliberately ambiguous constructed benchmark; they do not estimate error inflation on existing financial benchmarks.",
+      "All eight defined English ratios are below one. Seven of eight Chinese ratios exceed one; Qwen3.5-35B is the exception at 48/51.",
+      "Language is confounded with source and filing regime.",
+      "The archived stratified-report script uses an upper-middle value as its median for an even number of models; the median here is the arithmetic mean of the two middle values."
+    ]
+  },
+  "gpt5_pilot": {
+    "n_per_condition": 50,
+    "subset": "First 50 frozen instances, 3 English and 47 Chinese; not stratified.",
+    "rows": [
+      {
+        "condition": "answer+search+interact",
+        "n": 50,
+        "correct": 17,
+        "accuracy_percent": 34.0,
+        "default_captured": 10,
+        "default_capture_percent": 20.0,
+        "asked": 50,
+        "interaction_percent": 100.0,
+        "source": "eval_axisaware_gpt5.jsonl"
+      },
+      {
+        "condition": "axis-aware",
+        "n": 50,
+        "correct": 23,
+        "accuracy_percent": 46.0,
+        "default_captured": 6,
+        "default_capture_percent": 12.0,
+        "asked": 50,
+        "interaction_percent": 100.0,
+        "source": "eval_axisaware_gpt5.jsonl"
+      },
+      {
+        "condition": "interp-oracle",
+        "n": 50,
+        "correct": 2,
+        "accuracy_percent": 4.0,
+        "default_captured": 0,
+        "default_capture_percent": 0.0,
+        "asked": 0,
+        "interaction_percent": 0.0,
+        "source": "eval_axisaware_gpt5.jsonl"
+      },
+      {
+        "condition": "answer+search",
+        "n": 50,
+        "correct": 3,
+        "accuracy_percent": 6.0,
+        "default_captured": 6,
+        "default_capture_percent": 12.0,
+        "asked": 0,
+        "interaction_percent": 0.0,
+        "source": "eval_axisaware_gpt5.jsonl"
+      },
+      {
+        "condition": "context-oracle",
+        "n": 50,
+        "correct": 46,
+        "accuracy_percent": 92.0,
+        "default_captured": 1,
+        "default_capture_percent": 2.0,
+        "asked": 0,
+        "interaction_percent": 0.0,
+        "source": "eval_axisaware_gpt5.jsonl"
+      },
+      {
+        "condition": "matched-unambiguous-control",
+        "n": 50,
+        "correct": 35,
+        "accuracy_percent": 70.0,
+        "default_captured": 0,
+        "default_capture_percent": 0.0,
+        "asked": 24,
+        "interaction_percent": 48.0,
+        "source": "eval_unambig_gpt5.jsonl"
+      },
+      {
+        "condition": "freeform-interaction",
+        "n": 50,
+        "correct": 19,
+        "accuracy_percent": 38.0,
+        "default_captured": 7,
+        "default_capture_percent": 14.0,
+        "asked": 50,
+        "interaction_percent": 100.0,
+        "source": "eval_freeform_gpt5.jsonl"
+      },
+      {
+        "condition": "ask-once-yes-no",
+        "n": 50,
+        "correct": 11,
+        "accuracy_percent": 22.0,
+        "default_captured": 5,
+        "default_capture_percent": 10.0,
+        "asked": 50,
+        "interaction_percent": 100.0,
+        "source": "eval_askonce_yn_gpt5.jsonl"
+      },
+      {
+        "condition": "ask-once-freeform",
+        "n": 50,
+        "correct": 18,
+        "accuracy_percent": 36.0,
+        "default_captured": 4,
+        "default_capture_percent": 8.0,
+        "asked": 50,
+        "interaction_percent": 100.0,
+        "source": "eval_askonce_ff_gpt5.jsonl"
+      },
+      {
+        "condition": "generic-structured",
+        "n": 50,
+        "correct": 14,
+        "accuracy_percent": 28.0,
+        "default_captured": 9,
+        "default_capture_percent": 18.0,
+        "asked": 50,
+        "interaction_percent": 100.0,
+        "source": "eval_ablation_gpt5.jsonl",
+        "validation_note": "Recomputed from the complete, uniquely identified 50-record block. The separate saved summary contains incompatible aggregate values and is not used."
+      },
+      {
+        "condition": "axis-aware-nogate",
+        "n": 50,
+        "correct": 25,
+        "accuracy_percent": 50.0,
+        "default_captured": 5,
+        "default_capture_percent": 10.0,
+        "asked": 50,
+        "interaction_percent": 100.0,
+        "source": "eval_ablation_gpt5.jsonl",
+        "validation_note": "Recomputed from the complete, uniquely identified 50-record block. The separate saved summary contains incompatible aggregate values and is not used."
+      }
+    ],
+    "caveats": [
+      "One pilot on one backbone; do not present these as full-scale or multi-seed estimates.",
+      "The no-precheck raw archive has a malformed line and duplicated records; no verified no-precheck result is included.",
+      "The stored aggregate file disagrees with the raw generic-structured and no-gate blocks; only raw complete-block results are included. The discrepant aggregates must not be interpreted as independently verified repeat trials.",
+      "The matched-unambiguous control folds the hidden disambiguating context into the question. Its 24/50 interaction rate is an over-asking diagnostic in this controlled setup.",
+      "The human baseline uses a different 50-item subset, so ask-once model scores are not a directly matched human comparison."
+    ]
+  }
+}

@@ -11,25 +11,22 @@ A bilingual (EN/ZH) benchmark of *ambiguous financial queries* built on the
 
 | Property | Value |
 |----------|-------|
-| Total instances | **173** (all pass 14/14 QC, all R14-discriminating) |
+| Total instances | **173** frozen evaluation records; v1.1 excludes one consensus-rejected record |
 | Language | 53 EN (31%) / 120 ZH (69%) |
-| Unique companies | 61 |
+| Company metadata | 60 distinct nonempty labels; three DocFinQA records lack a company label. A normalized company count has not been established. |
 | Sources | CNINFO/akshare 120, EDGAR 43, EDGAR-recognition 7, DocFinQA 3 |
-| Filing recency | 2022 (40), 2023 (53), 2024 (58), 2025 (19) |
+| Filing dates | 2022 (40), 2023 (53), 2024 (58), 2025 (19); three undated DocFinQA records include older periods |
 | Primary axis | entity_scope 94 (54%), metric_definition 63 (36%), recognition_policy 9 (5%), temporal_scope 7 (4%), filing_vintage 0 |
 | n-axes | single 128 (74%) / two 45 (26%) |
 | Mean H₀ | 2.20 bits |
 | **Blind-solve rate** | **0.3%** (adversarial 10-trial verifier) |
 
-## Quality guarantees
+## Construction checks and their limits
 
-- **100% QC-clean**: every instance passes all 14 pre-verifier rules (R1–R14).
-- **Provably discriminating (R14)**: intended vs default answers differ by more than grader
-  tolerance, so a model resolving to the wrong interpretation necessarily answers wrong.
-- **Genuinely hard (0.3% blind-solve)**: frontier models answering without the disambiguating
-  context almost never recover the intended answer for the intended reason — measured
-  performance is attributable to interaction/retrieval, not parametric recall.
-- **Contamination-favorable**: FY2022–2025 filings, freshly constructed from structured facts.
+- The construction pipeline applies 14 checks. Stored final QC objects record acceptance and verifier counts, not a complete per-rule audit trail. Human adjudication subsequently rejected one record, removed in v1.1.
+- The answer-separation check aims to distinguish intended and default values under the grader tolerance; it does not establish that both readings are equally plausible to users.
+- Stored blind-verifier counts total 6 successful trials out of 1,730 (0.347%, rounded to 0.3%). This is a construction diagnostic, not evidence that all evaluation performance is caused by interaction.
+- Most dated filings are from 2022–2025. Three DocFinQA-derived records have no filing date and include older financial periods. No contamination-free guarantee is made.
 
 ## Known scope limits (report honestly)
 
@@ -62,3 +59,7 @@ shared_attributes, distinctive_attributes, axes, n_axes, h0, qc{...}`
   (5× GPT-5-mini + 5× GPT-5, two-condition rejection). OpenAI API only.
 - IDs are clean and sequential (`fininteract_0001`..`fininteract_0173`); an earlier
   resume-counter collision was deduplicated at freeze time.
+
+## License
+
+Original benchmark records, annotations, and metadata: CC BY 4.0; see `LICENSE.txt`. Source filings and other third-party materials retain their original rights and terms.

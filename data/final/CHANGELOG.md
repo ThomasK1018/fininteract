@@ -15,12 +15,7 @@
 ### Effect on reported results
 All experiments in the paper are computed on the **frozen v1.0 evaluation
 snapshot** (`fininteract_v1.jsonl`, N=173), which retains `fininteract_0172`.
-The instance is unsolved by every model in every interactive mode (answer-only,
-+search, +interact, forced-interact); it is answerable only in the context-oracle
-mode, where the resolving context is supplied outright. Removing it would shift
-the oracle ceiling by <0.05pp (gpt-4o 93.06→93.02; gpt-5/gpt-5-mini 95.38→95.35,
-both still "93–95%") and leave every other reported number unchanged. No finding
-depends on it.
+Removing an item changes the evaluation denominator and may also change the numerator, depending on the run. Results on v1.1 must therefore be recomputed from the matching 172 records; v1.0 percentages must not be relabeled as v1.1 results. The paper retains the frozen v1.0 results for reproducibility.
 
 ## v1.0
 - Initial frozen release: 173 bilingual instances (53 EN / 120 ZH), 5-axis
